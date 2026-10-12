@@ -1,0 +1,2497 @@
+import { useEffect, useRef, useState } from 'react';
+import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { StatusBar } from 'expo-status-bar';
+import { Accelerometer } from 'expo-sensors';
+import { Ionicons } from '@expo/vector-icons';
+import Animated, {
+  Easing,
+  Extrapolation,
+  interpolate,
+  interpolateColor,
+  runOnJS,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { cardEnter } from '../utils/cardEnter';
+import { apiGet } from '../services/api';
+
+const { width: SCREEN_W } = Dimensions.get('window');
+const H_PAD = 16;
+const TAB_PURPLE = '#4A168C';
+const SLIDE_WIDTH = SCREEN_W;
+const SLIDE_HEIGHT = Math.round(SCREEN_W * (380 / 401));
+const GARBA_W = Math.round(SCREEN_W * 0.58);
+const GARBA_H = Math.round(GARBA_W * (960 / 1042));
+const SLIDER2_FRONT_W = Math.round(SCREEN_W * 0.55);
+const SLIDER2_FRONT_H = Math.round(SLIDER2_FRONT_W * (377 / 355));
+const SLIDER3_FRONT_W = Math.round(SCREEN_W * 0.58);
+const SLIDER3_FRONT_H = Math.round(SLIDER3_FRONT_W * 1.12);
+const SOCIAL_CARD_W = Math.round(SCREEN_W * 0.405);
+const SOCIAL_CARD_H = Math.round(SOCIAL_CARD_W * 1.59);
+const SOCIAL_GAP = 14;
+const REVIEW_CARD_W = Math.round(SCREEN_W * 0.64);
+const REVIEW_CARD_H = 318;
+const REVIEW_GAP = 12;
+const REVIEW_SNAP = REVIEW_CARD_W + REVIEW_GAP;
+const REVIEW_PILLS = [
+  'Fastest Growing',
+  'Customer Supportive',
+  'Price Guarantee',
+  'Trust',
+  'Doorstep Evaluation',
+  'Multi-Zone Across India',
+  'Hassle free pay-Zone',
+  'Inspection Quality',
+];
+const CUSTOMER_REVIEWS = [
+  {
+    id: 'murthy',
+    name: 'Murthy Kasturi',
+    city: 'Ahmedabad',
+    quote:
+      'The entire process was seamless and very quick. I checked the quote online and Spinny executive came for evaluation the same day. The entire...',
+    readMore: true,
+    badge: 'Rent Evegah City',
+    image:
+      'https://media.assettype.com/outlookbusiness/2025-07-18/mf49u3l7/ChatGPT-Image-Jul-18-2025-032837-PM.png?w=801&auto=format%2Ccompress&fit=max&format=webp&dpr=1.0',
+  },
+  {
+    id: 'surinder',
+    name: 'Surinder Pal Singh',
+    city: 'Guwahati',
+    quote:
+      'From inspection to paperwork, I completed the entire process from the comfort of home. Spinny team was very professional and friendly.',
+    readMore: false,
+    badge: 'Rent Evegeh Mink',
+    image:
+      'https://www.evegah.com/images/t2.webp',
+  },
+  {
+    id: 'sanjeev',
+    name: 'Sanjeev Gupta',
+    city: 'Daman',
+    quote:
+      "We didn't think selling our car could be so fast and easy. We received the best amount and it was same as the online estimate.",
+    readMore: false,
+    badge: 'Rent Evegah Fly',
+    image:
+      'https://www.evegah.com/images/t1.webp',
+  },
+  {
+    id: 'tejashree',
+    name: 'Tejashree Kale',
+    city: 'Vadodara',
+    quote:
+      'I love my car and with Spinny I got the confidence that the car will be in safe custody till it gets transferred to the new owner.',
+    readMore: false,
+    badge: 'Rent Evegah Pro',
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQErT7Zy_-UNWmvrhjzk_ZKRFlI9IKHSwa5wtgygjRe-JPHbYcipYjdoL0&s=10',
+  },
+  {
+    id: 'vikrant',
+    name: 'Vikrant Jadhav',
+    city: 'Aatapi',
+    quote:
+      "Spinny valued our car with the best price for our car and I don't think anyone can compete with the prices offered",
+    readMore: false,
+    badge: 'Rent Evegah City',
+    image:
+      'https://www.evegah.com/images/partner-blinkit.jpg',
+  },
+];
+const REVIEW_LOOP = [...CUSTOMER_REVIEWS, ...CUSTOMER_REVIEWS, ...CUSTOMER_REVIEWS];
+const SOCIAL_VIDEOS = [
+  require('../assets/home/vid1.mp4'),
+  require('../assets/home/vid2.mp4'),
+  require('../assets/home/vid3.mp4'),
+  require('../assets/home/vid4.mp4'),
+];
+const FOOTER_ART = require('../assets/home/footer-evegah.png');
+const FOOTER_ART_HEIGHT = Math.round(SCREEN_W * (673 / 861));
+
+const SLIDES = [
+  {
+    kind: 'navratri',
+    bg: require('../assets/home/ride-more-slide.png'),
+    front: require('../assets/home/garba.png'),
+    frontWidth: GARBA_W,
+    frontHeight: GARBA_H,
+    frontRight: -10,
+    frontBottom: 22,
+    cta: 'Rent EVs',
+  },
+  {
+    kind: 'headline',
+    bg: require('../assets/home/slider2.png'),
+    front: require('../assets/home/slider2_front.png'),
+    frontWidth: SLIDER2_FRONT_W,
+    frontHeight: SLIDER2_FRONT_H,
+    frontRight: 0,
+    frontBottom: 20,
+    lines: ['Rent your EV', 'for the', 'Right price'],
+    cta: 'Rent EV',
+  },
+  {
+    kind: 'smart',
+    bg: require('../assets/home/slider3.png'),
+    front: require('../assets/home/slider3-top.png'),
+    frontWidth: SLIDER3_FRONT_W,
+    frontHeight: SLIDER3_FRONT_H,
+    frontRight: -8,
+    frontBottom: 18,
+    lines: ['smart way', 'to ride'],
+    subLines: ['zero deposit plan', 'options'],
+    cta: 'Go With EV',
+  },
+];
+const LOOP = [...SLIDES, SLIDES[0]];
+const RIDE_CARD_W = Math.round(SCREEN_W * 0.7);
+const RIDE_SNAP = Math.round(SCREEN_W * 0.54);
+const VEHICLES = [
+  {
+    name: 'Evegah Fly',
+    tag: 'E-Scooter',
+    line: 'Light for every day',
+    range: '40-60 km',
+    speed: '25 km/h',
+    tint: '#EEF3FF',
+    image: require('../assets/home/vehicle-fly.png'),
+  },
+  {
+    name: 'Evegah Mink',
+    tag: 'E-Scooter',
+    line: 'Smooth city miles',
+    range: '70-90 km',
+    speed: '45 km/h',
+    tint: '#F6F1FC',
+    image: require('../assets/home/vehicle-mink.png'),
+  },
+  {
+    name: 'Evegah City',
+    tag: 'E-Scooter',
+    line: 'Quiet across town',
+    range: '80-90 km',
+    speed: '45 km/h',
+    tint: '#F3FBF6',
+    image: require('../assets/home/vehicle-city.png'),
+  },
+  {
+    name: 'Evegah Pro',
+    tag: 'E-Scooter',
+    line: 'Built for longer rides',
+    range: '110-130 km',
+    speed: '75 km/h',
+    tint: '#FFF6F2',
+    image: require('../assets/home/vehicle-pro.png'),
+  },
+];
+
+function GyroFooterArt() {
+  const rotateZ = useSharedValue(0);
+  const shiftX = useSharedValue(0);
+  const shiftY = useSharedValue(0);
+
+  useEffect(() => {
+    const samples = [];
+    const smooth = { x: 0, y: 0 };
+    Accelerometer.setUpdateInterval(32);
+    const subscription = Accelerometer.addListener(({ x, y }) => {
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+
+      smooth.x += (x - smooth.x) * 0.22;
+      smooth.y += (y - smooth.y) * 0.22;
+
+      if (samples.length < 6) {
+        samples.push({ x: smooth.x, y: smooth.y });
+        return;
+      }
+      if (samples.base == null) {
+        const count = samples.length;
+        samples.base = samples.reduce(
+          (acc, sample) => ({
+            x: acc.x + sample.x / count,
+            y: acc.y + sample.y / count,
+          }),
+          { x: 0, y: 0 },
+        );
+      }
+
+      const roll = Math.max(-0.7, Math.min(0.7, smooth.x - samples.base.x));
+      const pitch = Math.max(-0.7, Math.min(0.7, smooth.y - samples.base.y));
+      const blend = 0.12;
+      rotateZ.value += ((roll / 0.7) * -4 - rotateZ.value) * blend;
+      shiftX.value += (roll * -36 - shiftX.value) * blend;
+      shiftY.value += (pitch * 22 - shiftY.value) * blend;
+    });
+
+    return () => subscription.remove();
+  }, [rotateZ, shiftX, shiftY]);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: shiftX.value },
+      { translateY: shiftY.value },
+      { rotateZ: `${rotateZ.value}deg` },
+    ],
+  }));
+
+  return (
+    <View style={styles.footerPerspective} collapsable={false}>
+      <Animated.View collapsable={false} style={[styles.footerStage, style]}>
+        <Image source={FOOTER_ART} style={styles.footerArt} contentFit="contain" />
+      </Animated.View>
+    </View>
+  );
+}
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function RideCard({ vehicle, index, totalCount, scrollX, active, onOpenVehicle }) {
+  const [saved, setSaved] = useState(false);
+  const paint = useSharedValue(active ? 1 : 0);
+  const btnWidth = useSharedValue(RIDE_CARD_W - 32);
+  const style = useAnimatedStyle(() => {
+    const input = [(index - 1) * RIDE_SNAP, index * RIDE_SNAP, (index + 1) * RIDE_SNAP];
+    const raw = interpolate(scrollX.value, input, [-1, 0, 1], Extrapolation.CLAMP);
+    const eased = Math.sign(raw) * Math.pow(Math.abs(raw), 1.35);
+    return {
+      zIndex: Math.abs(raw) < 0.5 ? 8 : 1,
+      transform: [
+        { translateX: eased * 14 },
+        { scale: 1 - Math.abs(eased) * 0.08 },
+      ],
+    };
+  });
+  const paintStyle = useAnimatedStyle(() => ({
+    width: btnWidth.value * paint.value,
+  }));
+  const paintLabelStyle = useAnimatedStyle(() => ({
+    width: btnWidth.value,
+  }));
+  const buttonStyle = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(paint.value, [0, 1], ['#E4D8F4', TAB_PURPLE]),
+  }));
+
+  useEffect(() => {
+    paint.value = withTiming(active ? 1 : 0, {
+      duration: 560,
+      easing: Easing.inOut(Easing.cubic),
+    });
+  }, [active, paint]);
+
+  return (
+    <Animated.View
+      collapsable={false}
+      style={[
+        styles.rideSlot,
+        index < totalCount - 1 && styles.rideSlotOverlap,
+        style,
+      ]}
+    >
+      <View style={[styles.rideCard, { backgroundColor: vehicle.tint }]}>
+        <View style={styles.rideTop}>
+          <View style={styles.ridePill}>
+            <Text style={styles.ridePillText}>{vehicle.tag}</Text>
+          </View>
+          <Pressable hitSlop={8} style={styles.rideHeart} onPress={() => setSaved((value) => !value)}>
+            <Ionicons name={saved ? 'heart' : 'heart-outline'} size={18} color={saved ? '#E2557A' : '#7A7388'} />
+          </Pressable>
+        </View>
+        <Text style={styles.rideName}>{vehicle.name}</Text>
+        <Text style={styles.rideLine}>{vehicle.line}</Text>
+        <Image source={vehicle.image} style={styles.rideImage} contentFit="contain" />
+        <View style={styles.rideSpecs}>
+          <View style={styles.rideSpec}>
+            <Ionicons name="navigate" size={15} color={TAB_PURPLE} />
+            <Text style={styles.rideSpecValue}>{vehicle.range}</Text>
+            <Text style={styles.rideSpecLabel}>Range</Text>
+          </View>
+          <View style={styles.rideSpec}>
+            <Ionicons name="speedometer" size={15} color={TAB_PURPLE} />
+            <Text style={styles.rideSpecValue}>{vehicle.speed}</Text>
+            <Text style={styles.rideSpecLabel}>Top Speed</Text>
+          </View>
+        </View>
+        <AnimatedPressable
+          style={[styles.rideBtn, buttonStyle]}
+          onPress={() => onOpenVehicle?.(vehicle)}
+          onLayout={(event) => {
+            btnWidth.value = event.nativeEvent.layout.width;
+          }}
+        >
+          <View style={styles.rideBtnFace}>
+            <Text style={styles.rideBtnText}>View Details</Text>
+            <Ionicons name="arrow-forward" size={14} color={TAB_PURPLE} />
+          </View>
+          <Animated.View pointerEvents="none" style={[styles.rideBtnPaint, paintStyle]}>
+            <Animated.View style={[styles.rideBtnPaintLabel, paintLabelStyle]}>
+              <Text style={[styles.rideBtnText, styles.rideBtnTextOn]}>Book This Ride</Text>
+              <Ionicons name="arrow-forward" size={14} color="#FFFFFF" />
+            </Animated.View>
+          </Animated.View>
+        </AnimatedPressable>
+      </View>
+    </Animated.View>
+  );
+}
+
+function SocialVideoCard({ source, paused, onPress }) {
+  const player = useVideoPlayer(source, (instance) => {
+    instance.loop = true;
+    instance.muted = true;
+    instance.play();
+  });
+
+  useEffect(() => {
+    player.loop = true;
+    if (paused) {
+      player.pause();
+    } else {
+      player.muted = true;
+      player.play();
+    }
+  }, [paused, player]);
+
+  return (
+    <Pressable onPress={onPress} style={styles.socialCard}>
+      <View pointerEvents="none" style={styles.socialVideo}>
+        <VideoView
+          player={player}
+          style={styles.socialVideo}
+          contentFit="cover"
+          surfaceType="textureView"
+          nativeControls={false}
+          allowsPictureInPicture={false}
+        />
+      </View>
+    </Pressable>
+  );
+}
+
+function StatusVideoSlide({ source, muted, onProgress, onEnded }) {
+  const onProgressRef = useRef(onProgress);
+  const onEndedRef = useRef(onEnded);
+  onProgressRef.current = onProgress;
+  onEndedRef.current = onEnded;
+
+  const player = useVideoPlayer(source, (instance) => {
+    instance.loop = true;
+    instance.muted = muted;
+    instance.volume = 1.0;
+    instance.timeUpdateEventInterval = 0.05;
+    instance.play();
+  });
+
+  useEffect(() => {
+    player.loop = true;
+    player.muted = muted;
+    player.play();
+  }, [muted, player, source]);
+
+  useEffect(() => {
+    const timeSub = player.addListener('timeUpdate', ({ currentTime }) => {
+      const duration = player.duration;
+      if (duration > 0) {
+        onProgressRef.current?.(Math.min(1, Math.max(0, currentTime / duration)));
+      }
+    });
+
+    const endSub = player.addListener('playToEnd', () => {
+      onEndedRef.current?.();
+    });
+
+    return () => {
+      timeSub.remove();
+      endSub.remove();
+    };
+  }, [player]);
+
+  return (
+    <VideoView
+      player={player}
+      style={styles.statusVideo}
+      contentFit="cover"
+      nativeControls={false}
+      allowsPictureInPicture={false}
+    />
+  );
+}
+
+function SocialStatusModal({ initialIndex, onClose }) {
+  const insets = useSafeAreaInsets();
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [muted, setMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [replayTick, setReplayTick] = useState(0);
+  const touchStartXRef = useRef(null);
+
+  const goPrev = () => {
+    setProgress(0);
+    setCurrentIndex((prev) => (prev - 1 + SOCIAL_VIDEOS.length) % SOCIAL_VIDEOS.length);
+    setReplayTick((t) => t + 1);
+  };
+
+  const goNext = () => {
+    setProgress(0);
+    setCurrentIndex((prev) => (prev + 1) % SOCIAL_VIDEOS.length);
+    setReplayTick((t) => t + 1);
+  };
+
+  return (
+    <View style={styles.statusRoot}>
+      <StatusBar style="light" />
+      <View style={[styles.statusBarsRow, { marginTop: insets.top + 8 }]}>
+        {SOCIAL_VIDEOS.map((_, idx) => {
+          const fillPercent =
+            idx < currentIndex ? 100 : idx === currentIndex ? Math.min(100, Math.max(0, progress * 100)) : 0;
+          return (
+            <View key={idx} style={styles.statusBarTrack}>
+              <View style={[styles.statusBarFill, { width: `${fillPercent}%` }]} />
+            </View>
+          );
+        })}
+      </View>
+
+      <View
+        style={[styles.statusStage, { marginBottom: Math.max(insets.bottom, 12) }]}
+        onTouchStart={(e) => {
+          touchStartXRef.current = e.nativeEvent.pageX;
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartXRef.current == null) return;
+          const dx = e.nativeEvent.pageX - touchStartXRef.current;
+          touchStartXRef.current = null;
+          if (Math.abs(dx) > 42) {
+            if (dx < 0) goNext();
+            else goPrev();
+          }
+        }}
+      >
+        <StatusVideoSlide
+          key={`${currentIndex}-${replayTick}`}
+          source={SOCIAL_VIDEOS[currentIndex]}
+          muted={muted}
+          onProgress={setProgress}
+          onEnded={goNext}
+        />
+
+        <View style={styles.statusTapLayer}>
+          <Pressable style={styles.statusTapLeft} onPress={goPrev} />
+          <Pressable style={styles.statusTapRight} onPress={goNext} />
+        </View>
+
+        <Pressable hitSlop={12} style={[styles.statusNavArrow, styles.statusNavArrowLeft]} onPress={goPrev}>
+          <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
+        </Pressable>
+        <Pressable hitSlop={12} style={[styles.statusNavArrow, styles.statusNavArrowRight]} onPress={goNext}>
+          <Ionicons name="chevron-forward" size={22} color="#FFFFFF" />
+        </Pressable>
+
+        <View style={styles.statusControls}>
+          <Pressable
+            hitSlop={10}
+            style={styles.statusCircleBtn}
+            onPress={() => setMuted((prev) => !prev)}
+          >
+            <Ionicons name={muted ? 'volume-mute' : 'volume-high'} size={18} color="#FFFFFF" />
+          </Pressable>
+          <Pressable hitSlop={10} style={styles.statusCircleBtn} onPress={onClose}>
+            <Ionicons name="close" size={20} color="#FFFFFF" />
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function MergeSlide({ index, slide, scrollX }) {
+  const bgStyle = useAnimatedStyle(() => {
+    const input = [(index - 1) * SLIDE_WIDTH, index * SLIDE_WIDTH, (index + 1) * SLIDE_WIDTH];
+    return {
+      opacity: interpolate(scrollX.value, input, [0, 1, 0], Extrapolation.CLAMP),
+      transform: [
+        {
+          translateX: interpolate(
+            scrollX.value,
+            input,
+            [SLIDE_WIDTH * 0.24, 0, -SLIDE_WIDTH * 0.24],
+            Extrapolation.CLAMP,
+          ),
+        },
+        {
+          scale: interpolate(scrollX.value, input, [1.04, 1, 1.04], Extrapolation.CLAMP),
+        },
+      ],
+    };
+  });
+
+  const copyStyle = useAnimatedStyle(() => {
+    const input = [(index - 1) * SLIDE_WIDTH, index * SLIDE_WIDTH, (index + 1) * SLIDE_WIDTH];
+    return {
+      opacity: interpolate(
+        scrollX.value,
+        [input[0] + SLIDE_WIDTH * 0.14, input[1], input[2] - SLIDE_WIDTH * 0.14],
+        [0, 1, 0],
+        Extrapolation.CLAMP,
+      ),
+      transform: [
+        {
+          translateX: interpolate(
+            scrollX.value,
+            input,
+            [SLIDE_WIDTH * 0.56, 0, -SLIDE_WIDTH * 0.56],
+            Extrapolation.CLAMP,
+          ),
+        },
+      ],
+    };
+  });
+
+  const frontStyle = useAnimatedStyle(() => {
+    const input = [(index - 1) * SLIDE_WIDTH, index * SLIDE_WIDTH, (index + 1) * SLIDE_WIDTH];
+    return {
+      opacity: interpolate(
+        scrollX.value,
+        [input[0] + SLIDE_WIDTH * 0.08, input[1], input[2] - SLIDE_WIDTH * 0.08],
+        [0, 1, 0],
+        Extrapolation.CLAMP,
+      ),
+      transform: [
+        {
+          translateX: interpolate(
+            scrollX.value,
+            input,
+            [SLIDE_WIDTH * 0.82, 0, -SLIDE_WIDTH * 0.82],
+            Extrapolation.CLAMP,
+          ),
+        },
+        {
+          scale: interpolate(scrollX.value, input, [0.93, 1, 0.93], Extrapolation.CLAMP),
+        },
+      ],
+    };
+  });
+
+  return (
+    <View pointerEvents="none" style={styles.slide}>
+      <Animated.View style={[styles.slideBgWrap, bgStyle]}>
+        <Image source={slide.bg} style={styles.slideImage} contentFit="cover" />
+        {slide.kind !== 'navratri' ? (
+          <LinearGradient
+            colors={['rgba(10, 12, 18, 0.62)', 'rgba(10, 12, 18, 0.24)', 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 0.78, y: 0.5 }}
+            style={StyleSheet.absoluteFillObject}
+          />
+        ) : null}
+      </Animated.View>
+
+      <Animated.View style={[styles.slideCopyWrap, copyStyle]}>
+        {slide.kind === 'navratri' ? (
+          <View style={styles.navratriEmblem}>
+            <View style={styles.navratriArchRow}>
+              <View style={styles.navratriArchWing} />
+              <View style={styles.navratriArchDome}>
+                <Ionicons name="sparkles" size={12} color="#B51F38" />
+              </View>
+              <View style={styles.navratriArchWing} />
+            </View>
+            <Text style={styles.navratriHelloText}>HELLO,</Text>
+            <Text style={styles.navratriMainText}>NAVRATRI</Text>
+            <View style={styles.navratriSwirlBar} />
+          </View>
+        ) : (
+          <View style={styles.slideHeadlineBlock}>
+            <View style={styles.slideAccentVector}>
+              <View style={styles.slideAccentDot} />
+              <View style={styles.slideAccentLine} />
+            </View>
+            {slide.lines?.map((line) => (
+              <Text key={line} style={styles.slideHeadlineText}>
+                {line}
+              </Text>
+            ))}
+            {slide.subLines ? (
+              <View style={styles.slideSubBlock}>
+                {slide.subLines.map((sub) => (
+                  <Text key={sub} style={styles.slideSubText}>
+                    {sub}
+                  </Text>
+                ))}
+              </View>
+            ) : null}
+          </View>
+        )}
+
+        <View
+          style={[
+            styles.slideCtaBtn,
+            slide.kind === 'navratri' && styles.slideCtaBtnGold,
+          ]}
+        >
+          <Text style={styles.slideCtaText}>{slide.cta}</Text>
+        </View>
+      </Animated.View>
+
+      {slide.front ? (
+        <Animated.View
+          style={[
+            styles.slideFrontWrap,
+            {
+              width: slide.frontWidth,
+              height: slide.frontHeight,
+              right: slide.frontRight ?? 0,
+              bottom: slide.frontBottom,
+            },
+            frontStyle,
+          ]}
+        >
+          <Image source={slide.front} style={styles.slideFrontImage} contentFit="contain" />
+        </Animated.View>
+      ) : null}
+    </View>
+  );
+}
+
+const TICKER_LOOP = [...REVIEW_PILLS, ...REVIEW_PILLS];
+const TICKER_SET_W = 1220;
+
+function ReviewPillTicker() {
+  const offsetX = useSharedValue(0);
+
+  useEffect(() => {
+    offsetX.value = 0;
+    offsetX.value = withRepeat(
+      withTiming(-TICKER_SET_W, {
+        duration: 22000,
+        easing: Easing.linear,
+      }),
+      -1,
+      false
+    );
+  }, [offsetX]);
+
+  const trackStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: offsetX.value }],
+  }));
+
+  return (
+    <View style={styles.reviewTickerClip}>
+      <Animated.View style={[styles.reviewTickerTrack, trackStyle]}>
+        {TICKER_LOOP.map((label, idx) => (
+          <View key={`${label}-${idx}`} style={styles.reviewTickerPill}>
+            <Text style={styles.reviewTickerPillText}>{label}</Text>
+          </View>
+        ))}
+      </Animated.View>
+    </View>
+  );
+}
+
+export default function HomeScreen({
+  onOpenLocation,
+  onOpenMyRide,
+  onOpenScan,
+  onOpenProfile,
+  onOpenWallet,
+  onOpenVehicle,
+  onOpenVehicleList,
+  onOpenNotifications,
+  onOpenInsights,
+  onOpenBms,
+  hasUnread,
+}) {
+  const insets = useSafeAreaInsets();
+  const [vehicles, setVehicles] = useState(VEHICLES);
+
+  useEffect(() => {
+    apiGet('/vehicles/models')
+      .then((body) => {
+        const rows = body?.data || [];
+        if (!rows.length) return;
+        setVehicles(VEHICLES.map((item) => {
+          const live = rows.find((row) => String(row.name || '').toLowerCase() === item.name.toLowerCase());
+          if (!live) return item;
+          return {
+            ...item,
+            tag: live.category || item.tag,
+            line: live.tagline || item.line,
+            range: live.range || item.range,
+            speed: live.top_speed || item.speed,
+            battery: live.battery_capacity,
+            motor: live.motor_power,
+            about: live.description,
+            charge: live.charging_time,
+            load: live.load_capacity,
+            wheels: live.wheel_size,
+            batteryType: live.battery_type,
+            brakes: live.brakes,
+            water: live.water_resistance,
+            warranty: live.warranty,
+          };
+        }));
+      })
+      .catch(() => {});
+  }, []);
+
+  const rideLoop = [...vehicles, ...vehicles, ...vehicles];
+  const initialRideIdx = vehicles.length + 1;
+
+  const scrollRef = useRef(null);
+  const scrollX = useSharedValue(0);
+  const isUserDragging = useSharedValue(false);
+  const rideX = useSharedValue(initialRideIdx * RIDE_SNAP);
+  const rideRef = useRef(null);
+  const [rideIndex, setRideIndex] = useState(initialRideIdx);
+  const [activeSocialIndex, setActiveSocialIndex] = useState(null);
+  const pageRef = useRef(0);
+  const timerRef = useRef(null);
+
+  const reviewRef = useRef(null);
+  const reviewIdxRef = useRef(CUSTOMER_REVIEWS.length);
+  const reviewDraggingRef = useRef(false);
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      if (isUserDragging.value) {
+        scrollX.value = event.contentOffset.x;
+      }
+    },
+  });
+  const onRideScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      rideX.value = event.contentOffset.x;
+    },
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      rideX.value = initialRideIdx * RIDE_SNAP;
+      rideRef.current?.scrollTo({ x: initialRideIdx * RIDE_SNAP, animated: false });
+      reviewRef.current?.scrollTo({
+        x: CUSTOMER_REVIEWS.length * REVIEW_SNAP,
+        animated: false,
+      });
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [initialRideIdx, rideX]);
+
+  useEffect(() => {
+    const reviewTimer = setInterval(() => {
+      if (reviewDraggingRef.current) return;
+      const count = CUSTOMER_REVIEWS.length;
+      let nextIdx = reviewIdxRef.current + 1;
+      reviewIdxRef.current = nextIdx;
+      reviewRef.current?.scrollTo({
+        x: nextIdx * REVIEW_SNAP,
+        animated: true,
+      });
+      if (nextIdx >= count * 2) {
+        setTimeout(() => {
+          if (reviewDraggingRef.current) return;
+          const resetIdx = count + (nextIdx % count);
+          reviewIdxRef.current = resetIdx;
+          reviewRef.current?.scrollTo({
+            x: resetIdx * REVIEW_SNAP,
+            animated: false,
+          });
+        }, 420);
+      }
+    }, 3600);
+    return () => clearInterval(reviewTimer);
+  }, []);
+
+  const syncNativeSlideScroll = (targetPage) => {
+    if (targetPage >= SLIDES.length) {
+      pageRef.current = 0;
+      scrollX.value = 0;
+      scrollRef.current?.scrollTo({ x: 0, animated: false });
+    } else {
+      pageRef.current = targetPage;
+      scrollRef.current?.scrollTo({ x: targetPage * SLIDE_WIDTH, animated: false });
+    }
+  };
+
+  const stopAuto = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+  };
+
+  const startAuto = () => {
+    stopAuto();
+    timerRef.current = setInterval(() => {
+      isUserDragging.value = false;
+      const next = pageRef.current + 1;
+      scrollX.value = withTiming(
+        next * SLIDE_WIDTH,
+        {
+          duration: 1550,
+          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        },
+        (finished) => {
+          if (finished) {
+            runOnJS(syncNativeSlideScroll)(next);
+          }
+        }
+      );
+    }, 4500);
+  };
+
+  useEffect(() => {
+    startAuto();
+    return stopAuto;
+  }, []);
+
+  return (
+    <View style={styles.root}>
+      <StatusBar style="light" />
+
+      <ScrollView
+        style={styles.mainScroll}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={styles.slider}>
+          {LOOP.map((slide, index) => (
+            <MergeSlide key={index} index={index} slide={slide} scrollX={scrollX} />
+          ))}
+          <Animated.ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            nestedScrollEnabled
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={onScroll}
+            onScrollBeginDrag={() => {
+              isUserDragging.value = true;
+              stopAuto();
+            }}
+            onMomentumScrollEnd={(event) => {
+              const page = Math.round(event.nativeEvent.contentOffset.x / SLIDE_WIDTH);
+              if (page >= SLIDES.length) {
+                pageRef.current = 0;
+                scrollX.value = 0;
+                scrollRef.current?.scrollTo({ x: 0, animated: false });
+              } else {
+                pageRef.current = page;
+                scrollX.value = page * SLIDE_WIDTH;
+              }
+              isUserDragging.value = false;
+              startAuto();
+            }}
+            style={styles.sliderTouch}
+          >
+            {LOOP.map((_, index) => (
+              <Pressable
+                key={index}
+                style={styles.slideSpacer}
+                onPress={onOpenVehicleList}
+              />
+            ))}
+          </Animated.ScrollView>
+
+          <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+            <View style={styles.headerTopRow}>
+              <View style={styles.headerLeft}>
+                <Pressable hitSlop={8} onPress={onOpenBms} style={styles.hamburger}>
+                  <View style={styles.hamShort} />
+                  <View style={styles.hamLong} />
+                  <View style={styles.hamShort} />
+                </Pressable>
+                <Pressable hitSlop={12} onPress={() => onOpenLocation?.()} style={styles.location}>
+                  <Text style={styles.locationText}>Gotri, Vadodara</Text>
+                  <Ionicons name="chevron-down" size={16} color="#FFFFFF" />
+                </Pressable>
+              </View>
+              <Pressable hitSlop={8} onPress={onOpenNotifications} style={styles.bell}>
+                <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
+                {hasUnread ? <View style={styles.bellDot} /> : null}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.sheet}>
+          <View style={styles.planHead}>
+          <Text style={styles.rentalTitle}>Choose Your Plan</Text>
+          <Pressable style={styles.planCustom} onPress={onOpenVehicleList}>
+            <Text style={styles.planCustomText}>Custom</Text>
+          </Pressable>
+        </View>
+        <View style={styles.planRow}>
+          <Animated.View entering={cardEnter(0)} style={[styles.planCard, styles.planDaily]}>
+            <View style={styles.popular}>
+              <Text style={styles.popularText}>Most Popular</Text>
+            </View>
+            <Text style={styles.planName}>Daily Plan</Text>
+            <View style={styles.planBody}>
+              <View style={styles.planCopy}>
+                <Text style={styles.planDrive} numberOfLines={1}>
+                  Daily drive
+                </Text>
+                <Text style={styles.planLength} numberOfLines={1}>
+                  24 hours
+                </Text>
+              </View>
+              <Image
+                source={require('../assets/home/vehicle-mink.png')}
+                style={styles.planVehicle}
+                contentFit="contain"
+                contentPosition="left"
+              />
+            </View>
+            {['Unlimited km', 'Swap anytime', 'Doorstep delivery'].map((item) => (
+              <View key={item} style={styles.planPoint}>
+                <Ionicons name="checkmark" size={12} color="#1F8A4C" />
+                <Text style={styles.planPointText}>{item}</Text>
+              </View>
+            ))}
+            <View style={styles.planSpacer} />
+            <Pressable style={styles.planBtn} onPress={onOpenVehicleList}>
+              <Text style={styles.planBtnText}>Book Daily</Text>
+            </Pressable>
+          </Animated.View>
+
+          <Animated.View entering={cardEnter(1)} style={[styles.planCard, styles.planMonthly]}>
+            <Text style={styles.planName}>Monthly Plan</Text>
+            <View style={styles.planBody}>
+              <View style={styles.planCopy}>
+                <Text style={styles.planDrive} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+                  Monthly drive
+                </Text>
+                <Text style={styles.planLength} numberOfLines={1}>
+                  30 days
+                </Text>
+              </View>
+              <Image
+                source={require('../assets/home/vehicle-city.png')}
+                style={styles.planVehicle}
+                contentFit="contain"
+                contentPosition="left"
+              />
+            </View>
+            {['Unlimited km', 'Priority support', 'Best value'].map((item) => (
+              <View key={item} style={styles.planPoint}>
+                <Ionicons name="checkmark" size={12} color="#1F8A4C" />
+                <Text style={styles.planPointText}>{item}</Text>
+              </View>
+            ))}
+            <View style={styles.planSpacer} />
+            <Pressable style={[styles.planBtn, styles.planBtnSoft]} onPress={onOpenVehicleList}>
+              <Text style={[styles.planBtnText, styles.planBtnTextSoft]}>Book Monthly</Text>
+            </Pressable>
+          </Animated.View>
+        </View>
+
+        <View style={styles.sectionHead}>
+          <View style={styles.sectionText}>
+            <Text style={styles.sectionTitle}>Choose Your EV Ride</Text>
+            <Text style={styles.sectionSubtitle}>Clean Rides. Greener Tomorrows.</Text>
+          </View>
+          <Pressable style={styles.viewAll} onPress={onOpenVehicleList}>
+            <Text style={styles.viewAllText}>View All</Text>
+            <Ionicons name="chevron-forward" size={14} color={TAB_PURPLE} />
+          </Pressable>
+        </View>
+
+        <Animated.View entering={cardEnter(2)} style={styles.rideDeck}>
+          <Animated.ScrollView
+            ref={rideRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            decelerationRate="fast"
+            snapToInterval={RIDE_SNAP}
+            snapToAlignment="start"
+            nestedScrollEnabled
+            scrollEventThrottle={16}
+            contentOffset={{ x: initialRideIdx * RIDE_SNAP, y: 0 }}
+            contentContainerStyle={styles.rideTrack}
+            onScroll={onRideScroll}
+            onMomentumScrollEnd={(event) => {
+              const count = vehicles.length;
+              const rawIdx = Math.round(event.nativeEvent.contentOffset.x / RIDE_SNAP);
+              const mod = ((rawIdx % count) + count) % count;
+              const centeredIdx = count + mod;
+              if (rawIdx < count || rawIdx >= count * 2) {
+                rideX.value = centeredIdx * RIDE_SNAP;
+                rideRef.current?.scrollTo({ x: centeredIdx * RIDE_SNAP, animated: false });
+              }
+              setRideIndex(centeredIdx);
+            }}
+          >
+            {rideLoop.map((vehicle, index) => (
+              <RideCard
+                key={`${vehicle.name}-${index}`}
+                vehicle={vehicle}
+                index={index}
+                totalCount={rideLoop.length}
+                scrollX={rideX}
+                active={index % vehicles.length === rideIndex % vehicles.length}
+                onOpenVehicle={onOpenVehicle}
+              />
+            ))}
+          </Animated.ScrollView>
+        </Animated.View>
+
+        <Animated.View entering={cardEnter(9)} style={styles.customerReviewSection}>
+          <Text style={styles.customerReviewHeading}>
+            Bringing smiles to over{' '}
+            <Text style={styles.customerReviewAccent}>2 Lakh people</Text>
+          </Text>
+
+          <ReviewPillTicker />
+
+          <ScrollView
+            ref={reviewRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            decelerationRate="fast"
+            snapToInterval={REVIEW_SNAP}
+            snapToAlignment="start"
+            nestedScrollEnabled
+            contentOffset={{ x: CUSTOMER_REVIEWS.length * REVIEW_SNAP, y: 0 }}
+            contentContainerStyle={styles.customerReviewTrack}
+            onScrollBeginDrag={() => {
+              reviewDraggingRef.current = true;
+            }}
+            onMomentumScrollEnd={(event) => {
+              const count = CUSTOMER_REVIEWS.length;
+              const rawIdx = Math.round(event.nativeEvent.contentOffset.x / REVIEW_SNAP);
+              const mod = ((rawIdx % count) + count) % count;
+              const centeredIdx = count + mod;
+              reviewIdxRef.current = centeredIdx;
+              if (rawIdx < count || rawIdx >= count * 2) {
+                reviewRef.current?.scrollTo({
+                  x: centeredIdx * REVIEW_SNAP,
+                  animated: false,
+                });
+              }
+              reviewDraggingRef.current = false;
+            }}
+          >
+            {REVIEW_LOOP.map((item, idx) => (
+              <View key={`${item.id}-${idx}`} style={styles.customerReviewCard}>
+                <View style={styles.customerReviewImageWrap}>
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.customerReviewImage}
+                    contentFit="cover"
+                  />
+                  <LinearGradient
+                    colors={['transparent', 'rgba(20, 19, 26, 0.55)', '#14131A']}
+                    locations={[0.45, 0.78, 1]}
+                    style={styles.customerReviewImageFade}
+                  />
+
+                  <View style={styles.soldStampOuter}>
+                    <View style={styles.soldStampInner}>
+                      <Text style={styles.soldStampStars}>★ ★ ★</Text>
+                      <View style={styles.soldStampBand}>
+                        <Text style={styles.soldStampText}>RENT</Text>
+                      </View>
+                      <Text style={styles.soldStampStars}>★ ★ ★</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.customerReviewBody}>
+                  <Text style={styles.customerReviewName} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.customerReviewCity} numberOfLines={1}>
+                    {item.city}
+                  </Text>
+
+                  <Text style={styles.customerReviewQuote} numberOfLines={3}>
+                    {item.quote}
+                  </Text>
+                  <Text style={styles.customerReviewReadMore}>read more.</Text>
+
+                  <View style={styles.customerSoldBadge}>
+                    <Text style={styles.customerSoldBadgeText} numberOfLines={1}>
+                      {item.badge}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </Animated.View>
+
+        <Animated.View entering={cardEnter(10)} style={styles.socialSection}>
+          <Text style={styles.socialTitle}>Social</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            decelerationRate="fast"
+            snapToInterval={SOCIAL_CARD_W + SOCIAL_GAP}
+            snapToAlignment="start"
+            nestedScrollEnabled
+            contentContainerStyle={styles.socialTrack}
+          >
+            {SOCIAL_VIDEOS.map((videoSource, index) => (
+              <SocialVideoCard
+                key={index}
+                source={videoSource}
+                paused={activeSocialIndex !== null}
+                onPress={() => setActiveSocialIndex(index)}
+              />
+            ))}
+          </ScrollView>
+        </Animated.View>
+
+        <Animated.View entering={cardEnter(8)} style={styles.trustedSection}>
+          <Text style={styles.trustedHeading}>
+            <Text style={styles.trustedAccent}>Trusted</Text> by people across India
+          </Text>
+
+          <LinearGradient
+            colors={['#2E0E56', '#210840']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.trustedHeroCard}
+          >
+            <View style={styles.trustedWave1} />
+            <View style={styles.trustedWave2} />
+            <View style={styles.trustedWave3} />
+
+            <View style={styles.trustedHeroCopy}>
+              <Text style={styles.trustedHeroNumber}>2,63,923+</Text>
+              <Text style={styles.trustedHeroSub}>
+                riders trusted Evegah in EV 
+              </Text>
+            </View>
+
+            <View style={styles.trustedKeyWrap}>
+              <View style={styles.trustedCuff} />
+              <View style={styles.trustedKeyRing}>
+                <Ionicons name="key" size={18} color="#9E7BFF" />
+              </View>
+            </View>
+
+            <Image
+              source={require('../assets/home/vehicle-mink.png')}
+              style={styles.trustedHeroVehicle}
+              contentFit="contain"
+            />
+          </LinearGradient>
+
+          <View style={styles.trustedGridRow}>
+            <LinearGradient
+              colors={['#6C79F7', '#5866F2']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.trustedCitiesCard}
+            >
+              <View style={styles.trustedCitiesGrid} />
+              <View style={styles.trustedCitiesCopy}>
+                <Text style={styles.trustedSmallLabel}>Spread across</Text>
+                <Text style={styles.trustedCitiesNum}>25+</Text>
+                <Text style={styles.trustedCitiesSub}>Zones in India</Text>
+              </View>
+              <View style={styles.trustedMapGraphic}>
+                <Ionicons name="earth" size={78} color="rgba(255,255,255,0.24)" />
+                <View style={[styles.mapDot, { top: 18, left: 32 }]} />
+                <View style={[styles.mapDot, { top: 30, left: 22 }]} />
+                <View style={[styles.mapDot, { top: 34, left: 44 }]} />
+                <View style={[styles.mapDot, { top: 48, left: 30 }]} />
+                <View style={[styles.mapDot, { top: 60, left: 36 }]} />
+              </View>
+            </LinearGradient>
+
+            <LinearGradient
+              colors={['#7400BD', '#52008A']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.trustedRatingCard}
+            >
+              <View style={styles.trustedRatingChevron} />
+              <Text style={styles.trustedSmallLabel}>Ratings</Text>
+              <Text style={styles.trustedRatingNum}>4.9</Text>
+              <View style={styles.trustedStarsRow}>
+                <Ionicons name="star" size={18} color="#FFD21E" />
+                <Ionicons name="star" size={18} color="#FFD21E" />
+                <Ionicons name="star" size={18} color="#FFD21E" />
+                <Ionicons name="star" size={18} color="#FFD21E" />
+                <Ionicons name="star-half" size={18} color="#FFD21E" />
+              </View>
+            </LinearGradient>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={cardEnter(10)}>
+          <LinearGradient
+            colors={['#F7F7F8', '#F6F1FC', '#E6D4FA']}
+            locations={[0, 0.42, 1]}
+            style={styles.footer}
+          >
+            <GyroFooterArt />
+            <View style={styles.footerCreditWrap}>
+              <Text style={styles.footerCreditText}>
+                App Designed by <Text style={styles.footerCreditHandle}>@netsecinfotech</Text>
+              </Text>
+            </View>
+          </LinearGradient>
+        </Animated.View>
+        </View>
+      </ScrollView>
+
+      <Modal
+        visible={activeSocialIndex !== null}
+        animationType="fade"
+        presentationStyle="fullScreen"
+        statusBarTranslucent
+        onRequestClose={() => setActiveSocialIndex(null)}
+      >
+        {activeSocialIndex !== null ? (
+          <SocialStatusModal
+            initialIndex={activeSocialIndex}
+            onClose={() => setActiveSocialIndex(null)}
+          />
+        ) : null}
+      </Modal>
+
+      <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+        <Pressable style={styles.tab}>
+          <Ionicons name="home" size={22} color={TAB_PURPLE} />
+          <Text style={[styles.tabLabel, styles.tabLabelActive]}>Home</Text>
+        </Pressable>
+        <Pressable style={styles.tab} onPress={onOpenMyRide}>
+          <Ionicons name="bicycle-outline" size={22} color="#8A8A8A" />
+          <Text style={styles.tabLabel}>My Rides</Text>
+        </Pressable>
+        <Pressable style={styles.tab} onPress={onOpenScan}>
+          <View style={styles.scanButton}>
+            <Ionicons name="scan-outline" size={26} color="#FFFFFF" />
+            <Ionicons name="qr-code" size={12} color="#FFFFFF" style={styles.scanQr} />
+          </View>
+          <Text style={styles.tabLabel}>Scan</Text>
+        </Pressable>
+        <Pressable style={styles.tab} onPress={onOpenWallet}>
+          <Ionicons name="wallet-outline" size={22} color="#8A8A8A" />
+          <Text style={styles.tabLabel}>Wallet</Text>
+        </Pressable>
+        <Pressable style={styles.tab} onPress={onOpenProfile}>
+          <Ionicons name="person-outline" size={22} color="#8A8A8A" />
+          <Text style={styles.tabLabel}>Profile</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#F7F7F8',
+  },
+  mainScroll: {
+    flex: 1,
+  },
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 5,
+    elevation: 8,
+    paddingHorizontal: H_PAD,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 40,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  heroSearchPill: {
+    marginTop: 10,
+    height: 44,
+    borderRadius: 999,
+    backgroundColor: 'rgba(18, 12, 16, 0.72)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroSearchPrefix: {
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.72)',
+  },
+  heroSearchKeyword: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  hamburger: {
+    width: 22,
+    height: 16,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bell: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bellDot: {
+    position: 'absolute',
+    top: 2,
+    right: 1,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: TAB_PURPLE,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+  },
+  hamShort: {
+    width: 14,
+    height: 2.5,
+    borderRadius: 2,
+    backgroundColor: '#FFFFFF',
+  },
+  hamLong: {
+    width: 22,
+    height: 2.5,
+    borderRadius: 2,
+    backgroundColor: '#FFFFFF',
+  },
+  location: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  locationText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  slider: {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+    backgroundColor: '#111111',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  sliderTouch: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+  },
+  slideSpacer: {
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+  },
+  slide: {
+    position: 'absolute',
+    width: SLIDE_WIDTH,
+    height: SLIDE_HEIGHT,
+    overflow: 'hidden',
+  },
+  slideBgWrap: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  slideImage: {
+    width: '100%',
+    height: '100%',
+  },
+  slideCopyWrap: {
+    position: 'absolute',
+    left: 16,
+    bottom: 48,
+    maxWidth: SCREEN_W * 0.5,
+    zIndex: 2,
+  },
+  navratriEmblem: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+  },
+  navratriArchRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 2,
+    gap: 3,
+  },
+  navratriArchWing: {
+    width: 22,
+    height: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderWidth: 1.5,
+    borderBottomWidth: 0,
+    borderColor: '#C5283D',
+  },
+  navratriArchDome: {
+    width: 28,
+    height: 18,
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    borderWidth: 1.5,
+    borderBottomWidth: 0,
+    borderColor: '#A91B30',
+    backgroundColor: 'rgba(255, 232, 189, 0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navratriHelloText: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#9B162C',
+    letterSpacing: 0.6,
+  },
+  navratriMainText: {
+    marginTop: -3,
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#881024',
+    letterSpacing: 0.4,
+  },
+  navratriSwirlBar: {
+    marginTop: 3,
+    width: 84,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: '#C5283D',
+  },
+  slideHeadlineBlock: {
+    alignItems: 'flex-start',
+  },
+  slideAccentVector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+    gap: 5,
+  },
+  slideAccentDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#FFD166',
+  },
+  slideAccentLine: {
+    width: 34,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+  },
+  slideHeadlineText: {
+    fontSize: 23,
+    lineHeight: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.3,
+    textShadowColor: 'rgba(0, 0, 0, 0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  slideSubBlock: {
+    marginTop: 5,
+  },
+  slideSubText: {
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.92)',
+  },
+  slideCtaBtn: {
+    marginTop: 14,
+    alignSelf: 'flex-start',
+    backgroundColor: '#141414',
+    borderRadius: 999,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.76)',
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+  },
+  slideCtaBtnGold: {
+    borderColor: '#D6A354',
+  },
+  slideCtaText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  slideFrontWrap: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  slideFrontImage: {
+    width: '100%',
+    height: '100%',
+  },
+  sheet: {
+    marginTop: -28,
+    backgroundColor: '#F7F7F8',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    zIndex: 2,
+  },
+  rentalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1C1C1C',
+  },
+  planHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  planCustom: {
+    backgroundColor: TAB_PURPLE,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  planCustomText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  planRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  planCard: {
+    flex: 1,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingTop: 36,
+    paddingBottom: 12,
+    overflow: 'hidden',
+  },
+  planDaily: {
+    backgroundColor: '#F4EEFB',
+  },
+  planMonthly: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6DDF3',
+  },
+  popular: {
+    position: 'absolute',
+    top: 10,
+    left: 12,
+    backgroundColor: TAB_PURPLE,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  popularText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  planName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1C1C1C',
+  },
+  planBody: {
+    marginTop: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  planCopy: {
+    flexShrink: 0,
+  },
+  planDrive: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#6E6E6E',
+  },
+  planLength: {
+    marginTop: 1,
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '700',
+    color: TAB_PURPLE,
+  },
+  planPoint: {
+    marginTop: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  planPointText: {
+    flex: 1,
+    fontSize: 11,
+    color: '#3A3A3A',
+  },
+  planVehicle: {
+    flex: 1,
+    height: 74,
+    marginLeft: -2,
+    marginRight: -8,
+  },
+  planSpacer: {
+    flex: 1,
+    minHeight: 14,
+  },
+  planBtn: {
+    backgroundColor: TAB_PURPLE,
+    borderRadius: 12,
+    paddingVertical: 9,
+    alignItems: 'center',
+  },
+  planBtnSoft: {
+    backgroundColor: '#F3EEF8',
+  },
+  planBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  planBtnTextSoft: {
+    color: TAB_PURPLE,
+  },
+  sectionHead: {
+    marginTop: 18,
+    marginBottom: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  sectionText: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2A2140',
+  },
+  sectionSubtitle: {
+    marginTop: 2,
+    fontSize: 13,
+    color: '#8E8E93',
+  },
+  viewAll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: '#F3EEF8',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  viewAllText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: TAB_PURPLE,
+  },
+  rideDeck: {
+    marginHorizontal: -16,
+    marginBottom: 4,
+  },
+  rideTrack: {
+    paddingHorizontal: (SCREEN_W - RIDE_CARD_W) / 2,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  rideSlot: {
+    width: RIDE_CARD_W,
+  },
+  rideSlotOverlap: {
+    marginRight: RIDE_SNAP - RIDE_CARD_W,
+  },
+  rideCard: {
+    borderRadius: 28,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+    shadowColor: '#1A1030',
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.16,
+    shadowRadius: 22,
+    elevation: 8,
+  },
+  rideTop: {
+    minHeight: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ridePill: {
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  ridePillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#6E6880',
+  },
+  rideHeart: {
+    position: 'absolute',
+    right: 0,
+    top: 2,
+  },
+  rideName: {
+    marginTop: 12,
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#1C1430',
+    textAlign: 'center',
+  },
+  rideLine: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#8A8496',
+    textAlign: 'center',
+  },
+  rideImage: {
+    width: '100%',
+    height: 132,
+    marginTop: 6,
+  },
+  rideSpecs: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  rideSpec: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    borderRadius: 16,
+    paddingVertical: 10,
+    gap: 2,
+  },
+  rideSpecValue: {
+    marginTop: 2,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1C1430',
+  },
+  rideSpecLabel: {
+    fontSize: 10,
+    color: '#8A8496',
+  },
+  rideBtn: {
+    marginTop: 14,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1.5,
+    borderColor: '#E4D8F4',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  rideBtnFace: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  rideBtnPaint: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    overflow: 'hidden',
+    backgroundColor: TAB_PURPLE,
+  },
+  rideBtnPaintLabel: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  rideBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: TAB_PURPLE,
+  },
+  rideBtnTextOn: {
+    color: '#FFFFFF',
+  },
+  impactCard: {
+    marginTop: 18,
+    backgroundColor: '#F3FBF6',
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#D9F0E2',
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 16,
+  },
+  impactHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  impactTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  impactLeaf: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#E3F6EA',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  impactTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1B6B3A',
+  },
+  monthPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#D9F0E2',
+  },
+  monthText: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    color: '#1F8A4C',
+  },
+  impactStats: {
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  impactStat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  impactValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1B6B3A',
+  },
+  impactLabel: {
+    fontSize: 11,
+    color: '#6A9A7C',
+    textAlign: 'center',
+  },
+  impactDivider: {
+    width: 1,
+    height: 42,
+    backgroundColor: '#D3EBD9',
+  },
+  benefitCard: {
+    marginTop: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#F0F0F2',
+  },
+  benefitItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 2,
+  },
+  benefitIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  benefitTitle: {
+    marginTop: 8,
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1C1C1C',
+    textAlign: 'center',
+  },
+  benefitSub: {
+    marginTop: 2,
+    fontSize: 9,
+    lineHeight: 12,
+    color: '#8A8A8A',
+    textAlign: 'center',
+  },
+  trustedSection: {
+    marginTop: 20,
+    marginHorizontal: -16,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingTop: 22,
+    paddingBottom: 18,
+  },
+  trustedHeading: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#2A0F44',
+    letterSpacing: -0.3,
+    marginBottom: 14,
+  },
+  trustedAccent: {
+    color: '#6371F8',
+  },
+  trustedHeroCard: {
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 22,
+    minHeight: 146,
+    position: 'relative',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  trustedWave1: {
+    position: 'absolute',
+    right: -30,
+    top: -40,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  trustedWave2: {
+    position: 'absolute',
+    right: -60,
+    top: -70,
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  trustedWave3: {
+    position: 'absolute',
+    right: -95,
+    top: -105,
+    width: 350,
+    height: 350,
+    borderRadius: 175,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  trustedHeroCopy: {
+    zIndex: 2,
+    maxWidth: '72%',
+  },
+  trustedHeroNumber: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.4,
+  },
+  trustedHeroSub: {
+    marginTop: 8,
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.88)',
+  },
+  trustedKeyWrap: {
+    position: 'absolute',
+    top: 10,
+    right: 16,
+    alignItems: 'center',
+  },
+  trustedCuff: {
+    width: 26,
+    height: 16,
+    borderRadius: 4,
+    backgroundColor: '#FFD21E',
+    transform: [{ rotate: '-24deg' }],
+  },
+  trustedKeyRing: {
+    marginTop: -2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 1.5,
+    borderColor: '#C5B3FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trustedHeroVehicle: {
+    position: 'absolute',
+    right: 6,
+    bottom: -6,
+    width: 112,
+    height: 82,
+    opacity: 0.94,
+  },
+  trustedGridRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    gap: 12,
+  },
+  trustedCitiesCard: {
+    flex: 1.28,
+    borderRadius: 20,
+    padding: 16,
+    minHeight: 136,
+    position: 'relative',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  trustedCitiesGrid: {
+    position: 'absolute',
+    right: -12,
+    top: -12,
+    bottom: -12,
+    width: 110,
+    borderLeftWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  trustedCitiesCopy: {
+    zIndex: 2,
+  },
+  trustedSmallLabel: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.92)',
+  },
+  trustedCitiesNum: {
+    marginTop: 4,
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  trustedCitiesSub: {
+    marginTop: 2,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  trustedMapGraphic: {
+    position: 'absolute',
+    right: 6,
+    top: 22,
+    width: 82,
+    height: 88,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapDot: {
+    position: 'absolute',
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#FFFFFF',
+  },
+  trustedRatingCard: {
+    flex: 1,
+    borderRadius: 20,
+    padding: 16,
+    minHeight: 136,
+    position: 'relative',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  trustedRatingChevron: {
+    position: 'absolute',
+    right: -24,
+    top: 18,
+    width: 96,
+    height: 96,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    transform: [{ rotate: '45deg' }],
+  },
+  trustedRatingNum: {
+    marginTop: 4,
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  trustedStarsRow: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  customerReviewSection: {
+    marginTop: 10,
+    marginHorizontal: -16,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 22,
+    paddingBottom: 24,
+  },
+  customerReviewHeading: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#24083C',
+    paddingHorizontal: 16,
+    letterSpacing: -0.3,
+  },
+  customerReviewAccent: {
+    color: '#7A25D9',
+    fontWeight: '800',
+  },
+  reviewTickerClip: {
+    marginTop: 14,
+    width: SCREEN_W,
+    overflow: 'hidden',
+  },
+  reviewTickerTrack: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+  },
+  reviewTickerPill: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#DED4EB',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8.5,
+  },
+  reviewTickerPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#280D42',
+  },
+  customerReviewTrack: {
+    paddingTop: 18,
+    paddingHorizontal: Math.round((SCREEN_W - REVIEW_CARD_W) / 2),
+    gap: REVIEW_GAP,
+  },
+  customerReviewCard: {
+    width: REVIEW_CARD_W,
+    height: REVIEW_CARD_H,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: '#14131A',
+    position: 'relative',
+  },
+  customerReviewImageWrap: {
+    width: '100%',
+    height: Math.round(REVIEW_CARD_H * 0.54),
+    position: 'relative',
+    backgroundColor: '#1E1C26',
+  },
+  customerReviewImage: {
+    width: '100%',
+    height: '100%',
+  },
+  customerReviewImageFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 68,
+  },
+  soldStampOuter: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.42)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-18deg' }],
+    zIndex: 2,
+  },
+  soldStampInner: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.34)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 1,
+  },
+  soldStampStars: {
+    color: 'rgba(255, 255, 255, 0.48)',
+    fontSize: 6.5,
+    letterSpacing: 1.5,
+  },
+  soldStampBand: {
+    width: 62,
+    paddingVertical: 1.5,
+    borderTopWidth: 1.2,
+    borderBottomWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.48)',
+    backgroundColor: 'rgba(20, 19, 26, 0.28)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  soldStampText: {
+    color: 'rgba(255, 255, 255, 0.62)',
+    fontSize: 13.5,
+    fontWeight: '900',
+    letterSpacing: 1.6,
+  },
+  customerReviewBody: {
+    flex: 1,
+    backgroundColor: '#14131A',
+    paddingHorizontal: 14,
+    paddingTop: 2,
+    paddingBottom: 14,
+    justifyContent: 'space-between',
+  },
+  customerReviewName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.2,
+  },
+  customerReviewCity: {
+    marginTop: 1,
+    fontSize: 11.5,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.78)',
+  },
+  customerReviewQuote: {
+    marginTop: 6,
+    fontSize: 11.5,
+    lineHeight: 16,
+    color: 'rgba(255, 255, 255, 0.92)',
+  },
+  customerReviewReadMore: {
+    marginTop: 1,
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  customerSoldBadge: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  customerSoldBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1E0E33',
+  },
+  socialSection: {
+    marginTop: 10,
+    marginHorizontal: -16,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 22,
+    paddingBottom: 26,
+  },
+  socialTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#767676',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    letterSpacing: -0.2,
+  },
+  socialTrack: {
+    paddingHorizontal: 16,
+    gap: SOCIAL_GAP,
+  },
+  socialCard: {
+    width: SOCIAL_CARD_W,
+    height: SOCIAL_CARD_H,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#000000',
+  },
+  socialVideo: {
+    width: '100%',
+    height: '100%',
+  },
+  statusRoot: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
+  statusBarsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 6,
+  },
+  statusBarTrack: {
+    flex: 1,
+    height: 2.5,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.32)',
+    overflow: 'hidden',
+  },
+  statusBarFill: {
+    height: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 2,
+  },
+  statusStage: {
+    flex: 1,
+    marginTop: 10,
+    backgroundColor: '#000000',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  statusVideo: {
+    width: '100%',
+    height: '100%',
+  },
+  statusTapLayer: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: 'row',
+    zIndex: 5,
+  },
+  statusTapLeft: {
+    flex: 1,
+  },
+  statusTapRight: {
+    flex: 1,
+  },
+  statusNavArrow: {
+    position: 'absolute',
+    top: '48%',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(20, 20, 26, 0.38)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 8,
+  },
+  statusNavArrowLeft: {
+    left: 12,
+  },
+  statusNavArrowRight: {
+    right: 12,
+  },
+  statusControls: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    zIndex: 10,
+  },
+  statusCircleBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(110, 110, 118, 0.58)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footer: {
+    marginTop: 12,
+    marginHorizontal: -16,
+    marginBottom: -20,
+    paddingTop: 28,
+    paddingBottom: 22,
+    alignItems: 'center',
+    overflow: 'visible',
+  },
+  footerPerspective: {
+    width: SCREEN_W,
+    height: FOOTER_ART_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerStage: {
+    width: SCREEN_W,
+    height: FOOTER_ART_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerArt: {
+    width: SCREEN_W * 0.94,
+    height: FOOTER_ART_HEIGHT * 0.94,
+  },
+  footerCreditWrap: {
+    marginTop: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 999,
+    backgroundColor: 'rgba(74, 22, 140, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerCreditText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: '#4E3869',
+    letterSpacing: 0.2,
+  },
+  footerCreditHandle: {
+    fontWeight: '800',
+    color: TAB_PURPLE,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-around',
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    paddingTop: 8,
+    zIndex: 3,
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  tabLabel: {
+    fontSize: 11,
+    color: '#8A8A8A',
+    fontWeight: '500',
+  },
+  tabLabelActive: {
+    color: TAB_PURPLE,
+    fontWeight: '700',
+  },
+  scanButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: TAB_PURPLE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -16,
+    shadowColor: TAB_PURPLE,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  scanQr: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+  },
+});

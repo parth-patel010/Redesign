@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Rider-Application",
+    "slug": "Rider-Application",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-image",
+      "expo-video",
+      "expo-font",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow $(PRODUCT_NAME) to use motion so the footer art can tilt in 3D."
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "AIzaSyC_Pn12n9hRH5jQdxU7hQUOPDy820ehjwo",
+          "iosGoogleMapsApiKey": "AIzaSyC_Pn12n9hRH5jQdxU7hQUOPDy820ehjwo"
+        }
+      ],
+      "expo-sharing"
+    ]
+  }
+}
