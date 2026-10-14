@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,7 +18,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const PURPLE = '#4A168C';
 const EASE = Easing.bezier(0.22, 1, 0.36, 1);
 const TIMING = { duration: 780, easing: EASE, reduceMotion: ReduceMotion.Never };
-const WALLET_ART = require('../assets/home/wallet-art.png');
+const WALLET_ART = require('../assets/wallet/intro-wallet.png');
+const INTRO_BG = require('../assets/wallet/intro-bg.jpg');
 
 export default function WalletIntro({
   active = 'home',
@@ -36,29 +37,79 @@ export default function WalletIntro({
   const iconY = useSharedValue(280);
   const iconOpacity = useSharedValue(0);
   const speed = useSharedValue(0);
-  const blink = useSharedValue(1);
-  const played = useRef(false);
+  const [sheetHeight, setSheetHeight] = useState(0);
+  const finished = useRef(false);
   const onOpenRef = useRef(onOpen);
   const onDoneRef = useRef(onDone);
   onOpenRef.current = onOpen;
   onDoneRef.current = onDone;
 
+  const goWalletRef = useRef(() => {});
+  goWalletRef.current = () => {
+    if (finished.current) return;
+    finished.current = true;
+    onOpenRef.current?.();
+    onDoneRef.current?.();
+  };
+
+  const goWallet = () => goWalletRef.current();
+
+  const leave = (go) => {
+    finished.current = true;
+    onDoneRef.current?.();
+    go?.();
+  };
+
+  useEffect(() => {
+    const backup = setTimeout(() => {
+      setSheetHeight((current) => current || Math.max(240, Dimensions.get('window').height - barH));
+    }, 80);
+    return () => clearTimeout(backup);
+  }, [barH]);
+
+  useEffect(() => {
+    if (!sheetHeight) return undefined;
+    sheetH.value = sheetHeight;
+    iconY.value = sheetHeight * 0.46;
+    let frame = 0;
+    const kick = () => {
+      frame = requestAnimationFrame(() => {
+        progress.value = withDelay(
+          280,
+          withTiming(1, TIMING, (done) => {
+            'worklet';
+            if (!done) return;
+            iconOpacity.value = withTiming(1, { duration: 180, easing: EASE, reduceMotion: ReduceMotion.Never });
+            iconY.value = withTiming(0, { duration: 820, easing: EASE, reduceMotion: ReduceMotion.Never }, (ended) => {
+              if (ended) runOnJS(goWalletRef.current)();
+            });
+            speed.value = withSequence(
+              withTiming(1, { duration: 140, reduceMotion: ReduceMotion.Never }),
+              withDelay(460, withTiming(0, { duration: 220, reduceMotion: ReduceMotion.Never })),
+            );
+          }),
+        );
+      });
+    };
+    kick();
+    const fallback = setTimeout(() => goWalletRef.current(), 2600);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(fallback);
+    };
+  }, [iconOpacity, iconY, progress, sheetH, sheetHeight, speed]);
+
   const purpleStyle = useAnimatedStyle(() => ({
     height: progress.value * sheetH.value,
   }));
   const iconStyle = useAnimatedStyle(() => ({
-    opacity: iconOpacity.value * blink.value,
+    opacity: iconOpacity.value,
     transform: [{ translateY: iconY.value }],
   }));
   const speedStyle = useAnimatedStyle(() => ({
     opacity: speed.value,
     transform: [{ translateY: (1 - speed.value) * 8 }, { scaleX: 0.65 + speed.value * 0.5 }],
   }));
-
-  const leave = (go) => {
-    onDoneRef.current?.();
-    go?.();
-  };
 
   return (
     <View pointerEvents="box-none" style={styles.root}>
@@ -68,42 +119,17 @@ export default function WalletIntro({
         style={[styles.sheet, { bottom: barH }]}
         onLayout={(event) => {
           const height = event.nativeEvent.layout.height;
-          if (height < 1 || played.current) return;
-          played.current = true;
-          sheetH.value = height;
-          iconY.value = height * 0.46;
-          const finish = () => {
-            onOpenRef.current?.();
-            onDoneRef.current?.();
-          };
-          const playIcon = (finished) => {
-            'worklet';
-            if (!finished) return;
-            iconOpacity.value = withTiming(1, { duration: 180, easing: EASE, reduceMotion: ReduceMotion.Never });
-            iconY.value = withTiming(0, { duration: 820, easing: EASE, reduceMotion: ReduceMotion.Never });
-            speed.value = withSequence(
-              withTiming(1, { duration: 140, reduceMotion: ReduceMotion.Never }),
-              withDelay(460, withTiming(0, { duration: 220, reduceMotion: ReduceMotion.Never })),
-            );
-            blink.value = withDelay(
-              860,
-              withSequence(
-                withTiming(0.15, { duration: 80, reduceMotion: ReduceMotion.Never }),
-                withTiming(1, { duration: 90, reduceMotion: ReduceMotion.Never }),
-                withTiming(0.2, { duration: 80, reduceMotion: ReduceMotion.Never }),
-                withTiming(1, { duration: 160, reduceMotion: ReduceMotion.Never }, (done) => {
-                  if (done) runOnJS(finish)();
-                }),
-              ),
-            );
-          };
-          progress.value = withDelay(
-            280,
-            withTiming(1, TIMING, playIcon),
-          );
+          if (height > 1) setSheetHeight((current) => current || height);
         }}
       >
-        <Animated.View style={[styles.purple, purpleStyle]} />
+        <Animated.View style={[styles.purple, purpleStyle]}>
+          <Image
+            source={INTRO_BG}
+            style={[styles.introBg, sheetHeight ? { height: sheetHeight } : null]}
+            contentFit="cover"
+            contentPosition="center"
+          />
+        </Animated.View>
       </View>
 
       <Animated.View
@@ -134,9 +160,9 @@ export default function WalletIntro({
           </View>
           <Text style={[styles.tabLabel, active === 'scan' && styles.tabLabelActive]}>Scan</Text>
         </Pressable>
-        <Pressable style={styles.tab}>
-          <Ionicons name="wallet-outline" size={22} color="#8A8A8A" />
-          <Text style={styles.tabLabel}>Wallet</Text>
+        <Pressable style={styles.tab} onPress={goWallet}>
+          <Ionicons name="wallet" size={22} color={PURPLE} />
+          <Text style={[styles.tabLabel, styles.tabLabelActive]}>Wallet</Text>
         </Pressable>
         <Pressable style={styles.tab} onPress={() => leave(onOpenProfile)}>
           <Ionicons name={active === 'profile' ? 'person' : 'person-outline'} size={22} color={active === 'profile' ? PURPLE : '#8A8A8A'} />
@@ -170,7 +196,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: PURPLE,
+    backgroundColor: '#3B1280',
+    overflow: 'hidden',
+  },
+  introBg: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   iconWrap: {
     position: 'absolute',
@@ -182,8 +215,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    width: 168,
-    height: 148,
+    width: 210,
+    height: 178,
   },
   speedLines: {
     marginTop: 6,

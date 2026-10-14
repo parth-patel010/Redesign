@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { cardEnter } from '../utils/cardEnter';
+import { SketchVerify } from '../components/Sketches';
 
 const PURPLE = '#4A168C';
 
@@ -42,48 +43,42 @@ export default function KycScreen({ kyc, onBack, onStep }) {
         <Pressable hitSlop={8} style={styles.back} onPress={onBack}>
           <Ionicons name="chevron-back" size={20} color="#1C1C1C" />
         </Pressable>
-        <Text style={styles.headerTitle}>KYC</Text>
+        <Text style={styles.headerTitle}>Verify account</Text>
         <View style={styles.headerSide} />
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 28 }}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 28 }}>
         <Animated.View entering={cardEnter(0)} style={styles.hero}>
-          <Text style={styles.kicker}>{verified ? 'Verified' : 'Unverified'}</Text>
-          <Text style={styles.title}>{verified ? 'You are verified' : 'Verify your account'}</Text>
+          <SketchVerify width={210} height={140} />
+          <Text style={styles.kicker}>{verified ? 'VERIFIED' : 'KYC'}</Text>
+          <Text style={styles.title}>{verified ? 'You are verified' : 'A photo, then Aadhaar'}</Text>
           <Text style={styles.subtitle}>
             {verified
-              ? 'Your photo and Aadhaar are on file.'
-              : 'A live photo, then both sides of your Aadhaar.'}
+              ? 'Your photo and Aadhaar are on file. You can rent without another check.'
+              : 'Take a live photo, then both sides of your Aadhaar.'}
           </Text>
           <View style={styles.track}>
             <View style={[styles.trackFill, { width: `${(doneCount / STEPS.length) * 100}%` }]} />
           </View>
-          <Text style={styles.count}>{doneCount} of {STEPS.length}</Text>
+          <Text style={styles.count}>{doneCount} of {STEPS.length} complete</Text>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(1)} style={styles.list}>
-          {STEPS.map((step, index) => {
-            const complete = Boolean(kyc?.[step.key]);
-            const isLocked = locked(step.key);
-            const holding = busy === step.key;
-            return (
+        {STEPS.map((step, index) => {
+          const complete = Boolean(kyc?.[step.key]);
+          const isLocked = locked(step.key);
+          const holding = busy === step.key;
+          return (
+            <Animated.View key={step.key} entering={cardEnter(index + 1)}>
               <Pressable
-                key={step.key}
                 disabled={complete || isLocked || Boolean(busy)}
                 onPress={() => take(step.key)}
-                style={[styles.row, index > 0 && styles.rowLine]}
+                style={styles.card}
               >
                 <View style={[styles.icon, complete && styles.iconOn]}>
-                  <Ionicons
-                    name={complete ? 'checkmark' : step.icon}
-                    size={18}
-                    color={complete ? '#FFFFFF' : PURPLE}
-                  />
+                  <Ionicons name={complete ? 'checkmark' : step.icon} size={18} color={complete ? '#FFFFFF' : PURPLE} />
                 </View>
                 <View style={styles.copy}>
+                  <Text style={styles.stepNo}>Step {index + 1}</Text>
                   <Text style={styles.rowTitle}>{step.title}</Text>
                   <Text style={styles.rowText}>
                     {holding ? 'Hold still' : isLocked ? 'Finish the step above first' : step.text}
@@ -92,14 +87,14 @@ export default function KycScreen({ kyc, onBack, onStep }) {
                 {complete ? (
                   <Text style={styles.done}>Done</Text>
                 ) : isLocked ? (
-                  <Ionicons name="lock-closed" size={14} color="#C8C0D4" />
+                  <Ionicons name="lock-closed" size={16} color="#C8C0D4" />
                 ) : (
                   <Text style={styles.take}>{holding ? '…' : 'Take'}</Text>
                 )}
               </Pressable>
-            );
-          })}
-        </Animated.View>
+            </Animated.View>
+          );
+        })}
 
         {verified ? (
           <Animated.Text entering={FadeIn.duration(280)} style={styles.note}>
@@ -114,7 +109,7 @@ export default function KycScreen({ kyc, onBack, onStep }) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#F7F7F8',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     paddingHorizontal: 16,
@@ -127,14 +122,14 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F4F8',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
     color: '#1C1C1C',
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   headerSide: {
     width: 36,
@@ -142,20 +137,24 @@ const styles = StyleSheet.create({
   hero: {
     marginHorizontal: 16,
     marginTop: 8,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    backgroundColor: '#F7F5FB',
+    borderRadius: 28,
     padding: 18,
+    alignItems: 'flex-start',
   },
   kicker: {
+    marginTop: 8,
     color: PURPLE,
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.1,
   },
   title: {
     marginTop: 6,
     color: '#1C1C1C',
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '800',
+    letterSpacing: -0.4,
   },
   subtitle: {
     marginTop: 6,
@@ -165,9 +164,10 @@ const styles = StyleSheet.create({
   },
   track: {
     marginTop: 16,
+    alignSelf: 'stretch',
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#F1EAF8',
+    backgroundColor: '#E7DFF2',
     overflow: 'hidden',
   },
   trackFill: {
@@ -181,27 +181,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  list: {
+  card: {
     marginTop: 12,
     marginHorizontal: 16,
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    paddingHorizontal: 14,
-  },
-  row: {
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#F0EAF6',
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
     gap: 12,
   },
-  rowLine: {
-    borderTopWidth: 1,
-    borderTopColor: '#F1F1F3',
-  },
   icon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 42,
+    height: 42,
+    borderRadius: 14,
     backgroundColor: '#F6F1FC',
     alignItems: 'center',
     justifyContent: 'center',
@@ -212,25 +207,31 @@ const styles = StyleSheet.create({
   copy: {
     flex: 1,
   },
-  rowTitle: {
-    color: '#1C1C1C',
-    fontSize: 15,
+  stepNo: {
+    color: '#8A8496',
+    fontSize: 11,
     fontWeight: '700',
+  },
+  rowTitle: {
+    marginTop: 2,
+    color: '#1C1C1C',
+    fontSize: 16,
+    fontWeight: '800',
   },
   rowText: {
     marginTop: 2,
     color: '#6E6878',
-    fontSize: 12,
+    fontSize: 13,
+  },
+  done: {
+    color: '#16A34A',
+    fontSize: 13,
+    fontWeight: '800',
   },
   take: {
     color: PURPLE,
     fontSize: 14,
-    fontWeight: '700',
-  },
-  done: {
-    color: '#1F8A4C',
-    fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   note: {
     marginTop: 16,

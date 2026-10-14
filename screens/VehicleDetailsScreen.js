@@ -1,17 +1,136 @@
-import { useRef, useState } from 'react';
-import { Dimensions, Modal, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Dimensions,
+  Modal,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  FadeIn,
+  interpolate,
+  LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
+import VehicleAskChat from '../components/VehicleAskChat';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PRIMARY_BLUE = '#3729E8';
+const FLEXI_GREEN = '#129A43';
 const STORY_VIDEO = require('../assets/home/vid1.mp4');
+
+const PRIME_LOCATIONS = [
+  {
+    id: 'bdq-airport',
+    icon: 'airplane-outline',
+    title: 'Vadodara Airport (BDQ)',
+    subtitle: "A key link for Gujarat's cultural and industrial hub.",
+    address: 'Vadodara Airport (BDQ), Civil Aerodrome, Harni Rd, Vadodara, Gujarat 390022',
+  },
+  {
+    id: 'gotri-hub',
+    icon: 'flash-outline',
+    title: 'Gotri EV Super Hub',
+    subtitle: '24/7 Fast Charging & Express EV Pickup Point.',
+    address: 'Gotri EV Super Hub, New Alkapuri, Laxmipura, Vadodara, Gujarat 390021',
+  },
+];
+
+const INITIAL_SAVED_ADDRESSES = [
+  {
+    id: 'addr-1',
+    tag: 'HOME',
+    address:
+      'Shirshak Plasto Packaging Pvt Ltd, Bhayli Rd, Bhaili, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'addr-2',
+    tag: 'HOME',
+    address: '746R+56R, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'addr-3',
+    tag: 'HOME',
+    address: 'Auro Prime C, Vadodara, Gujarat 391410, India',
+  },
+];
+
+const MAP_LANDMARKS = [
+  {
+    id: 'lm-1',
+    name: 'Mahantam health\ncare center',
+    sub: '',
+    color: '#EF4444',
+    icon: 'medkit',
+    top: '20%',
+    left: '14%',
+    address: 'Mahantam Health Care Center, Bhayli, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'lm-2',
+    name: 'Auro Prime',
+    sub: 'Residential',
+    color: '#3B82F6',
+    icon: 'bag-handle',
+    top: '29%',
+    right: '14%',
+    address: 'Auro Prime C, Bhayli Rd, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'lm-3',
+    name: 'Param Bliss',
+    sub: '',
+    color: '#3B82F6',
+    icon: 'bag-handle',
+    top: '39%',
+    right: '8%',
+    address: 'Param Bliss, New Alkapuri, Bhayli, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'lm-4',
+    name: 'Meadows Skylark',
+    sub: '',
+    color: '#F59E0B',
+    icon: 'business',
+    top: '44%',
+    left: '6%',
+    address: 'Meadows Skylark, Bhayli, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'lm-5',
+    name: 'Pure Water Suppliers',
+    sub: '',
+    color: '#3B82F6',
+    icon: 'bag-handle',
+    bottom: '28%',
+    left: '14%',
+    address: '746R+56R, Pure Water Suppliers, Vadodara, Gujarat 391410, India',
+  },
+  {
+    id: 'lm-6',
+    name: 'Cleaning Expert',
+    sub: '',
+    color: '#3B82F6',
+    icon: 'bag-handle',
+    bottom: '19%',
+    left: '18%',
+    address: 'Cleaning Expert, Bhayli Main Rd, Vadodara, Gujarat 391410, India',
+  },
+];
 
 const EXTRA = {
   'Evegah Fly': {
@@ -232,6 +351,47 @@ const QUESTIONS = [
   },
 ];
 
+const DROP_EASE = Easing.bezier(0.22, 1, 0.36, 1);
+
+function FaqRow({ item, open, last, onPress }) {
+  const progress = useSharedValue(open ? 1 : 0);
+  const bodyH = useSharedValue(0);
+
+  useEffect(() => {
+    progress.value = withTiming(open ? 1 : 0, { duration: 320, easing: DROP_EASE });
+  }, [open, progress]);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${progress.value * 180}deg` }],
+  }));
+  const bodyStyle = useAnimatedStyle(() => ({
+    height: bodyH.value * progress.value,
+    opacity: interpolate(progress.value, [0, 0.35, 1], [0, 0.15, 1]),
+  }));
+
+  return (
+    <Pressable onPress={onPress} style={[styles.faqRow, last && styles.faqRowLast]}>
+      <View style={styles.faqHead}>
+        <Text style={styles.faqQ}>{item.q}</Text>
+        <Animated.View style={chevronStyle}>
+          <Ionicons name="chevron-down" size={16} color="#8A8496" />
+        </Animated.View>
+      </View>
+      <Animated.View style={[styles.faqClip, bodyStyle]}>
+        <View
+          style={styles.faqMeasure}
+          onLayout={(event) => {
+            const next = event.nativeEvent.layout.height;
+            if (next > 0) bodyH.value = next;
+          }}
+        >
+          <Text style={styles.faqA}>{item.a}</Text>
+        </View>
+      </Animated.View>
+    </Pressable>
+  );
+}
+
 function VehicleStoryModal({ onClose }) {
   const insets = useSafeAreaInsets();
   const [muted, setMuted] = useState(false);
@@ -281,9 +441,100 @@ export default function VehicleDetailsScreen({ vehicle, onBack, onBook }) {
   const [bentoTab, setBentoTab] = useState('Exterior');
   const [featureSpecMode, setFeatureSpecMode] = useState('Features');
   const [showAllFeatures, setShowAllFeatures] = useState(false);
-  const [askExpanded, setAskExpanded] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
+
+  // Flexi Vehicle Pickup & Drop State
+  const [flexiEnabled, setFlexiEnabled] = useState(Boolean(vehicle?.flexiEnabled));
+  const [sameFlexiLocation, setSameFlexiLocation] = useState(false);
+  const [flexiPickupAddress, setFlexiPickupAddress] = useState(
+    vehicle?.flexiPickupAddress || ''
+  );
+  const [flexiDropAddress, setFlexiDropAddress] = useState(
+    vehicle?.flexiDropAddress || ''
+  );
+  const [addressTarget, setAddressTarget] = useState('pickup'); // 'pickup' | 'drop'
+  const [addressSheetOpen, setAddressSheetOpen] = useState(false);
+  const [mapPickerOpen, setMapPickerOpen] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState(INITIAL_SAVED_ADDRESSES);
+  const [mapAddressDraft, setMapAddressDraft] = useState(
+    '746R+56R, Vadodara, Gujarat 391410, India'
+  );
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [thingsKeepInMindOpen, setThingsKeepInMindOpen] = useState(false);
+
+  const openAddressPicker = (target) => {
+    setAddressTarget(target);
+    setAddressSheetOpen(true);
+  };
+
+  const applySelectedAddress = (addrString) => {
+    if (addressTarget === 'pickup') {
+      setFlexiPickupAddress(addrString);
+      if (sameFlexiLocation) {
+        setFlexiDropAddress(addrString);
+      }
+      setAddressSheetOpen(false);
+      // If rider still needs to add Drop location, prompt them for Drop next!
+      if (!sameFlexiLocation && !flexiDropAddress) {
+        setTimeout(() => {
+          setAddressTarget('drop');
+          setAddressSheetOpen(true);
+        }, 280);
+      }
+    } else {
+      setFlexiDropAddress(addrString);
+      setAddressSheetOpen(false);
+    }
+  };
+
+  const handleConfirmMapPin = () => {
+    const cleanAddr =
+      mapAddressDraft.trim() || '746R+56R, Vadodara, Gujarat 391410, India';
+    if (editingAddressId) {
+      setSavedAddresses((prev) =>
+        prev.map((item) =>
+          item.id === editingAddressId ? { ...item, address: cleanAddr } : item
+        )
+      );
+      setEditingAddressId(null);
+    } else if (!savedAddresses.some((item) => item.address === cleanAddr)) {
+      setSavedAddresses((prev) => [
+        { id: `addr-${Date.now()}`, tag: 'HOME', address: cleanAddr },
+        ...prev,
+      ]);
+    }
+    setMapPickerOpen(false);
+    applySelectedAddress(cleanAddr);
+  };
+
+  const handleProceedBook = () => {
+    if (flexiEnabled) {
+      if (!flexiPickupAddress) {
+        openAddressPicker('pickup');
+        return;
+      }
+      const effectiveDrop = sameFlexiLocation
+        ? flexiPickupAddress
+        : flexiDropAddress;
+      if (!effectiveDrop) {
+        openAddressPicker('drop');
+        return;
+      }
+      onBook?.({
+        flexiEnabled: true,
+        flexiPickupAddress,
+        flexiDropAddress: effectiveDrop,
+      });
+      return;
+    }
+    onBook?.({
+      flexiEnabled: false,
+      flexiPickupAddress: '',
+      flexiDropAddress: '',
+    });
+  };
 
   const mainScrollRef = useRef(null);
   const galleryRef = useRef(null);
@@ -607,6 +858,217 @@ export default function VehicleDetailsScreen({ vehicle, onBack, onBook }) {
                 <Text style={styles.festBadgeLine3}>Days</Text>
               </View>
             </View>
+
+            {/* Location Pill (Matches Screenshot 1) */}
+            <View style={styles.hubLocationPill}>
+              <Ionicons name="location-outline" size={16} color="#11141C" />
+              <Text style={styles.hubLocationText} numberOfLines={1}>
+                103, New Alkapuri, Laxmipura, Vad | 9.8 Kms Away
+              </Text>
+            </View>
+
+            {/* Guarantee / Professional Host Banner (Matches Screenshot 1) */}
+            <View style={styles.guaranteeHostCard}>
+              <View style={styles.guaranteeSealWrap}>
+                <View style={styles.guaranteeSealOuter}>
+                  <View style={styles.guaranteeSealInner}>
+                    <Text style={styles.guaranteeStarsTop}>★ ★ ★</Text>
+                    <View style={styles.guaranteeRibbon}>
+                      <Text style={styles.guaranteeRibbonText}>GUARANTEE</Text>
+                    </View>
+                    <Text style={styles.guaranteeStarsTop}>★ ★ ★</Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.guaranteeHostCopy}>
+                <Text style={styles.guaranteeHostTitle}>Professional Host</Text>
+                <Text style={styles.guaranteeHostSub}>
+                  99% fulfillment with consistent 5-star ratings
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+            </View>
+
+            {/* Flexi EV Delivery & Pickup Card (Matches Screenshot 1) */}
+            <View style={styles.flexiSectionWrap}>
+              {/* Top Dark Tab Ribbon */}
+              <View style={styles.flexiTopTabRibbon}>
+                <Text style={styles.flexiTopTabText}>EV Delivery & Pickup</Text>
+              </View>
+
+              <View
+                style={[
+                  styles.flexiMainCard,
+                  flexiEnabled && styles.flexiMainCardActive,
+                ]}
+              >
+                {/* Grey Header Area with Toggle + Isometric House/EV Illustration */}
+                <View style={styles.flexiHeaderGrey}>
+                  <View style={styles.flexiHeaderLeft}>
+                    <Text style={styles.flexiRateText}>
+                      Base fare ₹150 + Additional ₹15/KM{'\n'}Beyond 5kms
+                    </Text>
+
+                    <View style={styles.flexiSwitchRow}>
+                      <Pressable
+                        onPress={() => {
+                          const next = !flexiEnabled;
+                          setFlexiEnabled(next);
+                          if (next && !flexiPickupAddress) {
+                            openAddressPicker('pickup');
+                          }
+                        }}
+                        style={[
+                          styles.flexiSwitchTrack,
+                          flexiEnabled && styles.flexiSwitchTrackOn,
+                        ]}
+                      >
+                        <View
+                          style={[
+                            styles.flexiSwitchThumb,
+                            flexiEnabled && styles.flexiSwitchThumbOn,
+                          ]}
+                        />
+                      </Pressable>
+                      <Text style={styles.flexiToggleStatusText}>
+                        {flexiEnabled
+                          ? 'Flexi Pickup & Drop Selected'
+                          : 'Select Flexi Pickup & Drop'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* 3D Isometric House + EV Delivery Illustration */}
+                  <View style={styles.flexiHouseArtWrap}>
+                    <View style={styles.isoGroundSlab}>
+                      <View style={styles.isoRoadStrip} />
+                      <View style={styles.isoTreeLeft} />
+                      <View style={styles.isoHouseWalls}>
+                        <View style={styles.isoHouseRoof} />
+                        <View style={styles.isoHouseDoor} />
+                      </View>
+                      <View style={styles.isoScooterBadge}>
+                        <Ionicons name="bicycle" size={16} color="#FFFFFF" />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                {/* White Body: Pickup & Drop Address Selection Rows */}
+                <View style={styles.flexiWhiteBody}>
+                  {/* Pickup / Delivery Address Row */}
+                  <Pressable
+                    onPress={() => {
+                      if (!flexiEnabled) setFlexiEnabled(true);
+                      openAddressPicker('pickup');
+                    }}
+                    style={styles.flexiAddressRow}
+                  >
+                    <View style={styles.flexiAddressCopy}>
+                      <Text style={styles.flexiAddressKicker}>
+                        {flexiEnabled
+                          ? 'Pickup / Delivery Location (Required)'
+                          : 'We will deliver & pickup the EV from'}
+                      </Text>
+                      {flexiPickupAddress ? (
+                        <Text
+                          style={styles.flexiSelectedAddressText}
+                          numberOfLines={2}
+                        >
+                          {flexiPickupAddress}
+                        </Text>
+                      ) : null}
+                    </View>
+
+                    <View style={styles.flexiAddAddressBtn}>
+                      <Text style={styles.flexiAddAddressText}>
+                        {flexiPickupAddress ? 'Change' : 'Add address'}
+                      </Text>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={15}
+                        color={FLEXI_GREEN}
+                      />
+                    </View>
+                  </Pressable>
+
+                  {/* Checkbox: Same delivery and pickup location */}
+                  <Pressable
+                    onPress={() => {
+                      const nextSame = !sameFlexiLocation;
+                      setSameFlexiLocation(nextSame);
+                      if (nextSame && flexiPickupAddress) {
+                        setFlexiDropAddress(flexiPickupAddress);
+                      }
+                    }}
+                    style={styles.flexiSameLocRow}
+                  >
+                    <View
+                      style={[
+                        styles.flexiCheckbox,
+                        sameFlexiLocation && styles.flexiCheckboxOn,
+                      ]}
+                    >
+                      {sameFlexiLocation ? (
+                        <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+                      ) : null}
+                    </View>
+                    <Text style={styles.flexiSameLocText}>
+                      Same delivery and pickup location
+                    </Text>
+                  </Pressable>
+
+                  {/* Drop / Return Location Row (Always shown when Flexi is selected or when Same Location is unchecked so rider can add BOTH Pickup and Drop) */}
+                  {!sameFlexiLocation ? (
+                    <Pressable
+                      onPress={() => {
+                        if (!flexiEnabled) setFlexiEnabled(true);
+                        openAddressPicker('drop');
+                      }}
+                      style={[styles.flexiAddressRow, styles.flexiDropAddressRow]}
+                    >
+                      <View style={styles.flexiAddressCopy}>
+                        <Text style={styles.flexiAddressKicker}>
+                          Drop / Return Location (Required)
+                        </Text>
+                        {flexiDropAddress ? (
+                          <Text
+                            style={styles.flexiSelectedAddressText}
+                            numberOfLines={2}
+                          >
+                            {flexiDropAddress}
+                          </Text>
+                        ) : null}
+                      </View>
+
+                      <View style={styles.flexiAddAddressBtn}>
+                        <Text style={styles.flexiAddAddressText}>
+                          {flexiDropAddress ? 'Change' : 'Add drop address'}
+                        </Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={15}
+                          color={FLEXI_GREEN}
+                        />
+                      </View>
+                    </Pressable>
+                  ) : null}
+
+                  <View style={styles.flexiBodyDivider} />
+
+                  {/* Things to keep in mind -> */}
+                  <Pressable
+                    onPress={() => setThingsKeepInMindOpen(true)}
+                    style={styles.flexiKeepInMindRow}
+                  >
+                    <Text style={styles.flexiKeepInMindText}>
+                      Things to keep in mind
+                    </Text>
+                    <Ionicons name="arrow-forward" size={16} color="#11141C" />
+                  </Pressable>
+                </View>
+              </View>
+            </View>
           </Animated.View>
         </View>
 
@@ -916,7 +1378,7 @@ export default function VehicleDetailsScreen({ vehicle, onBack, onBook }) {
           </View>
 
           {/* 2-column grid of icon + label */}
-          <View style={styles.featureTwoColGrid}>
+          <Animated.View layout={LinearTransition.duration(320).easing(DROP_EASE)} style={styles.featureTwoColGrid}>
             {(featureSpecMode === 'Features' ? visibleFeatures : specGridItems).map((item) => (
               <View key={item.key} style={styles.featureGridCell}>
                 <View style={styles.featureIconSquare}>
@@ -925,7 +1387,7 @@ export default function VehicleDetailsScreen({ vehicle, onBack, onBook }) {
                 <Text style={styles.featureCellLabel}>{item.label}</Text>
               </View>
             ))}
-          </View>
+          </Animated.View>
 
           <Pressable
             style={styles.lavenderActionBtn}
@@ -950,43 +1412,40 @@ export default function VehicleDetailsScreen({ vehicle, onBack, onBook }) {
           </Text>
 
           <View style={styles.faqCard}>
-            {QUESTIONS.map((item, index) => {
-              const open = openFaq === index;
-              return (
-                <Pressable
-                  key={item.q}
-                  onPress={() => setOpenFaq(open ? -1 : index)}
-                  style={[styles.faqRow, index === QUESTIONS.length - 1 && styles.faqRowLast]}
-                >
-                  <View style={styles.faqHead}>
-                    <Text style={styles.faqQ}>{item.q}</Text>
-                    <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={16} color="#8A8496" />
-                  </View>
-                  {open ? <Text style={styles.faqA}>{item.a}</Text> : null}
-                </Pressable>
-              );
-            })}
+            {QUESTIONS.map((item, index) => (
+              <FaqRow
+                key={item.q}
+                item={item}
+                open={openFaq === index}
+                last={index === QUESTIONS.length - 1}
+                onPress={() => setOpenFaq(openFaq === index ? -1 : index)}
+              />
+            ))}
           </View>
         </View>
       </ScrollView>
 
-      {/* Floating Sparkle / "Ask me anything" FAB */}
-      <Pressable
-        style={[styles.sparkleFabWrap, { bottom: Math.max(insets.bottom, 12) + 74 }]}
-        onPress={() => setAskExpanded((prev) => !prev)}
-      >
-        <LinearGradient
-          colors={['#885BF4', '#632CE6']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.sparkleFabGradient, askExpanded && styles.sparkleFabExpanded]}
-        >
-          <Ionicons name="sparkles-sharp" size={20} color="#FFFFFF" />
-          {askExpanded ? (
-            <Text style={styles.askMeAnythingText}>Ask me anything</Text>
-          ) : null}
-        </LinearGradient>
-      </Pressable>
+      <VehicleAskChat
+        open={chatOpen}
+        onOpen={() => setChatOpen(true)}
+        onClose={() => setChatOpen(false)}
+        dockBottom={Math.max(insets.bottom, 12) + 74}
+        ride={{
+          name: vehicleName,
+          price: extra.price,
+          monthly: extra.monthly,
+          discount: extra.discount,
+          variant: extra.variant,
+          battery: extra.battery,
+          motor: extra.motor,
+          charge: extra.charge,
+          load: extra.load,
+          wheels: extra.wheels,
+          range: vehicle?.range,
+          speed: vehicle?.speed,
+          features: (extra.features || []).map((item) => item.label.replace(/\n/g, ' ')),
+        }}
+      />
 
       {/* Sticky Bottom Bar */}
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
@@ -994,14 +1453,351 @@ export default function VehicleDetailsScreen({ vehicle, onBack, onBook }) {
           <Ionicons name="call" size={20} color={PRIMARY_BLUE} />
         </Pressable>
 
-        <Pressable style={styles.reserveBtn} onPress={onBook}>
+        <Pressable style={styles.reserveBtn} onPress={handleProceedBook}>
           <Text style={styles.reserveBtnText}>Reserve EV</Text>
         </Pressable>
 
-        <Pressable style={styles.testDriveBtn} onPress={onBook}>
+        <Pressable style={styles.testDriveBtn} onPress={handleProceedBook}>
           <Text style={styles.testDriveBtnText}>Test drive</Text>
         </Pressable>
       </View>
+
+      {/* Select Delivery / Drop Address Bottom Sheet Modal (Matches Screenshot 3) */}
+      <Modal
+        visible={addressSheetOpen}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={() => setAddressSheetOpen(false)}
+      >
+        <View style={styles.addrSheetBackdrop}>
+          <Pressable
+            style={styles.addrSheetBackdropTouch}
+            onPress={() => setAddressSheetOpen(false)}
+          />
+
+          {/* Floating Circular X Close Button */}
+          <View style={styles.addrFloatingCloseRow}>
+            <Pressable
+              onPress={() => setAddressSheetOpen(false)}
+              style={styles.addrFloatingCloseBtn}
+            >
+              <Ionicons name="close" size={22} color="#111827" />
+            </Pressable>
+          </View>
+
+          <View
+            style={[
+              styles.addrBottomSheet,
+              { paddingBottom: Math.max(insets.bottom, 18) },
+            ]}
+          >
+            {/* Pickup / Drop Tab Switcher inside Modal so Rider can easily set BOTH */}
+            <View style={styles.addrTargetTabsRow}>
+              <Pressable
+                onPress={() => setAddressTarget('pickup')}
+                style={[
+                  styles.addrTargetTab,
+                  addressTarget === 'pickup' && styles.addrTargetTabActive,
+                ]}
+              >
+                <Ionicons
+                  name="locate-outline"
+                  size={15}
+                  color={addressTarget === 'pickup' ? '#FFFFFF' : '#374151'}
+                />
+                <Text
+                  style={[
+                    styles.addrTargetTabText,
+                    addressTarget === 'pickup' && styles.addrTargetTabTextActive,
+                  ]}
+                >
+                  1. Pickup Location {flexiPickupAddress ? '✓' : ''}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => setAddressTarget('drop')}
+                style={[
+                  styles.addrTargetTab,
+                  addressTarget === 'drop' && styles.addrTargetTabActive,
+                ]}
+              >
+                <Ionicons
+                  name="flag-outline"
+                  size={15}
+                  color={addressTarget === 'drop' ? '#FFFFFF' : '#374151'}
+                />
+                <Text
+                  style={[
+                    styles.addrTargetTabText,
+                    addressTarget === 'drop' && styles.addrTargetTabTextActive,
+                  ]}
+                >
+                  2. Drop Location {flexiDropAddress ? '✓' : ''}
+                </Text>
+              </Pressable>
+            </View>
+
+            <Text style={styles.addrSheetTitle}>
+              {addressTarget === 'pickup'
+                ? 'Select Delivery (Pickup) Address'
+                : 'Select Return (Drop) Address'}
+            </Text>
+            <Text style={styles.addrSheetSub}>
+              {addressTarget === 'pickup'
+                ? 'We will deliver the EV at this address for your trip'
+                : 'We will pick up the EV from this address after your trip'}
+            </Text>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={styles.addrSheetScroll}
+            >
+              {/* Prime Locations */}
+              <Text style={styles.addrSectionHeading}>Prime Locations</Text>
+
+              {PRIME_LOCATIONS.map((loc) => (
+                <Pressable
+                  key={loc.id}
+                  onPress={() => applySelectedAddress(loc.address)}
+                  style={styles.primeLocRow}
+                >
+                  <View style={styles.primeLocIconCircle}>
+                    <Ionicons name={loc.icon} size={22} color="#111827" />
+                  </View>
+                  <View style={styles.primeLocCopy}>
+                    <Text style={styles.primeLocTitle}>{loc.title}</Text>
+                    <Text style={styles.primeLocSub}>{loc.subtitle}</Text>
+                  </View>
+                </Pressable>
+              ))}
+
+              {/* Saved Addresses */}
+              <Text style={[styles.addrSectionHeading, { marginTop: 18 }]}>
+                Saved Addresses
+              </Text>
+
+              {savedAddresses.map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => applySelectedAddress(item.address)}
+                  style={styles.savedAddrRow}
+                >
+                  <View style={styles.savedAddrIconWrap}>
+                    <Ionicons name="home-outline" size={22} color="#111827" />
+                  </View>
+                  <View style={styles.savedAddrCopy}>
+                    <Text style={styles.savedAddrTag}>{item.tag}</Text>
+                    <Text style={styles.savedAddrText}>{item.address}</Text>
+                  </View>
+                  <Pressable
+                    hitSlop={10}
+                    onPress={() => {
+                      setEditingAddressId(item.id);
+                      setMapAddressDraft(item.address);
+                      setAddressSheetOpen(false);
+                      setMapPickerOpen(true);
+                    }}
+                    style={styles.savedAddrEditBtn}
+                  >
+                    <Text style={styles.savedAddrEditText}>Edit</Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={14}
+                      color={FLEXI_GREEN}
+                    />
+                  </Pressable>
+                </Pressable>
+              ))}
+            </ScrollView>
+
+            {/* Bottom Full-Width Green Button: Add New Address */}
+            <Pressable
+              onPress={() => {
+                setEditingAddressId(null);
+                setMapAddressDraft('746R+56R, Vadodara, Gujarat 391410, India');
+                setAddressSheetOpen(false);
+                setMapPickerOpen(true);
+              }}
+              style={styles.addNewAddressGreenBtn}
+            >
+              <Text style={styles.addNewAddressGreenBtnText}>
+                Add New Address
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Google Maps Pin Confirmation Full-Screen Modal (Matches Screenshot 2) */}
+      <Modal
+        visible={mapPickerOpen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        statusBarTranslucent
+        onRequestClose={() => setMapPickerOpen(false)}
+      >
+        <View style={styles.mapModalRoot}>
+          <StatusBar style="dark" />
+
+          {/* Interactive Map Canvas */}
+          <View style={styles.mapCanvas}>
+            {/* Green Park Zones */}
+            <View style={styles.mapParkTopLeft} />
+            <View style={styles.mapParkBottomRight} />
+
+            {/* Map Roads Network */}
+            <View style={styles.mapRoadH1} />
+            <View style={styles.mapRoadH2} />
+            <View style={styles.mapRoadH3} />
+            <View style={styles.mapRoadV1} />
+            <View style={styles.mapRoadV2} />
+            <View style={styles.mapRoadDiag} />
+
+            {/* Map Building Blocks */}
+            <View style={[styles.mapBuildingBlock, { top: '26%', left: '34%', width: 64, height: 36 }]} />
+            <View style={[styles.mapBuildingBlock, { top: '52%', left: '48%', width: 76, height: 42 }]} />
+            <View style={[styles.mapBuildingBlock, { top: '60%', left: '22%', width: 54, height: 32 }]} />
+
+            {/* Tappable Map Landmarks matching Screenshot 2 */}
+            {MAP_LANDMARKS.map((lm) => (
+              <Pressable
+                key={lm.id}
+                onPress={() => setMapAddressDraft(lm.address)}
+                style={[
+                  styles.mapLandmarkWrap,
+                  lm.top ? { top: lm.top } : null,
+                  lm.bottom ? { bottom: lm.bottom } : null,
+                  lm.left ? { left: lm.left } : null,
+                  lm.right ? { right: lm.right } : null,
+                ]}
+              >
+                <View style={styles.mapLandmarkTextCol}>
+                  <Text style={[styles.mapLandmarkTitle, { color: lm.color }]}>
+                    {lm.name}
+                  </Text>
+                  {lm.sub ? (
+                    <Text style={styles.mapLandmarkSub}>{lm.sub}</Text>
+                  ) : null}
+                </View>
+                <View
+                  style={[styles.mapLandmarkPinCircle, { backgroundColor: lm.color }]}
+                >
+                  <Ionicons name={lm.icon} size={13} color="#FFFFFF" />
+                </View>
+              </Pressable>
+            ))}
+
+            {/* Center Selected Location Pin */}
+            <View pointerEvents="none" style={styles.mapCenterPinContainer}>
+              <View style={styles.mapCenterPinHead}>
+                <View style={styles.mapCenterPinInnerDot} />
+              </View>
+              <View style={styles.mapCenterPinTip} />
+              <View style={styles.mapCenterGroundDot} />
+            </View>
+
+            {/* Top Floating Back + Address Search Bar */}
+            <View style={[styles.mapTopBarRow, { top: insets.top + 12 }]}>
+              <Pressable
+                onPress={() => {
+                  setMapPickerOpen(false);
+                  setAddressSheetOpen(true);
+                }}
+                style={styles.mapBackCircleBtn}
+              >
+                <Ionicons name="arrow-back" size={20} color="#111827" />
+              </Pressable>
+
+              <View style={styles.mapSearchPill}>
+                <TextInput
+                  value={mapAddressDraft}
+                  onChangeText={setMapAddressDraft}
+                  placeholder="Enter pickup or drop address..."
+                  placeholderTextColor="#9CA3AF"
+                  style={styles.mapSearchInput}
+                />
+              </View>
+            </View>
+
+            {/* Bottom-Left Google Maps Watermark */}
+            <View style={styles.googleWatermarkWrap}>
+              <Text style={styles.googleWatermarkText}>Google Maps</Text>
+            </View>
+
+            {/* Bottom-Right GPS Target Button */}
+            <Pressable
+              onPress={() =>
+                setMapAddressDraft('746R+56R, Vadodara, Gujarat 391410, India')
+              }
+              style={styles.mapGpsTargetBtn}
+            >
+              <Ionicons name="locate" size={22} color="#374151" />
+            </Pressable>
+          </View>
+
+          {/* Bottom White Confirm Footer */}
+          <View
+            style={[
+              styles.mapConfirmFooter,
+              { paddingBottom: Math.max(insets.bottom, 14) },
+            ]}
+          >
+            <Pressable
+              onPress={handleConfirmMapPin}
+              style={styles.mapConfirmGreenBtn}
+            >
+              <Text style={styles.mapConfirmGreenBtnText}>Confirm</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Things to keep in mind Modal */}
+      <Modal
+        visible={thingsKeepInMindOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setThingsKeepInMindOpen(false)}
+      >
+        <Pressable
+          style={styles.addrSheetBackdrop}
+          onPress={() => setThingsKeepInMindOpen(false)}
+        >
+          <View
+            style={[
+              styles.addrBottomSheet,
+              { paddingBottom: Math.max(insets.bottom, 20) },
+            ]}
+          >
+            <Text style={styles.addrSheetTitle}>Things to keep in mind</Text>
+            <Text style={styles.addrSheetSub}>
+              Flexi EV Delivery & Pickup guidelines
+            </Text>
+            <View style={{ marginTop: 14, gap: 12 }}>
+              <View style={styles.keepMindBullet}>
+                <Ionicons name="checkmark-circle" size={18} color={FLEXI_GREEN} />
+                <Text style={styles.keepMindText}>
+                  Base fare ₹150 covers doorstep delivery & pickup within 5 KMs of the hub.
+                </Text>
+              </View>
+              <View style={styles.keepMindBullet}>
+                <Ionicons name="checkmark-circle" size={18} color={FLEXI_GREEN} />
+                <Text style={styles.keepMindText}>
+                  Beyond 5 KMs, an additional ₹15/KM applies based on distance.
+                </Text>
+              </View>
+              <View style={styles.keepMindBullet}>
+                <Ionicons name="checkmark-circle" size={18} color={FLEXI_GREEN} />
+                <Text style={styles.keepMindText}>
+                  You can choose different Pickup and Drop locations across the city.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
 
       <Modal
         visible={storyOpen}
@@ -1966,6 +2762,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  faqClip: {
+    overflow: 'hidden',
+  },
+  faqMeasure: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+  },
   faqQ: {
     flex: 1,
     color: '#11141C',
@@ -1981,30 +2785,20 @@ const styles = StyleSheet.create({
   sparkleFabWrap: {
     position: 'absolute',
     right: 16,
-    zIndex: 9,
+    zIndex: 12,
+    elevation: 12,
   },
   sparkleFabGradient: {
-    height: 54,
-    minWidth: 54,
-    borderRadius: 27,
-    paddingHorizontal: 17,
-    flexDirection: 'row',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
     shadowColor: '#2E147A',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
-    elevation: 8,
-  },
-  sparkleFabExpanded: {
-    paddingHorizontal: 20,
-  },
-  askMeAnythingText: {
-    color: '#FFFFFF',
-    fontSize: 14.5,
-    fontWeight: '700',
+    elevation: 12,
   },
   bottomBar: {
     position: 'absolute',
@@ -2082,5 +2876,758 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(110, 110, 118, 0.58)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  /* Location Pill, Guarantee Card & Flexi EV Delivery & Pickup Styles */
+  hubLocationPill: {
+    marginTop: 16,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  hubLocationText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  guaranteeHostCard: {
+    marginTop: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1,
+  },
+  guaranteeSealWrap: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guaranteeSealOuter: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#F59E0B',
+    borderWidth: 2,
+    borderColor: '#FDE68A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guaranteeSealInner: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#D97706',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guaranteeStarsTop: {
+    fontSize: 5,
+    color: '#FEF3C7',
+    letterSpacing: 0.5,
+  },
+  guaranteeRibbon: {
+    backgroundColor: '#78350F',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 2,
+    marginVertical: 1,
+  },
+  guaranteeRibbonText: {
+    color: '#FDE68A',
+    fontSize: 5.5,
+    fontWeight: '900',
+    letterSpacing: 0.3,
+  },
+  guaranteeHostCopy: {
+    flex: 1,
+  },
+  guaranteeHostTitle: {
+    fontSize: 15.5,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  guaranteeHostSub: {
+    marginTop: 3,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#4B5563',
+  },
+  flexiSectionWrap: {
+    marginTop: 18,
+  },
+  flexiTopTabRibbon: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#2E323B',
+    paddingHorizontal: 18,
+    paddingTop: 9,
+    paddingBottom: 11,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 18,
+    marginBottom: -4,
+    zIndex: 1,
+  },
+  flexiTopTabText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  flexiMainCard: {
+    borderRadius: 18,
+    borderTopLeftRadius: 6,
+    borderWidth: 1,
+    borderColor: '#E2E6EE',
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    zIndex: 2,
+  },
+  flexiMainCardActive: {
+    borderColor: '#A7F3D0',
+  },
+  flexiHeaderGrey: {
+    backgroundColor: '#F2F4F8',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  flexiHeaderLeft: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  flexiRateText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#4B5563',
+    fontWeight: '500',
+  },
+  flexiSwitchRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  flexiSwitchTrack: {
+    width: 52,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#CBD5E1',
+    padding: 3,
+    justifyContent: 'center',
+  },
+  flexiSwitchTrackOn: {
+    backgroundColor: FLEXI_GREEN,
+  },
+  flexiSwitchThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  flexiSwitchThumbOn: {
+    alignSelf: 'flex-end',
+  },
+  flexiToggleStatusText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  flexiHouseArtWrap: {
+    width: 112,
+    height: 82,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  isoGroundSlab: {
+    width: 104,
+    height: 68,
+    borderRadius: 14,
+    backgroundColor: '#D1FAE5',
+    borderBottomWidth: 4,
+    borderBottomColor: '#9CA3AF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  isoRoadStrip: {
+    position: 'absolute',
+    bottom: 6,
+    left: 8,
+    right: 8,
+    height: 14,
+    borderRadius: 6,
+    backgroundColor: '#4B5563',
+  },
+  isoTreeLeft: {
+    position: 'absolute',
+    left: 10,
+    top: 10,
+    width: 16,
+    height: 22,
+    borderRadius: 8,
+    backgroundColor: '#059669',
+  },
+  isoHouseWalls: {
+    position: 'absolute',
+    top: 6,
+    right: 14,
+    width: 42,
+    height: 32,
+    borderRadius: 4,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  isoHouseRoof: {
+    position: 'absolute',
+    top: -8,
+    width: 48,
+    height: 12,
+    borderRadius: 4,
+    backgroundColor: '#EA580C',
+  },
+  isoHouseDoor: {
+    width: 10,
+    height: 14,
+    backgroundColor: '#92400E',
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+  },
+  isoScooterBadge: {
+    position: 'absolute',
+    bottom: 8,
+    left: 26,
+    width: 28,
+    height: 22,
+    borderRadius: 8,
+    backgroundColor: '#2563EB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flexiWhiteBody: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  flexiAddressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  flexiDropAddressRow: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#E5E7EB',
+  },
+  flexiAddressCopy: {
+    flex: 1,
+  },
+  flexiAddressKicker: {
+    fontSize: 13.5,
+    fontWeight: '500',
+    color: '#4B5563',
+  },
+  flexiSelectedAddressText: {
+    marginTop: 4,
+    fontSize: 13.5,
+    fontWeight: '700',
+    color: '#111827',
+    lineHeight: 18,
+  },
+  flexiAddAddressBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  flexiAddAddressText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: FLEXI_GREEN,
+  },
+  flexiSameLocRow: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  flexiCheckbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flexiCheckboxOn: {
+    backgroundColor: FLEXI_GREEN,
+    borderColor: FLEXI_GREEN,
+  },
+  flexiSameLocText: {
+    fontSize: 13.5,
+    fontWeight: '500',
+    color: '#4B5563',
+  },
+  flexiBodyDivider: {
+    marginTop: 14,
+    marginBottom: 12,
+    height: 1,
+    backgroundColor: '#F1F5F9',
+  },
+  flexiKeepInMindRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  flexiKeepInMindText: {
+    fontSize: 13.5,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  /* Select Delivery / Drop Address Bottom Sheet Styles */
+  addrSheetBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+    justifyContent: 'flex-end',
+  },
+  addrSheetBackdropTouch: {
+    flex: 1,
+  },
+  addrFloatingCloseRow: {
+    alignItems: 'flex-end',
+    paddingRight: 18,
+    marginBottom: 12,
+  },
+  addrFloatingCloseBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  addrBottomSheet: {
+    maxHeight: '82%',
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 18,
+    paddingHorizontal: 18,
+  },
+  addrTargetTabsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 14,
+  },
+  addrTargetTab: {
+    flex: 1,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  addrTargetTabActive: {
+    backgroundColor: FLEXI_GREEN,
+  },
+  addrTargetTabText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  addrTargetTabTextActive: {
+    color: '#FFFFFF',
+  },
+  addrSheetTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  addrSheetSub: {
+    marginTop: 4,
+    fontSize: 13.5,
+    color: '#6B7280',
+  },
+  addrSheetScroll: {
+    marginTop: 16,
+    maxHeight: 400,
+  },
+  addrSectionHeading: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  primeLocRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  primeLocIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primeLocCopy: {
+    flex: 1,
+  },
+  primeLocTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  primeLocSub: {
+    marginTop: 2,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#6B7280',
+  },
+  savedAddrRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  savedAddrIconWrap: {
+    paddingTop: 2,
+  },
+  savedAddrCopy: {
+    flex: 1,
+  },
+  savedAddrTag: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: 0.4,
+  },
+  savedAddrText: {
+    marginTop: 4,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: '#4B5563',
+  },
+  savedAddrEditBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingTop: 4,
+  },
+  savedAddrEditText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: FLEXI_GREEN,
+  },
+  addNewAddressGreenBtn: {
+    marginTop: 16,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: FLEXI_GREEN,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addNewAddressGreenBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  /* Google Maps Pin Confirmation Modal Styles */
+  mapModalRoot: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  mapCanvas: {
+    flex: 1,
+    backgroundColor: '#EEF1EC',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  mapParkTopLeft: {
+    position: 'absolute',
+    top: '8%',
+    left: '-10%',
+    width: 190,
+    height: 160,
+    borderRadius: 40,
+    backgroundColor: '#DCEFD9',
+  },
+  mapParkBottomRight: {
+    position: 'absolute',
+    bottom: '12%',
+    right: '-8%',
+    width: 170,
+    height: 150,
+    borderRadius: 36,
+    backgroundColor: '#DCEFD9',
+  },
+  mapRoadH1: {
+    position: 'absolute',
+    top: '28%',
+    left: 0,
+    right: 0,
+    height: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  mapRoadH2: {
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    right: 0,
+    height: 18,
+    backgroundColor: '#FFFFFF',
+  },
+  mapRoadH3: {
+    position: 'absolute',
+    top: '76%',
+    left: 0,
+    right: 0,
+    height: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  mapRoadV1: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: '28%',
+    width: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  mapRoadV2: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: '68%',
+    width: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  mapRoadDiag: {
+    position: 'absolute',
+    top: '40%',
+    left: '-10%',
+    width: SCREEN_W * 1.3,
+    height: 12,
+    backgroundColor: '#FFFFFF',
+    transform: [{ rotate: '-22deg' }],
+  },
+  mapBuildingBlock: {
+    position: 'absolute',
+    backgroundColor: '#E2E6DF',
+    borderRadius: 6,
+  },
+  mapLandmarkWrap: {
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  mapLandmarkTextCol: {
+    alignItems: 'flex-end',
+  },
+  mapLandmarkTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'right',
+  },
+  mapLandmarkSub: {
+    fontSize: 10.5,
+    color: '#6B7280',
+  },
+  mapLandmarkPinCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  mapCenterPinContainer: {
+    position: 'absolute',
+    top: '44%',
+    left: '50%',
+    marginLeft: -20,
+    alignItems: 'center',
+  },
+  mapCenterPinHead: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#4F46E5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#312E81',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  mapCenterPinInnerDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#FFFFFF',
+  },
+  mapCenterPinTip: {
+    width: 4,
+    height: 12,
+    backgroundColor: '#4F46E5',
+    marginTop: -2,
+  },
+  mapCenterGroundDot: {
+    marginTop: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#111827',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  mapTopBarRow: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  mapBackCircleBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  mapSearchPill: {
+    flex: 1,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  mapSearchInput: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+    paddingVertical: 0,
+  },
+  googleWatermarkWrap: {
+    position: 'absolute',
+    left: 14,
+    bottom: 14,
+  },
+  googleWatermarkText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#6B7280',
+  },
+  mapGpsTargetBtn: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  mapConfirmFooter: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#ECEEF2',
+  },
+  mapConfirmGreenBtn: {
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: FLEXI_GREEN,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapConfirmGreenBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  keepMindBullet: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  keepMindText: {
+    flex: 1,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: '#374151',
   },
 });

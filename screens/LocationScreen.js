@@ -20,14 +20,112 @@ const PURPLE = '#4A168C';
 const MAP = require('../assets/home/location-map.jpg');
 const MAP_HEIGHT = Math.round(SCREEN_W * 0.72);
 
-const PINS = [
-  { name: 'Evegah', distance: '3.6 km', x: 0.76, y: 0.32, tint: '#F3EEF8', icon: PURPLE },
-  { name: 'Manjalpur', distance: '9.5 km', x: 0.2, y: 0.3, tint: '#E7F6EC', icon: '#1F8A4C' },
-  { name: 'Gotri', distance: '13 km', x: 0.18, y: 0.7, tint: '#E8F4FC', icon: '#2B7BB9' },
-  { name: 'Aatapi', distance: '18.6 km', x: 0.78, y: 0.66, tint: '#FFF4E8', icon: '#E07A1F' },
+export const EVEGAH_ZONES = [
+  {
+    id: 'bill',
+    name: 'Bill, Vadodara-391410',
+    shortName: 'Bill',
+    address: 'Krishna Battery Sales & Services, Bill Road, Vadodara 391410',
+    hours: '06:00 – 23:00',
+    phone: '1800 889 8791',
+    distance: '3.6 km',
+    tint: '#F3EEF8',
+    icon: PURPLE,
+  },
+  {
+    id: 'manjalpur',
+    name: 'Manjalpur, Vadodara-390011',
+    shortName: 'Manjalpur',
+    address: 'Office No. 11, Vidya Dham Society',
+    hours: '10:00 – 22:00',
+    phone: '1800 889 8791',
+    distance: '9.5 km',
+    tint: '#E7F6EC',
+    icon: '#1F8A4C',
+  },
+  {
+    id: 'gotri',
+    name: 'Gotri, Vadodara-390021',
+    shortName: 'Gotri',
+    address: 'Office 10, Royal Nandish, New Alkapuri',
+    hours: '10:00 – 22:00',
+    phone: '1800 889 8791',
+    distance: '13.0 km',
+    tint: '#E8F4FC',
+    icon: '#2B7BB9',
+  },
+  {
+    id: 'aatapi',
+    name: 'Aatapi, Vadodara-391510',
+    shortName: 'Aatapi',
+    address: 'Evegah Aatapi Wonderland, Ajwa',
+    hours: '09:00 – 21:00',
+    phone: '1800 889 8791',
+    distance: '18.6 km',
+    tint: '#FFF4E8',
+    icon: '#E07A1F',
+  },
 ];
 
-function PressScale({ style, children, scaleTo = 0.975, entering }) {
+const PINS = [
+  { name: 'Evegah', distance: '3.6 km', x: 0.76, y: 0.32, tint: '#F3EEF8', icon: PURPLE, zoneIdx: 0 },
+  { name: 'Manjalpur', distance: '9.5 km', x: 0.2, y: 0.3, tint: '#E7F6EC', icon: '#1F8A4C', zoneIdx: 1 },
+  { name: 'Gotri', distance: '13 km', x: 0.18, y: 0.7, tint: '#E8F4FC', icon: '#2B7BB9', zoneIdx: 2 },
+  { name: 'Aatapi', distance: '18.6 km', x: 0.78, y: 0.66, tint: '#FFF4E8', icon: '#E07A1F', zoneIdx: 3 },
+];
+
+const ZONES = [
+  {
+    id: 'bill',
+    name: 'Evegah Zone',
+    shortName: 'Bill',
+    fullLabel: 'Bill, Vadodara-391410',
+    address: 'Krishna Battery Sales & Services',
+    hours: '06:00 – 23:00',
+    phone: '+91 89809 66376',
+    distance: '3.6 km',
+    tint: '#F3EEF8',
+    icon: PURPLE,
+  },
+  {
+    id: 'manjalpur',
+    name: 'Manjalpur Zone',
+    shortName: 'Manjalpur',
+    fullLabel: 'Manjalpur, Vadodara-390011',
+    address: 'Office No. 11, Vidya Dham Society',
+    hours: '10:00 – 22:00',
+    phone: '+91 89809 66677',
+    distance: '9.5 km',
+    tint: '#E7F6EC',
+    icon: '#1F8A4C',
+  },
+  {
+    id: 'gotri',
+    name: 'Gotri Zone',
+    shortName: 'Gotri',
+    fullLabel: 'Gotri, Vadodara-390021',
+    address: 'Office 10, Royal Nandish, New Alkapuri',
+    hours: '10:00 – 22:00',
+    phone: '+91 81282 5117',
+    distance: '13.0 km',
+    tint: '#E8F4FC',
+    icon: '#2B7BB9',
+  },
+  {
+    id: 'aatapi',
+    name: 'Aatapi Zone',
+    shortName: 'Aatapi',
+    fullLabel: 'Aatapi, Vadodara-391510',
+    address: 'Evegah Aatapi Wonderland, Ajwa',
+    hours: '',
+    phone: '',
+    distance: '18.6 km',
+    tint: '#FFF4E8',
+    icon: '#E07A1F',
+  },
+];
+
+function PressScale({ style, children, scaleTo = 0.975, entering, onPress }) {
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -35,6 +133,7 @@ function PressScale({ style, children, scaleTo = 0.975, entering }) {
 
   return (
     <Pressable
+      onPress={onPress}
       onPressIn={() => {
         scale.value = withTiming(scaleTo, { duration: 160, easing: Easing.out(Easing.cubic) });
       }}
@@ -113,7 +212,7 @@ function RadarScan({ size }) {
   );
 }
 
-function MapRadar({ width, height, topInset }) {
+function MapRadar({ width, height, topInset, onPinSelect }) {
   const sheetOverlap = 28;
   const visibleTop = topInset + 8;
   const visibleBottom = height - sheetOverlap - 8;
@@ -133,7 +232,11 @@ function MapRadar({ width, height, topInset }) {
           entering={ZoomIn.delay(220 + index * 140).duration(460)}
           style={[styles.pin, { left: pin.x * width - 46, top: pin.y * height - 24 }]}
         >
-          <PressScale style={styles.pinPress} scaleTo={0.92}>
+          <PressScale
+            style={styles.pinPress}
+            scaleTo={0.92}
+            onPress={() => onPinSelect?.(EVEGAH_ZONES[pin.zoneIdx] || EVEGAH_ZONES[0])}
+          >
             <View style={styles.pinBubble}>
               <View style={[styles.pinIcon, { backgroundColor: pin.tint }]}>
                 <Ionicons name="storefront" size={15} color={pin.icon} />
@@ -151,55 +254,34 @@ function MapRadar({ width, height, topInset }) {
   );
 }
 
-const ZONES = [
-  {
-    name: 'Evegah Zone',
-    address: 'Krishna Battery Sales & Services',
-    hours: '06:00 – 23:00',
-    phone: '+91 89809 66376',
-    distance: '3.6 km',
-    tint: '#F3EEF8',
-    icon: PURPLE,
-  },
-  {
-    name: 'Manjalpur Zone',
-    address: 'Office No. 11, Vidya Dham Society',
-    hours: '10:00 – 22:00',
-    phone: '+91 89809 66677',
-    distance: '9.5 km',
-    tint: '#E7F6EC',
-    icon: '#1F8A4C',
-  },
-  {
-    name: 'Gotri Zone',
-    address: 'Office 10, Royal Nandish, New Alkapuri',
-    hours: '10:00 – 22:00',
-    phone: '+91 81282 5117',
-    distance: '13.0 km',
-    tint: '#E8F4FC',
-    icon: '#2B7BB9',
-  },
-  {
-    name: 'Aatapi Zone',
-    address: 'Evegah Aatapi Wonderland, Ajwa',
-    hours: '',
-    phone: '',
-    distance: '18.6 km',
-    tint: '#FFF4E8',
-    icon: '#E07A1F',
-  },
-];
-
-export default function LocationScreen({ onBack }) {
+export default function LocationScreen({ onBack, onSelectZone }) {
   const insets = useSafeAreaInsets();
   const mapH = MAP_HEIGHT + insets.top;
+
+  const handleChooseZone = (zoneObj) => {
+    if (onSelectZone) {
+      onSelectZone({
+        id: zoneObj.id || 'bill',
+        name: zoneObj.fullLabel || zoneObj.name || 'Bill, Vadodara-391410',
+        shortName: zoneObj.shortName || zoneObj.name?.replace(' Zone', '') || 'Bill',
+        address: zoneObj.address || '',
+      });
+    } else {
+      onBack?.();
+    }
+  };
 
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
       <View style={[styles.mapWrap, { height: mapH }]}>
         <Image source={MAP} style={styles.map} contentFit="cover" contentPosition="center" />
-        <MapRadar width={SCREEN_W} height={mapH} topInset={insets.top} />
+        <MapRadar
+          width={SCREEN_W}
+          height={mapH}
+          topInset={insets.top}
+          onPinSelect={handleChooseZone}
+        />
       </View>
 
       <Pressable
@@ -225,7 +307,11 @@ export default function LocationScreen({ onBack }) {
               868Q+5X4, Ajwa Rd, Sonalvatika
             </Text>
           </View>
-          <Pressable onPress={onBack} hitSlop={8} style={styles.useCurrent}>
+          <Pressable
+            onPress={() => handleChooseZone(ZONES[0])}
+            hitSlop={8}
+            style={styles.useCurrent}
+          >
             <Ionicons name="paper-plane-outline" size={14} color={PURPLE} />
             <Text style={styles.useCurrentText}>Use Current</Text>
           </Pressable>
@@ -240,7 +326,12 @@ export default function LocationScreen({ onBack }) {
         </View>
 
         {ZONES.map((zone, index) => (
-          <PressScale key={zone.name} entering={cardEnter(index + 1)} style={styles.zoneCard}>
+          <PressScale
+            key={zone.name}
+            entering={cardEnter(index + 1)}
+            style={styles.zoneCard}
+            onPress={() => handleChooseZone(zone)}
+          >
             <View style={styles.zoneTop}>
               <View style={[styles.zoneMark, { backgroundColor: zone.tint }]}>
                 <Ionicons name="storefront" size={22} color={zone.icon} />
@@ -280,7 +371,10 @@ export default function LocationScreen({ onBack }) {
                   </View>
                 ) : null}
               </View>
-              <Pressable style={styles.direction}>
+              <Pressable
+                style={styles.direction}
+                onPress={() => handleChooseZone(zone)}
+              >
                 <Ionicons name="navigate-outline" size={14} color={PURPLE} />
                 <Text style={styles.directionText}>Direction</Text>
               </Pressable>

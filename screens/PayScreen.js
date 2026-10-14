@@ -1,30 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { BlurTargetView, BlurView } from 'expo-blur';
+import { useEffect, useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   Easing,
+  FadeIn,
   ReduceMotion,
-  interpolate,
-  Extrapolation,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withRepeat,
-  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
 
-const PURPLE = '#6D35D6';
-const INK = '#1A1A1A';
-const MUTED = '#8B8498';
+const PURPLE = '#4A168C';
+const EASE = Easing.bezier(0.22, 1, 0.36, 1);
 const DAY_RATE = {
   'Evegah Fly': 149,
   'Evegah Mink': 199,
@@ -32,30 +24,58 @@ const DAY_RATE = {
   'Evegah Pro': 299,
 };
 const DEPOSIT = 250;
-const OFFER_OFF = 40;
-const METHODS = [
-  { id: 'payu', name: 'PayU', logo: require('../assets/pay/payu.png') },
-  { id: 'icici', name: 'ICICI Bank', logo: require('../assets/pay/icici-bank.png') },
-];
-const SKETCHES = {
-  fly: require('../assets/pay/sketch-fly.png'),
-  mink: require('../assets/pay/sketch-mink.png'),
-  city: require('../assets/pay/sketch-city.png'),
-  pro: require('../assets/pay/sketch-pro.png'),
-};
+const FLEXI_BASE_FARE = 150;
 
-function sketchFor(vehicle) {
-  const name = String(vehicle?.name || '').toLowerCase();
-  if (name.includes('fly')) return SKETCHES.fly;
-  if (name.includes('mink')) return SKETCHES.mink;
-  if (name.includes('city')) return SKETCHES.city;
-  if (name.includes('pro')) return SKETCHES.pro;
-  return SKETCHES.city;
-}
+const CHECKOUT_COUPONS = [
+  {
+    id: 'first50',
+    title: 'Flat ₹50 OFF on First Evegah Ride',
+    subtitle: 'Use code FIRST50',
+    code: 'FIRST50',
+    discount: 50,
+    bullets: [
+      'Valid on your first Evegah electric scooter booking.',
+      'Applicable across Hourly, Daily & Monthly plans.',
+    ],
+  },
+  {
+    id: 'navratri100',
+    title: 'Navratri Fest • Flat ₹100 OFF',
+    subtitle: 'Use code NAVRATRI100',
+    code: 'NAVRATRI100',
+    discount: 100,
+    bullets: [
+      'Festive special coupon for Garba & night EV rides.',
+      'Includes free battery swap at any 24/7 Evegah hub.',
+    ],
+  },
+  {
+    id: 'diwali200',
+    title: 'Diwali Dhamaka • Flat ₹200 OFF',
+    subtitle: 'Use code DIWALI200',
+    code: 'DIWALI200',
+    discount: 200,
+    bullets: [
+      'Festive reward coupon on multi-day or weekly EV plans.',
+      'Applicable on Evegah Fly, Mink, City & Pro scooters.',
+    ],
+  },
+  {
+    id: 'winter40',
+    title: 'Winter Ride • Flat ₹40 OFF above ₹149',
+    subtitle: 'Use code WINTER40',
+    code: 'WINTER40',
+    discount: 40,
+    bullets: [
+      'This offer is personalised for your winter morning rides.',
+      'Applicable on order worth ₹149 or above.',
+    ],
+  },
+];
 
 function rupee(amount) {
-  const value = Math.abs(Math.round(amount)).toLocaleString('en-IN');
-  return amount < 0 ? `− ₹${value}` : `₹${value}`;
+  const sign = amount < 0 ? '−' : '';
+  return `${sign}₹${Math.abs(Math.round(amount)).toLocaleString('en-IN')}`;
 }
 
 function billDays(start, end) {
@@ -75,333 +95,417 @@ function spanLabel(start, end) {
 function whenLine(ms) {
   if (!ms) return 'Select';
   const date = new Date(ms);
-  const day = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const day = date.toLocaleDateString('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
+  const time = date.toLocaleTimeString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
   return `${day} · ${time}`;
 }
 
-function policyWhen(ms) {
-  if (!ms) return 'Pickup time';
-  const date = new Date(ms);
-  const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-  return `${day}, ${time}`;
+function formatCutoffLabel(pickupAt) {
+  const d = pickupAt ? new Date(pickupAt) : new Date(Date.now() + 3600 * 1000);
+  const dayMonth = d.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+  });
+  const time = d.toLocaleTimeString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+  return `${dayMonth}, ${time.toUpperCase()}`;
 }
 
-function chargeLine(vehicle) {
-  const raw = String(vehicle?.charge || '4–5 hours');
-  return raw.replace(/hours/gi, 'hrs').replace(/hour/gi, 'hr');
-}
+function Segment({ value, onChange }) {
+  const [width, setWidth] = useState(0);
+  const x = useSharedValue(0);
+  const markW = Math.max((width - 8) / 2, 0);
 
-const SHEET_OFF = 560;
-const SHEET_EASE = Easing.bezier(0.22, 1, 0.36, 1);
+  useEffect(() => {
+    x.value = withTiming(value === 'now' ? 0 : markW, {
+      duration: 320,
+      easing: EASE,
+      reduceMotion: ReduceMotion.Never,
+    });
+  }, [markW, value, x]);
 
-function Radio({ on }) {
+  const markStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: x.value }],
+  }));
+
   return (
-    <View style={[styles.radio, on && styles.radioOn]}>
-      {on ? <View style={styles.radioDot} /> : null}
-    </View>
-  );
-}
-
-function VerificationIcon() {
-  return (
-    <View style={styles.bringIcon}>
-      <View style={[styles.scanCorner, styles.scanTL]} />
-      <View style={[styles.scanCorner, styles.scanTR]} />
-      <View style={[styles.scanCorner, styles.scanBL]} />
-      <View style={[styles.scanCorner, styles.scanBR]} />
-      <View style={styles.personHead} />
-      <View style={styles.personBody} />
-    </View>
-  );
-}
-
-function PermitIcon() {
-  return (
-    <View style={styles.bringIcon}>
-      <View style={styles.doc}>
-        <View style={styles.docLine} />
-        <View style={[styles.docLine, styles.docLineMid]} />
-        <View style={[styles.docLine, styles.docLineShort]} />
-      </View>
-      <View style={styles.stamp} />
+    <View
+      style={styles.segment}
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+    >
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.segmentMark, { width: markW }, markStyle]}
+      />
+      {[
+        ['now', 'Pay now'],
+        ['later', 'Pay later'],
+      ].map(([id, label]) => {
+        const on = value === id;
+        return (
+          <Pressable
+            key={id}
+            style={styles.segmentBtn}
+            onPress={() => onChange(id)}
+          >
+            <Text style={[styles.segmentText, on && styles.segmentTextOn]}>
+              {label}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
 
 export default function PayScreen({ vehicle, trip, onBack, onPay }) {
   const insets = useSafeAreaInsets();
-  const [offerOn, setOfferOn] = useState(true);
-  const [method, setMethod] = useState('payu');
-  const [summaryOpen, setSummaryOpen] = useState(false);
-  const blurTargetRef = useRef(null);
+  const [offerOn, setOfferOn] = useState(false);
+  const [appliedCode, setAppliedCode] = useState('FIRST50');
+  const [appliedDiscountAmt, setAppliedDiscountAmt] = useState(50);
+  const [couponPopupOpen, setCouponPopupOpen] = useState(false);
+  const [expandedMap, setExpandedMap] = useState({
+    first50: true,
+    navratri100: true,
+    diwali200: true,
+    winter40: true,
+  });
+  const [depositWhen, setDepositWhen] = useState('now');
+  const [method, setMethod] = useState('upi');
   const btnScale = useSharedValue(1);
-  const sheetY = useSharedValue(SHEET_OFF);
-  const glide = useSharedValue(0);
-  const payWidth = useSharedValue(300);
-  const doneWidth = useSharedValue(300);
   const btnStyle = useAnimatedStyle(() => ({
     transform: [{ scale: btnScale.value }],
   }));
-  const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: sheetY.value }],
-  }));
-  const fillStyle = useAnimatedStyle(() => ({
-    width: payWidth.value * 3,
-    transform: [{ translateX: payWidth.value * -1.6 * (1 - glide.value) }],
-  }));
-  const shineStyle = useAnimatedStyle(() => {
-    const width = payWidth.value;
-    return {
-      width: width * 2,
-      opacity: interpolate(glide.value, [0, 0.12, 0.5, 0.88, 1], [0, 0, 0.4, 0, 0], Extrapolation.CLAMP),
-      transform: [
-        { translateX: interpolate(glide.value, [0, 1], [width * -2.2, width * 1.25]) },
-        { skewX: '-20deg' },
-      ],
-    };
-  });
-  const doneFillStyle = useAnimatedStyle(() => ({
-    width: doneWidth.value * 3,
-    transform: [{ translateX: doneWidth.value * -1.6 * (1 - glide.value) }],
-  }));
-  const doneShineStyle = useAnimatedStyle(() => {
-    const width = doneWidth.value;
-    return {
-      width: width * 2,
-      opacity: interpolate(glide.value, [0, 0.12, 0.5, 0.88, 1], [0, 0, 0.4, 0, 0], Extrapolation.CLAMP),
-      transform: [
-        { translateX: interpolate(glide.value, [0, 1], [width * -2.2, width * 1.25]) },
-        { skewX: '-20deg' },
-      ],
-    };
-  });
-
-  useEffect(() => {
-    glide.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1600, easing: Easing.linear, reduceMotion: ReduceMotion.Never }),
-        withDelay(700, withTiming(1, { duration: 0, reduceMotion: ReduceMotion.Never })),
-        withTiming(0, { duration: 0, reduceMotion: ReduceMotion.Never }),
-      ),
-      -1,
-      false,
-      undefined,
-      ReduceMotion.Never,
-    );
-  }, [glide]);
-
-  useEffect(() => {
-    if (!summaryOpen) return undefined;
-    const frame = requestAnimationFrame(() => {
-      sheetY.value = withTiming(0, {
-        duration: 420,
-        easing: SHEET_EASE,
-        reduceMotion: ReduceMotion.Never,
-      });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [summaryOpen, sheetY]);
 
   const days = billDays(trip?.pickupAt, trip?.dropAt);
   const rate = DAY_RATE[vehicle?.name] || DAY_RATE['Evegah Mink'];
   const fare = rate * days;
-  const discount = offerOn ? Math.min(OFFER_OFF, fare) : 0;
-  const total = fare - discount + DEPOSIT;
+  const flexiEnabled = Boolean(trip?.flexiEnabled || vehicle?.flexiEnabled);
+  const flexiFee = flexiEnabled ? FLEXI_BASE_FARE : 0;
+  const discount = offerOn ? Math.min(appliedDiscountAmt, fare) : 0;
+  const deposit = depositWhen === 'now' ? DEPOSIT : 0;
+  const total = fare + flexiFee - discount + deposit;
   const span = spanLabel(trip?.pickupAt, trip?.dropAt);
-  const dayLabel = days === 1 ? '1 day' : `${days} days`;
 
-  const pay = () => onPay?.({
-    total,
-    fare,
-    discount,
-    deposit: DEPOSIT,
-    days,
-    method,
-    depositWhen: 'now',
-    offerOn,
-  });
-
-  const closeSummary = () => {
-    sheetY.value = withTiming(SHEET_OFF, {
-      duration: 320,
-      easing: Easing.in(Easing.cubic),
-      reduceMotion: ReduceMotion.Never,
-    }, (finished) => {
-      if (finished) runOnJS(setSummaryOpen)(false);
-    });
-  };
+  const pickupLabel =
+    trip?.flexiPickupAddress ||
+    vehicle?.flexiPickupAddress ||
+    trip?.pickupName ||
+    'Select';
+  const dropLabel =
+    trip?.flexiDropAddress ||
+    vehicle?.flexiDropAddress ||
+    trip?.dropName ||
+    'Select';
 
   return (
     <View style={styles.root}>
-      <BlurTargetView ref={blurTargetRef} collapsable={false} style={styles.blurTarget}>
       <StatusBar style="dark" />
-      <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
-        <Pressable hitSlop={10} style={styles.back} onPress={onBack}>
-          <Ionicons name="chevron-back" size={22} color={INK} />
-        </Pressable>
-        <Text style={styles.headerTitle}>Pay for ride</Text>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+        <View style={styles.headerRow}>
+          <Text pointerEvents="none" style={styles.headerTitle}>
+            Checkout
+          </Text>
+          <Pressable hitSlop={8} style={styles.back} onPress={onBack}>
+            <Ionicons name="chevron-back" size={20} color="#1C1C1C" />
+          </Pressable>
+          <View style={styles.secure}>
+            <Ionicons name="lock-closed" size={12} color={PURPLE} />
+            <Text style={styles.secureText}>Secure</Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 108, paddingTop: 4 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
       >
-        <Animated.View entering={cardEnter(0)} style={styles.hero}>
-          <View style={styles.heroCopy}>
-            <Text style={styles.heroName} numberOfLines={1}>{vehicle?.name || 'Your scooter'}</Text>
-            <View style={styles.specs}>
-              <View style={styles.spec}>
-                <Text style={styles.specLabel}>Range</Text>
-                <Text style={styles.specValue} numberOfLines={1}>{vehicle?.range || '—'}</Text>
-              </View>
-              <View style={styles.spec}>
-                <Text style={styles.specLabel}>Top speed</Text>
-                <Text style={styles.specValue} numberOfLines={1}>{vehicle?.speed || '—'}</Text>
-              </View>
-              <View style={styles.spec}>
-                <Text style={styles.specLabel}>Fast charge</Text>
-                <Text style={styles.specValue} numberOfLines={1}>{chargeLine(vehicle)}</Text>
-              </View>
+        <Animated.View entering={cardEnter(0)} style={styles.card}>
+          <View style={styles.hero}>
+            <View
+              style={[
+                styles.heroArt,
+                { backgroundColor: vehicle?.tint || '#F6F1FC' },
+              ]}
+            >
+              {vehicle?.image ? (
+                <Image
+                  source={vehicle.image}
+                  style={styles.heroImage}
+                  contentFit="contain"
+                />
+              ) : null}
+            </View>
+            <View style={styles.heroCopy}>
+              <Text style={styles.heroName}>
+                {vehicle?.name || 'Your scooter'}
+              </Text>
+              <Text style={styles.heroLine}>
+                {vehicle?.line || 'Electric ride'}
+              </Text>
+              <Text style={styles.heroMeta}>{vehicle?.range || ''}</Text>
             </View>
           </View>
-          {vehicle?.image ? (
-            <Image source={vehicle.image} style={styles.heroImage} contentFit="contain" />
-          ) : null}
-        </Animated.View>
-
-        <Animated.View entering={cardEnter(1)} style={styles.card}>
+          <View style={styles.rule} />
           <View style={styles.route}>
             <View style={styles.routeCol}>
-              <View style={styles.routeTitle}>
-                <Ionicons name="location" size={14} color={PURPLE} />
-                <Text style={styles.routeKicker}>Pickup</Text>
-              </View>
-              <Text style={styles.routePlace} numberOfLines={1}>{trip?.pickupName || 'Select'}</Text>
-              <Text style={styles.routeWhen} numberOfLines={1}>{whenLine(trip?.pickupAt)}</Text>
+              <Text style={styles.routeKicker}>
+                {flexiEnabled ? 'Flexi Pickup' : 'Pickup'}
+              </Text>
+              <Text style={styles.routePlace} numberOfLines={2}>
+                {pickupLabel}
+              </Text>
+              <Text style={styles.routeWhen} numberOfLines={1}>
+                {whenLine(trip?.pickupAt)}
+              </Text>
             </View>
             <View style={styles.routeMid}>
-              <View style={styles.routeDash} />
-              <View style={styles.spanPill}>
-                <Text style={styles.spanText}>{span}</Text>
-              </View>
+              <View style={styles.routeLine} />
+              <Text style={styles.routeSpan}>{span}</Text>
             </View>
             <View style={[styles.routeCol, styles.routeEnd]}>
-              <View style={styles.routeTitle}>
-                <Ionicons name="location" size={14} color={PURPLE} />
-                <Text style={styles.routeKicker}>Drop</Text>
-              </View>
-              <Text style={[styles.routePlace, styles.alignEnd]} numberOfLines={1}>{trip?.dropName || 'Select'}</Text>
-              <Text style={[styles.routeWhen, styles.alignEnd]} numberOfLines={1}>{whenLine(trip?.dropAt)}</Text>
+              <Text style={styles.routeKicker}>
+                {flexiEnabled ? 'Flexi Drop' : 'Drop'}
+              </Text>
+              <Text
+                style={[styles.routePlace, styles.routeAlign]}
+                numberOfLines={2}
+              >
+                {dropLabel}
+              </Text>
+              <Text
+                style={[styles.routeWhen, styles.routeAlign]}
+                numberOfLines={1}
+              >
+                {whenLine(trip?.dropAt)}
+              </Text>
             </View>
           </View>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(2)} style={styles.offer}>
-          <View style={styles.offerMark}>
-            <Ionicons name="pricetag" size={16} color={PURPLE} />
-          </View>
-          <View style={styles.offerCopy}>
-            <Text style={styles.offerCode}>EVE20</Text>
-            <Text style={styles.offerText}>₹40 off this ride</Text>
-          </View>
-          <Pressable hitSlop={8} onPress={() => setOfferOn((on) => !on)}>
-            <Text style={styles.offerAction}>{offerOn ? 'Remove' : 'Apply'}</Text>
+        <Animated.Text entering={cardEnter(1)} style={styles.section}>
+          Offer
+        </Animated.Text>
+        <Animated.View entering={cardEnter(1)}>
+          <Pressable
+            onPress={() => setCouponPopupOpen(true)}
+            style={[styles.offer, offerOn && styles.offerOn]}
+          >
+            <View style={styles.offerMark}>
+              <Ionicons name="pricetag" size={16} color="#FFFFFF" />
+            </View>
+            <View style={styles.offerCopy}>
+              <Text style={styles.offerCode}>
+                {offerOn ? appliedCode : 'Apply Evegah Coupon'}
+              </Text>
+              <Text style={styles.offerText}>
+                {offerOn
+                  ? `₹${discount} off applied on this ride`
+                  : 'First Ride, Navratri, Diwali & Winter Ride coupons'}
+              </Text>
+            </View>
+            <Text style={[styles.offerAction, offerOn && styles.offerActionOn]}>
+              {offerOn ? 'Applied' : 'View'}
+            </Text>
           </Pressable>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(3)}>
-          <Text style={styles.section}>Pay with</Text>
-          <View style={styles.choiceRow}>
-            {METHODS.map((item) => {
-              const on = method === item.id;
-              return (
-                <Pressable
-                  key={item.id}
-                  onPress={() => setMethod(item.id)}
-                  style={[styles.payCard, on && styles.choiceOn]}
-                >
-                  <View style={styles.logoWell}>
-                    <Image source={item.logo} style={styles.bankLogo} contentFit="contain" contentPosition="left" />
-                  </View>
-                  <View style={styles.payMeta}>
-                    <Text style={styles.bankName} numberOfLines={1}>{item.name}</Text>
-                    <Radio on={on} />
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
+        <Animated.Text entering={cardEnter(2)} style={styles.section}>
+          Deposit
+        </Animated.Text>
+        <Animated.View entering={cardEnter(2)} style={styles.card}>
+          <Segment value={depositWhen} onChange={setDepositWhen} />
+          <Text style={styles.depositNote}>
+            {depositWhen === 'now'
+              ? `₹${DEPOSIT} is refundable and comes back after the ride.`
+              : `₹${DEPOSIT} is due before pickup. It is refundable.`}
+          </Text>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(4)} style={styles.bill}>
-          <Text style={styles.billTitle}>Bill details</Text>
+        <Animated.Text entering={cardEnter(3)} style={styles.section}>
+          Pay with
+        </Animated.Text>
+        <Animated.View entering={cardEnter(3)} style={styles.methods}>
+          {[
+            ['upi', 'UPI', 'phone-portrait-outline'],
+            ['card', 'Card', 'card-outline'],
+          ].map(([id, label, icon]) => {
+            const on = method === id;
+            return (
+              <Pressable
+                key={id}
+                onPress={() => setMethod(id)}
+                style={[styles.method, on && styles.methodOn]}
+              >
+                <Ionicons
+                  name={icon}
+                  size={20}
+                  color={on ? PURPLE : '#6E6878'}
+                />
+                <Text style={[styles.methodText, on && styles.methodTextOn]}>
+                  {label}
+                </Text>
+                {on ? (
+                  <Ionicons name="checkmark-circle" size={16} color={PURPLE} />
+                ) : (
+                  <View style={styles.methodDot} />
+                )}
+              </Pressable>
+            );
+          })}
+        </Animated.View>
+
+        <Animated.Text entering={cardEnter(4)} style={styles.section}>
+          Bill
+        </Animated.Text>
+        <Animated.View entering={cardEnter(4)} style={styles.card}>
+          <View style={styles.billRow}>
+            <Text style={styles.billLabel}>
+              Ride fare · {days === 1 ? '1 day' : `${days} days`}
+            </Text>
+            <Text style={styles.billValue}>{rupee(fare)}</Text>
+          </View>
+          {flexiEnabled ? (
+            <View style={styles.billRow}>
+              <Text style={styles.billLabel}>Flexi EV Delivery & Pickup</Text>
+              <Text style={styles.billValue}>{rupee(flexiFee)}</Text>
+            </View>
+          ) : null}
+          {discount > 0 ? (
+            <Animated.View
+              entering={FadeIn.duration(220)}
+              style={styles.billRow}
+            >
+              <Text style={styles.billSave}>{appliedCode}</Text>
+              <Text style={styles.billSave}>{rupee(-discount)}</Text>
+            </Animated.View>
+          ) : null}
           <View style={styles.billRow}>
             <Text style={styles.billLabel}>Security deposit</Text>
-            <Text style={styles.billValue}>{rupee(DEPOSIT)}</Text>
-          </View>
-          <View style={styles.billRow}>
-            <Text style={styles.billSave}>Discount</Text>
-            <Text style={styles.billSave}>{discount ? rupee(-discount) : rupee(0)}</Text>
+            <Text style={styles.billValue}>
+              {deposit ? rupee(deposit) : 'Later'}
+            </Text>
           </View>
           <View style={styles.billRule} />
           <View style={styles.billRow}>
-            <Text style={styles.billTotal}>Total amount</Text>
-            <Text style={styles.billTotal}>{rupee(total)}</Text>
+            <Text style={styles.billTotal}>Total</Text>
+            <Animated.Text
+              key={total}
+              entering={FadeIn.duration(220)}
+              style={styles.billTotal}
+            >
+              {rupee(total)}
+            </Animated.Text>
           </View>
-          <Pressable style={styles.summaryBtn} onPress={() => setSummaryOpen(true)}>
-            <Text style={styles.summaryBtnText}>Bill summary</Text>
-            <Ionicons name="chevron-down" size={18} color={INK} />
-          </Pressable>
+          <Text style={styles.billHint}>Includes taxes</Text>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(6)} style={styles.bring}>
-          <Text style={styles.blockTitle}>Things to bring with you</Text>
+        {/* SECTION: Things to bring with you (KYC & Intercity Permit - Matches Screenshot) */}
+        <Animated.View entering={cardEnter(5)} style={styles.policySectionWrap}>
+          <Text style={styles.policyHeading}>Things to bring with you</Text>
+
           <View style={styles.bringCard}>
-            <VerificationIcon />
-            <View style={styles.bringCopy}>
-              <Text style={styles.bringTitle}>Verification</Text>
-              <Text style={styles.bringText}>
-                Carry your Original Driving Licence and Aadhaar for a quick in-person verification at the hub
+            <View style={styles.bringIconSquare}>
+              <View style={styles.verifyFaceCircle}>
+                <Ionicons name="person" size={20} color="#F59E0B" />
+              </View>
+              <View style={styles.verifyIdMini}>
+                <Ionicons name="card" size={13} color="#3B82F6" />
+              </View>
+              <View style={styles.verifyCheckDot}>
+                <Ionicons name="checkmark" size={9} color="#FFFFFF" />
+              </View>
+            </View>
+            <View style={styles.bringCardCopy}>
+              <Text style={styles.bringCardTitle}>Verification</Text>
+              <Text style={styles.bringCardSub}>
+                Carry your Original Driving Licence and Aadhaar for a quick
+                in-person verification at the hub
               </Text>
             </View>
           </View>
+
           <View style={styles.bringCard}>
-            <PermitIcon />
-            <View style={styles.bringCopy}>
-              <Text style={styles.bringTitle}>Ask for intercity permit.</Text>
-              <Text style={styles.bringText}>
-                Please ask hub partner for a permit if you're traveling intercity.
+            <View style={styles.bringIconSquare}>
+              <View style={styles.permitDocSheet}>
+                <View style={styles.permitDocLineLong} />
+                <View style={styles.permitDocLineShort} />
+                <View style={styles.permitStampBadge}>
+                  <Ionicons name="ribbon" size={12} color="#2563EB" />
+                </View>
+              </View>
+            </View>
+            <View style={styles.bringCardCopy}>
+              <Text style={styles.bringCardTitle}>
+                Ask for intercity permit.
+              </Text>
+              <Text style={styles.bringCardSub}>
+                Please ask hub partner for a permit if you&apos;re traveling
+                intercity.
               </Text>
             </View>
           </View>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(7)} style={styles.policy}>
-          <Text style={styles.blockTitle}>Cancellation Policy</Text>
-          <Text style={styles.policyLead}>Free cancellation available</Text>
-          <View style={styles.refundWrap}>
-            <View style={styles.refundBar}>
-              <View style={styles.refundFull}>
-                <Text style={styles.refundFullText}>100% Refund</Text>
+        {/* SECTION: Cancellation Policy (Matches Screenshot) */}
+        <Animated.View entering={cardEnter(6)} style={styles.policySectionWrap}>
+          <Text style={styles.policyHeading}>Cancellation Policy</Text>
+          <Text style={styles.policySubheading}>
+            Free cancellation available
+          </Text>
+
+          <View style={styles.cancelBarWrap}>
+            <View style={styles.cancelSplitPill}>
+              <View style={styles.cancelLeftGreen}>
+                <Text style={styles.cancelLeftGreenText}>100% Refund</Text>
               </View>
-              <View style={styles.refundNone}>
-                <Text style={styles.refundNoneText}>0% Refund</Text>
+              <View style={styles.cancelRightGrey}>
+                <Text style={styles.cancelRightGreyText}>0% Refund</Text>
               </View>
             </View>
-            <View style={styles.policyMark}>
-              <View style={styles.arrowStem} />
-              <View style={styles.arrowHead} />
-              <Text style={styles.policyWhen}>{policyWhen(trip?.pickupAt)}</Text>
+
+            <View style={styles.cancelCutoffPointer}>
+              <View style={styles.cancelArrowStem} />
+              <Ionicons name="arrow-down" size={15} color="#111827" style={{ marginTop: -5 }} />
+              <Text style={styles.cancelCutoffTimeText}>
+                {formatCutoffLabel(trip?.pickupAt)}
+              </Text>
             </View>
           </View>
         </Animated.View>
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 10) }]}>
+      <View
+        style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}
+      >
+        <View>
+          <Text style={styles.footerKicker}>To pay</Text>
+          <Text style={styles.footerAmount}>{rupee(total)}</Text>
+        </View>
         <Pressable
-          onPress={pay}
+          onPress={() =>
+            onPay?.({
+              total,
+              fare,
+              flexiFee,
+              discount,
+              deposit,
+              days,
+              method,
+              depositWhen,
+              offerOn,
+            })
+          }
           onPressIn={() => {
             btnScale.value = withSpring(0.96, { damping: 18, stiffness: 280 });
           }}
@@ -409,96 +513,129 @@ export default function PayScreen({ vehicle, trip, onBack, onPay }) {
             btnScale.value = withSpring(1, { damping: 14, stiffness: 220 });
           }}
         >
-          <Animated.View
-            style={[styles.pay, btnStyle]}
-            onLayout={(event) => {
-              payWidth.value = event.nativeEvent.layout.width;
-            }}
-          >
-            <Animated.View pointerEvents="none" style={[styles.payFill, fillStyle]}>
-              <LinearGradient
-                colors={['#7C1FFF', '#7C1FFF', '#D8B4FE', '#7C1FFF', '#7C1FFF']}
-                locations={[0, 0.36, 0.44, 0.52, 1]}
-                start={{ x: 0.79, y: 0.91 }}
-                end={{ x: 0.21, y: 0.09 }}
-                style={StyleSheet.absoluteFill}
-              />
-            </Animated.View>
+          <Animated.View style={[styles.pay, btnStyle]}>
             <Text style={styles.payText}>Pay {rupee(total)}</Text>
-            <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-            <Animated.View pointerEvents="none" style={[styles.lwShine, shineStyle]} />
           </Animated.View>
         </Pressable>
       </View>
-      </BlurTargetView>
 
-      {summaryOpen ? (
-        <View style={styles.sheetRoot}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={closeSummary}>
-            <BlurView
-              blurTarget={blurTargetRef}
-              intensity={16}
-              tint="light"
-              blurMethod="dimezisBlurView"
-              blurReductionFactor={4}
-              style={StyleSheet.absoluteFill}
-            />
-          </Pressable>
-          <Animated.View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) }, sheetStyle]}>
-            <View style={styles.sheetHandle} />
-            <Text style={styles.sheetTitle}>Bill summary</Text>
-            <View style={styles.billRow}>
-              <Text style={styles.billLabel}>Ride fare ({dayLabel})</Text>
-              <Text style={styles.billValue}>{rupee(fare)}</Text>
-            </View>
-            <View style={styles.billRow}>
-              <Text style={styles.billLabel}>Security deposit</Text>
-              <Text style={styles.billValue}>{rupee(DEPOSIT)}</Text>
-            </View>
-            <View style={styles.billRow}>
-              <Text style={styles.billSave}>Discount</Text>
-              <Text style={styles.billSave}>{discount ? rupee(-discount) : rupee(0)}</Text>
-            </View>
-            <View style={styles.billRow}>
-              <Text style={styles.billTotal}>Total amount</Text>
-              <Text style={styles.billTotal}>{rupee(total)}</Text>
-            </View>
-            <View style={styles.values}>
-              <Text style={styles.valuesTitle}>Best-in-class values</Text>
-              <View style={styles.valuesRow}>
-                <Text style={styles.valuesText}>
-                  Thorough inspection, expert refurbishment & cleaning has been conducted by our professionals.
-                </Text>
-                <Image
-                  source={sketchFor(vehicle)}
-                  style={styles.valuesSketch}
-                  contentFit="contain"
-                />
-              </View>
-            </View>
-            <Pressable style={styles.done} onPress={closeSummary}>
-              <View
-                style={styles.doneFace}
-                onLayout={(event) => {
-                  doneWidth.value = event.nativeEvent.layout.width;
-                }}
-              >
-                <Animated.View pointerEvents="none" style={[styles.payFill, doneFillStyle]}>
-                  <LinearGradient
-                    colors={['#7C1FFF', '#7C1FFF', '#D8B4FE', '#7C1FFF', '#7C1FFF']}
-                    locations={[0, 0.36, 0.44, 0.52, 1]}
-                    start={{ x: 0.79, y: 0.91 }}
-                    end={{ x: 0.21, y: 0.09 }}
-                    style={StyleSheet.absoluteFill}
-                  />
-                </Animated.View>
-                <Text style={styles.doneText}>Done</Text>
-                <Animated.View pointerEvents="none" style={[styles.lwShine, doneShineStyle]} />
-              </View>
+      {/* Apply Evegah Coupon Popup Modal */}
+      <Modal
+        visible={couponPopupOpen}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={() => setCouponPopupOpen(false)}
+      >
+        <View style={styles.popupBackdrop}>
+          <Pressable
+            style={styles.popupBackdropTouch}
+            onPress={() => setCouponPopupOpen(false)}
+          />
+
+          <View style={styles.popupCloseCircleWrap}>
+            <Pressable
+              onPress={() => setCouponPopupOpen(false)}
+              style={styles.popupCloseCircle}
+            >
+              <Ionicons name="close" size={22} color="#FFFFFF" />
             </Pressable>
-          </Animated.View>
+          </View>
+
+          <View
+            style={[
+              styles.popupSheet,
+              { paddingBottom: Math.max(insets.bottom, 20) },
+            ]}
+          >
+            <Text style={styles.popupMainTitle}>Offers at Evegah</Text>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.popupScroll}
+            >
+              <View style={styles.popupGroupBox}>
+                <Text style={styles.popupGroupHeading}>
+                  Evegah Ride Coupons
+                </Text>
+
+                {CHECKOUT_COUPONS.map((item) => {
+                  const open = expandedMap[item.id] !== false;
+                  return (
+                    <View key={item.id} style={styles.popupCouponCard}>
+                      <Pressable
+                        onPress={() =>
+                          setExpandedMap((prev) => ({
+                            ...prev,
+                            [item.id]: !open,
+                          }))
+                        }
+                        style={styles.popupCouponTop}
+                      >
+                        <View style={styles.popupBlueBadge}>
+                          <Text style={styles.popupBlueBadgeText}>%</Text>
+                        </View>
+
+                        <View style={styles.popupCouponCopy}>
+                          <Text style={styles.popupCouponTitle}>
+                            {item.title}
+                          </Text>
+                          {item.subtitle ? (
+                            <Text style={styles.popupUseCodeSub}>
+                              {item.subtitle}
+                            </Text>
+                          ) : null}
+                          {item.code ? (
+                            <Pressable
+                              onPress={() => {
+                                setAppliedCode(item.code);
+                                setAppliedDiscountAmt(item.discount || 40);
+                                setOfferOn(true);
+                                setCouponPopupOpen(false);
+                              }}
+                              style={styles.popupCodePill}
+                            >
+                              <Text style={styles.popupCodePillText}>
+                                APPLY {item.code}
+                              </Text>
+                            </Pressable>
+                          ) : null}
+                        </View>
+
+                        <Ionicons
+                          name={open ? 'chevron-up' : 'chevron-down'}
+                          size={18}
+                          color="#6B7280"
+                        />
+                      </Pressable>
+
+                      {open ? (
+                        <>
+                          <View style={styles.popupDashedRule} />
+                          <View style={styles.popupBullets}>
+                            {item.bullets.map((b, idx) => (
+                              <View key={idx} style={styles.popupBulletRow}>
+                                <View style={styles.popupGreenCheck}>
+                                  <Ionicons
+                                    name="checkmark"
+                                    size={11}
+                                    color="#FFFFFF"
+                                  />
+                                </View>
+                                <Text style={styles.popupBulletText}>{b}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </>
+                      ) : null}
+                    </View>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
         </View>
-      ) : null}
+      </Modal>
     </View>
   );
 }
@@ -506,77 +643,95 @@ export default function PayScreen({ vehicle, trip, onBack, onPay }) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#F6F4FB',
+    backgroundColor: '#F7F7F8',
   },
   header: {
-    paddingHorizontal: 8,
-    paddingBottom: 6,
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  headerRow: {
+    height: 36,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   back: {
     width: 36,
     height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    color: INK,
-    fontSize: 20,
-    fontWeight: '800',
-    letterSpacing: -0.3,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    lineHeight: 36,
+    color: '#1C1C1C',
+    fontSize: 17,
+    fontWeight: '700',
   },
-  hero: {
-    marginHorizontal: 16,
-    backgroundColor: '#F3EEFF',
-    borderRadius: 20,
-    paddingLeft: 14,
-    paddingRight: 8,
-    paddingVertical: 12,
+  secure: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F6F1FC',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    height: 32,
+  },
+  secureText: {
+    color: PURPLE,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  card: {
+    marginHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 16,
+  },
+  hero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  heroArt: {
+    width: 92,
+    height: 72,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroImage: {
+    width: 84,
+    height: 58,
   },
   heroCopy: {
     flex: 1,
-    paddingRight: 8,
+    marginLeft: 14,
   },
   heroName: {
-    color: INK,
+    color: '#1C1C1C',
     fontSize: 18,
     fontWeight: '700',
   },
-  specs: {
-    marginTop: 10,
-    gap: 7,
-  },
-  spec: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  specLabel: {
-    width: 78,
-    color: MUTED,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  specValue: {
-    flex: 1,
-    color: INK,
+  heroLine: {
+    marginTop: 2,
+    color: '#6E6878',
     fontSize: 13,
+  },
+  heroMeta: {
+    marginTop: 6,
+    color: PURPLE,
+    fontSize: 12,
     fontWeight: '700',
   },
-  heroImage: {
-    width: 124,
-    height: 96,
-    marginTop: 16,
-  },
-  card: {
-    marginTop: 12,
-    marginHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 16,
+  rule: {
+    height: 1,
+    backgroundColor: '#F1F1F3',
+    marginVertical: 14,
   },
   route: {
     flexDirection: 'row',
@@ -588,72 +743,69 @@ const styles = StyleSheet.create({
   routeEnd: {
     alignItems: 'flex-end',
   },
-  routeTitle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  routeAlign: {
+    textAlign: 'right',
   },
   routeKicker: {
-    color: MUTED,
-    fontSize: 12,
-    fontWeight: '600',
+    color: '#8A8496',
+    fontSize: 11,
+    fontWeight: '700',
   },
   routePlace: {
-    marginTop: 4,
-    color: INK,
-    fontSize: 16,
-    fontWeight: '800',
+    marginTop: 2,
+    color: '#1C1C1C',
+    fontSize: 14,
+    fontWeight: '700',
   },
   routeWhen: {
     marginTop: 2,
-    color: MUTED,
-    fontSize: 11,
-  },
-  alignEnd: {
-    textAlign: 'right',
+    color: '#6E6878',
+    fontSize: 12,
   },
   routeMid: {
-    width: 78,
-    height: 28,
+    width: 72,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 4,
+    paddingHorizontal: 8,
   },
-  routeDash: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 13,
-    borderTopWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: '#D9D0E8',
+  routeLine: {
+    height: 2,
+    width: '100%',
+    borderRadius: 1,
+    backgroundColor: '#E4D4F5',
   },
-  spanPill: {
-    backgroundColor: '#F3EAFF',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  spanText: {
+  routeSpan: {
+    marginTop: 6,
     color: PURPLE,
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  section: {
+    marginTop: 22,
+    marginBottom: 10,
+    marginHorizontal: 20,
+    color: '#1C1C1C',
+    fontSize: 16,
     fontWeight: '700',
   },
   offer: {
-    marginTop: 12,
     marginHorizontal: 16,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    borderRadius: 20,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+  },
+  offerOn: {
+    borderColor: '#E4D4F5',
+    backgroundColor: '#FCF9FF',
   },
   offerMark: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: 12,
-    backgroundColor: '#F3EAFF',
+    backgroundColor: PURPLE,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -662,13 +814,13 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   offerCode: {
-    color: INK,
+    color: '#1C1C1C',
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   offerText: {
     marginTop: 2,
-    color: MUTED,
+    color: '#6E6878',
     fontSize: 12,
   },
   offerAction: {
@@ -676,321 +828,280 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-  section: {
-    marginTop: 22,
-    marginBottom: 10,
-    marginHorizontal: 16,
-    color: INK,
-    fontSize: 16,
-    fontWeight: '800',
+  offerActionOn: {
+    color: '#1F8A4C',
   },
-  choiceRow: {
+  segment: {
+    flexDirection: 'row',
+    backgroundColor: '#F4F4F6',
+    borderRadius: 14,
+    padding: 4,
+  },
+  segmentMark: {
+    position: 'absolute',
+    left: 4,
+    top: 4,
+    bottom: 4,
+    borderRadius: 11,
+    backgroundColor: '#FFFFFF',
+  },
+  segmentBtn: {
+    flex: 1,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  segmentText: {
+    color: '#8A8496',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  segmentTextOn: {
+    color: '#1C1C1C',
+  },
+  depositNote: {
+    marginTop: 12,
+    color: '#6E6878',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  methods: {
     marginHorizontal: 16,
     flexDirection: 'row',
     gap: 10,
   },
-  choiceOn: {
-    borderColor: PURPLE,
-    backgroundColor: '#F8F4FF',
-  },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: '#D5D0DE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioOn: {
-    borderColor: PURPLE,
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: PURPLE,
-  },
-  payCard: {
+  method: {
     flex: 1,
-    borderRadius: 16,
+    height: 64,
+    borderRadius: 18,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
-    borderColor: '#E6E1EE',
-    paddingHorizontal: 12,
-    paddingTop: 12,
-    paddingBottom: 10,
-  },
-  logoWell: {
-    height: 36,
-    justifyContent: 'center',
-  },
-  bankLogo: {
-    width: '100%',
-    height: 36,
-  },
-  payMeta: {
-    marginTop: 10,
+    borderColor: '#FFFFFF',
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: 8,
   },
-  bankName: {
+  methodOn: {
+    borderColor: PURPLE,
+    backgroundColor: '#FCF9FF',
+  },
+  methodText: {
     flex: 1,
-    color: INK,
-    fontSize: 14,
+    color: '#3C3846',
+    fontSize: 15,
     fontWeight: '700',
   },
-  bill: {
-    marginTop: 22,
-    marginHorizontal: 16,
+  methodTextOn: {
+    color: '#1C1C1C',
   },
-  billTitle: {
-    color: INK,
-    fontSize: 16,
-    fontWeight: '800',
-    marginBottom: 8,
+  methodDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#D9D4E0',
   },
   billRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 7,
+    paddingVertical: 6,
   },
   billLabel: {
-    color: '#5E5868',
+    color: '#6E6878',
     fontSize: 14,
   },
   billValue: {
-    color: INK,
+    color: '#1C1C1C',
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   billSave: {
-    color: PURPLE,
+    color: '#1F8A4C',
     fontSize: 14,
     fontWeight: '700',
   },
   billRule: {
     height: 1,
-    backgroundColor: '#E8E4EF',
-    marginVertical: 6,
+    backgroundColor: '#F1F1F3',
+    marginVertical: 8,
   },
   billTotal: {
-    color: INK,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  summaryBtn: {
-    marginTop: 8,
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 6,
-  },
-  summaryBtnText: {
-    color: INK,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  values: {
-    marginTop: 14,
-    backgroundColor: '#F6F4FB',
-    borderRadius: 16,
-    paddingTop: 14,
-    paddingBottom: 8,
-    paddingHorizontal: 12,
-  },
-  valuesTitle: {
-    textAlign: 'center',
-    color: PURPLE,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  valuesRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  valuesText: {
-    flex: 1,
-    color: '#3C2A68',
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: '500',
-  },
-  valuesSketch: {
-    width: 112,
-    height: 124,
-  },
-  bring: {
-    marginTop: 26,
-    marginHorizontal: 16,
-    gap: 10,
-  },
-  blockTitle: {
     color: '#1C1C1C',
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 2,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  billHint: {
+    marginTop: 2,
+    color: '#8A8496',
+    fontSize: 12,
+  },
+  /* Things to bring with you & Cancellation Policy Styles */
+  policySectionWrap: {
+    marginTop: 24,
+    paddingHorizontal: 16,
+  },
+  policyHeading: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: -0.2,
+    marginBottom: 12,
+  },
+  policySubheading: {
+    marginTop: -8,
+    marginBottom: 14,
+    fontSize: 13.5,
+    color: '#6B7280',
+    fontWeight: '500',
   },
   bringCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E6E6EA',
-    paddingHorizontal: 12,
-    paddingVertical: 14,
+    borderColor: '#E5E7EB',
+    padding: 14,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 12,
   },
-  bringIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+  bringIconSquare: {
+    width: 58,
+    height: 58,
+    borderRadius: 14,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  verifyFaceCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#FEF3C7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verifyIdMini: {
+    position: 'absolute',
+    right: 6,
+    bottom: 6,
+    width: 20,
+    height: 16,
+    borderRadius: 4,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verifyCheckDot: {
+    position: 'absolute',
+    left: 6,
+    bottom: 6,
+    width: 15,
+    height: 15,
+    borderRadius: 7.5,
+    backgroundColor: '#16A34A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+  },
+  permitDocSheet: {
+    width: 34,
+    height: 40,
+    borderRadius: 6,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    padding: 6,
+    justifyContent: 'space-between',
+  },
+  permitDocLineLong: {
+    width: '90%',
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#9CA3AF',
+  },
+  permitDocLineShort: {
+    width: '60%',
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#D1D5DB',
+  },
+  permitStampBadge: {
+    alignSelf: 'flex-end',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bringCardCopy: {
+    flex: 1,
+  },
+  bringCardTitle: {
+    fontSize: 15.5,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  bringCardSub: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18.5,
+    color: '#6B7280',
+    fontWeight: '400',
+  },
+  cancelBarWrap: {
+    alignItems: 'center',
+  },
+  cancelSplitPill: {
+    width: '100%',
+    height: 48,
+    borderRadius: 24,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  cancelLeftGreen: {
+    flex: 1,
+    backgroundColor: '#E3F3E8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelLeftGreenText: {
+    color: '#137333',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  cancelRightGrey: {
+    flex: 1,
     backgroundColor: '#F3F4F6',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scanCorner: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    borderColor: '#C8CBD2',
-  },
-  scanTL: { top: 6, left: 6, borderTopWidth: 1.5, borderLeftWidth: 1.5 },
-  scanTR: { top: 6, right: 6, borderTopWidth: 1.5, borderRightWidth: 1.5 },
-  scanBL: { bottom: 6, left: 6, borderBottomWidth: 1.5, borderLeftWidth: 1.5 },
-  scanBR: { bottom: 6, right: 6, borderBottomWidth: 1.5, borderRightWidth: 1.5 },
-  personHead: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#2A2A2A',
-    marginBottom: 1,
-  },
-  personBody: {
-    width: 18,
-    height: 10,
-    borderTopLeftRadius: 9,
-    borderTopRightRadius: 9,
-    backgroundColor: '#3B78E0',
-  },
-  doc: {
-    width: 16,
-    height: 20,
-    borderRadius: 2,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D7DAE0',
-    paddingTop: 3,
-    paddingLeft: 2,
-    gap: 2,
-  },
-  docLine: {
-    width: 10,
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: '#C5C8D0',
-  },
-  docLineMid: { width: 8 },
-  docLineShort: { width: 5 },
-  stamp: {
-    position: 'absolute',
-    right: 6,
-    bottom: 6,
-    width: 11,
-    height: 11,
-    borderRadius: 6,
-    backgroundColor: '#2E9B74',
-    borderWidth: 2,
-    borderColor: '#F3F4F6',
-  },
-  bringCopy: {
-    flex: 1,
-  },
-  bringTitle: {
-    color: INK,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  bringText: {
-    marginTop: 3,
-    color: '#8E8A96',
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  policy: {
-    marginTop: 26,
-    marginHorizontal: 16,
-  },
-  policyLead: {
-    marginTop: 2,
-    marginBottom: 12,
-    color: '#8A8A90',
+  cancelRightGreyText: {
+    color: '#111827',
     fontSize: 14,
-  },
-  refundWrap: {
-    paddingBottom: 52,
-  },
-  refundBar: {
-    height: 46,
-    borderRadius: 23,
-    overflow: 'hidden',
-    flexDirection: 'row',
-  },
-  refundFull: {
-    flex: 1,
-    backgroundColor: '#E7F6EC',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  refundFullText: {
-    color: '#149447',
-    fontSize: 15,
     fontWeight: '600',
   },
-  refundNone: {
-    flex: 1,
-    backgroundColor: '#F2F2F4',
+  cancelCutoffPointer: {
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: -2,
   },
-  refundNoneText: {
-    color: '#2A2A2E',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  policyMark: {
-    position: 'absolute',
-    top: 46,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  arrowStem: {
+  cancelArrowStem: {
     width: 1.5,
-    height: 22,
-    backgroundColor: '#B0B0B6',
+    height: 12,
+    backgroundColor: '#111827',
   },
-  arrowHead: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 4,
-    borderRightWidth: 4,
-    borderTopWidth: 5,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#B0B0B6',
-  },
-  policyWhen: {
-    marginTop: 4,
-    color: '#8A8A90',
+  cancelCutoffTimeText: {
+    marginTop: 2,
     fontSize: 13,
+    fontWeight: '700',
+    color: '#111827',
   },
   footer: {
     position: 'absolute',
@@ -1000,86 +1111,171 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingTop: 12,
     paddingHorizontal: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0EDF4',
-  },
-  pay: {
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: '#7C1FFF',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#F1F1F3',
+  },
+  footerKicker: {
+    color: '#8A8496',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  footerAmount: {
+    color: '#1C1C1C',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  pay: {
+    height: 48,
+    paddingHorizontal: 22,
+    borderRadius: 16,
+    backgroundColor: PURPLE,
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    overflow: 'hidden',
-  },
-  payFill: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-  },
-  lwShine: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.4)',
   },
   payText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
-  blurTarget: {
+  popupBackdrop: {
     flex: 1,
-  },
-  sheetRoot: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 30,
-    elevation: 24,
+    backgroundColor: 'rgba(15, 18, 24, 0.62)',
     justifyContent: 'flex-end',
   },
-  sheet: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 20,
-    paddingTop: 10,
+  popupBackdropTouch: {
+    flex: 1,
   },
-  sheetHandle: {
-    alignSelf: 'center',
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#E4E1EA',
+  popupCloseCircleWrap: {
+    alignItems: 'center',
     marginBottom: 14,
   },
-  sheetTitle: {
-    color: INK,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  done: {
-    marginTop: 16,
-    height: 50,
-    borderRadius: 14,
-    backgroundColor: '#7C1FFF',
-    overflow: 'hidden',
-  },
-  doneFace: {
-    flex: 1,
+  popupCloseCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: 'rgba(42, 44, 50, 0.78)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  doneText: {
-    color: '#FFFFFF',
+  popupSheet: {
+    maxHeight: '78%',
+    backgroundColor: '#F4F5F8',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 20,
+  },
+  popupMainTitle: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#1E293B',
+    paddingHorizontal: 18,
+    marginBottom: 14,
+  },
+  popupScroll: {
+    paddingHorizontal: 14,
+    paddingBottom: 20,
+  },
+  popupGroupBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 14,
+    gap: 12,
+  },
+  popupGroupHeading: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 2,
+  },
+  popupCouponCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#ECEEF3',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+  },
+  popupCouponTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  popupBlueBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: PURPLE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
+  },
+  popupBlueBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  popupCouponCopy: {
+    flex: 1,
+  },
+  popupCouponTitle: {
+    fontSize: 14.5,
+    fontWeight: '800',
+    color: '#1E293B',
+  },
+  popupUseCodeSub: {
+    marginTop: 3,
+    fontSize: 12.5,
+    fontWeight: '500',
+    color: '#64748B',
+  },
+  popupCodePill: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#DDD6FE',
+    backgroundColor: '#F5F3FF',
+  },
+  popupCodePillText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#4A168C',
+    letterSpacing: 0.3,
+  },
+  popupDashedRule: {
+    marginVertical: 12,
+    borderTopWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#E5E7EB',
+  },
+  popupBullets: {
+    gap: 8,
+  },
+  popupBulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  popupGreenCheck: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#16A34A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  popupBulletText: {
+    flex: 1,
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: '#475569',
+    fontWeight: '500',
   },
 });

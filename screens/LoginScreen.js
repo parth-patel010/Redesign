@@ -37,7 +37,7 @@ const EVEGAH_PURPLE = '#4F2CA0';
 const EVEGAH_PURPLE_MUTED = '#C4B6DE';
 const VIDEO_WIDTH = 1492;
 const VIDEO_HEIGHT = 1440;
-const BANNER_HEIGHT = SCREEN_W * (VIDEO_HEIGHT / VIDEO_WIDTH);
+const BANNER_HEIGHT = Math.round(SCREEN_H * 0.52);
 const TOAST_OFFSCREEN_Y = -120;
 const TOAST_ENTER_MS = 560;
 const TOAST_EXIT_MS = 480;
@@ -50,9 +50,7 @@ const SCOOTER_HEIGHT = 32;
 const TRAIL_WIDTH = 30;
 const RIDE_GROUP_WIDTH = SCOOTER_WIDTH + TRAIL_WIDTH;
 const ROAD_DASHES = Array.from({ length: 16 }, (_, index) => index);
-const BOTTOM_ASSET_W = 2172;
-const BOTTOM_ASSET_H = 325;
-const BOTTOM_ASSET_HEIGHT = SCREEN_W * (BOTTOM_ASSET_H / BOTTOM_ASSET_W);
+const BOTTOM_ASSET_HEIGHT = Math.round(SCREEN_W * 0.335);
 const INTRO_VIDEO = require('../assets/intro-ride.mp4');
 const INTRO_VIDEO_REVERSE = require('../assets/intro-ride-reverse.mp4');
 // Digit 1–10 of the Indian mobile number, matched to a time in the ride clip.
@@ -74,7 +72,7 @@ function toOriginalTime(reverseTime, duration) {
   return Math.max(0, clipSpan(duration) - reverseTime);
 }
 
-export default function LoginScreen({ onContinue }) {
+export default function LoginScreen({ onContinue, onBack }) {
   const insets = useSafeAreaInsets();
   const forwardPlayer = useVideoPlayer(INTRO_VIDEO, (video) => {
     video.loop = false;
@@ -427,28 +425,28 @@ export default function LoginScreen({ onContinue }) {
     textFade.value = 1;
     arrowShift.value = 0;
     lineShift.value = 40;
-    textShift.value = withTiming(-46, { duration: 420, easing: Easing.out(Easing.cubic) });
-    textFade.value = withTiming(0, { duration: 360 });
-    arrowShift.value = withTiming(72, { duration: 480, easing: Easing.out(Easing.cubic) });
+    textShift.value = withTiming(-46, { duration: 220, easing: Easing.out(Easing.cubic) });
+    textFade.value = withTiming(0, { duration: 180 });
+    arrowShift.value = withTiming(72, { duration: 240, easing: Easing.out(Easing.cubic) });
     lineShift.value = withDelay(
-      500,
-      withTiming(0, { duration: 420, easing: Easing.out(Easing.cubic) }),
+      240,
+      withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) }),
     );
     scooterX.value = -RIDE_GROUP_WIDTH;
     scooterX.value = withDelay(
-      920,
+      440,
       withTiming(
         buttonWidthRef.current,
-        { duration: 2200, easing: Easing.inOut(Easing.cubic) },
+        { duration: 1100, easing: Easing.inOut(Easing.cubic) },
         (finished) => {
           if (!finished) return;
-          lineShift.value = withTiming(40, { duration: 420, easing: Easing.in(Easing.cubic) }, (roadDone) => {
+          lineShift.value = withTiming(40, { duration: 200, easing: Easing.in(Easing.cubic) }, (roadDone) => {
             if (!roadDone) return;
-            textShift.value = withTiming(0, { duration: 420, easing: Easing.out(Easing.cubic) });
-            textFade.value = withTiming(1, { duration: 360 });
+            textShift.value = withTiming(0, { duration: 220, easing: Easing.out(Easing.cubic) });
+            textFade.value = withTiming(1, { duration: 180 });
             arrowShift.value = withTiming(
               0,
-              { duration: 480, easing: Easing.out(Easing.cubic) },
+              { duration: 240, easing: Easing.out(Easing.cubic) },
               (backDone) => {
                 if (backDone) runOnJS(finishRide)();
               },
@@ -462,6 +460,19 @@ export default function LoginScreen({ onContinue }) {
   return (
     <Pressable style={styles.root} onPress={dismissInputs}>
       <StatusBar style="dark" />
+
+      {onBack ? (
+        <Pressable
+          onPress={onBack}
+          hitSlop={12}
+          style={[
+            styles.backBtn,
+            { top: Math.max(insets.top, 14) + 6 },
+          ]}
+        >
+          <Ionicons name="arrow-back" size={20} color="#24083C" />
+        </Pressable>
+      ) : null}
 
       {toastMessage ? (
         <Animated.View
@@ -477,7 +488,7 @@ export default function LoginScreen({ onContinue }) {
         <VideoView
           player={playingReverse ? reversePlayer : forwardPlayer}
           style={styles.bannerVideo}
-          contentFit="contain"
+          contentFit="cover"
           nativeControls={false}
           allowsPictureInPicture={false}
           surfaceType="textureView"
@@ -485,11 +496,20 @@ export default function LoginScreen({ onContinue }) {
       </View>
 
       <Animated.View
-        style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 8) }, sheetAnimStyle]}
+        style={[
+          styles.sheet,
+          {
+            paddingBottom:
+              Platform.OS === 'android' && insets.bottom >= 36
+                ? insets.bottom
+                : 0,
+          },
+          sheetAnimStyle,
+        ]}
       >
         <View style={styles.handle} />
 
-        <View style={[styles.sheetContent, { paddingBottom: BOTTOM_ASSET_HEIGHT + insets.bottom + 12 }]}>
+        <View style={styles.sheetContent}>
           <View style={styles.welcomeRow}>
             <Text style={styles.welcomeText}>Welcome to</Text>
             <Image
@@ -619,8 +639,9 @@ export default function LoginScreen({ onContinue }) {
         </View>
         <Image
           source={require('../assets/login/login-bottom-asset.png')}
-          style={[styles.bottomAsset, { bottom: insets.bottom }]}
-          contentFit="contain"
+          style={styles.bottomAsset}
+          contentFit="cover"
+          contentPosition="bottom"
         />
       </Animated.View>
     </Pressable>
@@ -632,6 +653,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F4F5F7',
     overflow: 'hidden',
+  },
+  backBtn: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 30,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 4,
   },
   banner: {
     width: '100%',
@@ -649,11 +686,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    minHeight: SCREEN_H * 0.64,
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
-    paddingTop: 16,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
+    paddingTop: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.08,
@@ -840,7 +876,7 @@ const styles = StyleSheet.create({
     height: SCOOTER_HEIGHT,
   },
   terms: {
-    marginTop: 16,
+    marginTop: 14,
     textAlign: 'center',
     fontSize: 12,
     color: '#808080',
@@ -855,12 +891,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomAsset: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    width: '100%',
+    marginTop: 10,
+    marginBottom: -4,
+    width: SCREEN_W,
     height: BOTTOM_ASSET_HEIGHT,
-    opacity: 0.4,
+    alignSelf: 'center',
+    opacity: 0.96,
   },
   toast: {
     position: 'absolute',

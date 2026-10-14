@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
 import OtpScreen from './screens/OtpScreen';
 import HomeScreen from './screens/HomeScreen';
-import LocationScreen from './screens/LocationScreen';
+import LocationScreen, { EVEGAH_ZONES } from './screens/LocationScreen';
 import MyRidesScreen from './screens/MyRidesScreen';
 import RideDetailScreen from './screens/RideDetailScreen';
 import ScanScreen from './screens/ScanScreen';
@@ -15,6 +16,8 @@ import EditProfileScreen from './screens/EditProfileScreen';
 import KycScreen from './screens/KycScreen';
 import ReferScreen from './screens/ReferScreen';
 import OffersScreen from './screens/OffersScreen';
+import GiftCardScreen from './screens/GiftCardScreen';
+import RedeemGiftCardScreen from './screens/RedeemGiftCardScreen';
 import HelpScreen from './screens/HelpScreen';
 import PreferencesScreen from './screens/PreferencesScreen';
 import AboutScreen from './screens/AboutScreen';
@@ -35,9 +38,11 @@ import WalletIntro from './components/WalletIntro';
 import { apiGet, apiPost, last10 } from './services/api';
 
 export default function App() {
-  const [screen, setScreen] = useState('login');
+  const [screen, setScreen] = useState('onboarding');
   const [phone, setPhone] = useState('');
   const [locationOpen, setLocationOpen] = useState(false);
+  const [selectedZone, setSelectedZone] = useState(EVEGAH_ZONES[0]);
+  const [calendarTriggerTick, setCalendarTriggerTick] = useState(0);
   const [walletIntro, setWalletIntro] = useState(false);
   const [vehicle, setVehicle] = useState(null);
   const [vehicleFrom, setVehicleFrom] = useState('home');
@@ -57,6 +62,7 @@ export default function App() {
   });
   const [kyc, setKyc] = useState({ selfie: false, front: false, back: false });
   const [offersFrom, setOffersFrom] = useState('profile');
+  const [redeemFrom, setRedeemFrom] = useState('profile');
   const [prefs, setPrefs] = useState({ push: true, email: false });
   const [tx, setTx] = useState(null);
   const [notes, setNotes] = useState([
@@ -155,6 +161,12 @@ export default function App() {
                 trip={trip}
                 receipt={receipt}
                 onBack={() => setScreen(rideFrom)}
+                onExtendRide={({ addedPrice, newDropAt }) => {
+                  setTrip((prev) => (prev ? { ...prev, dropAt: newDropAt } : prev));
+                  setReceipt((prev) =>
+                    prev ? { ...prev, total: (prev.total || 0) + (addedPrice || 0) } : prev
+                  );
+                }}
                 onEnd={(summary) => {
                   setRideSummary(summary);
                   setScreen('ended');
@@ -192,7 +204,15 @@ export default function App() {
             statusBarTranslucent
             onRequestClose={() => setLocationOpen(false)}
           >
-            <LocationScreen onBack={() => setLocationOpen(false)} />
+            <LocationScreen
+              selectedZone={selectedZone}
+              onBack={() => setLocationOpen(false)}
+              onSelectZone={(zone) => {
+                setSelectedZone(zone);
+                setLocationOpen(false);
+                setCalendarTriggerTick((tick) => tick + 1);
+              }}
+            />
           </Modal>
         </View>
       ) : screen === 'vehicle' ? (
@@ -248,6 +268,20 @@ export default function App() {
         />
       ) : screen === 'help' ? (
         <HelpScreen onBack={() => setScreen('profile')} />
+      ) : screen === 'giftCard' ? (
+        <GiftCardScreen
+          onBack={() => setScreen('profile')}
+          onHelp={() => setScreen('help')}
+          onRedeem={() => {
+            setRedeemFrom('giftCard');
+            setScreen('redeemGiftCard');
+          }}
+        />
+      ) : screen === 'redeemGiftCard' ? (
+        <RedeemGiftCardScreen
+          onBack={() => setScreen(redeemFrom)}
+          onHelp={() => setScreen('help')}
+        />
       ) : screen === 'offers' ? (
         <OffersScreen onBack={() => setScreen(offersFrom)} />
       ) : screen === 'refer' ? (
@@ -288,6 +322,11 @@ export default function App() {
           onOffers={() => {
             setOffersFrom('profile');
             setScreen('offers');
+          }}
+          onGiftCard={() => setScreen('giftCard')}
+          onRedeemGiftCard={() => {
+            setRedeemFrom('profile');
+            setScreen('redeemGiftCard');
           }}
           onHelp={() => setScreen('help')}
           onPreferences={() => setScreen('preferences')}
@@ -361,12 +400,18 @@ export default function App() {
       ) : screen === 'home' ? (
         <View style={styles.stage}>
           <HomeScreen
+            selectedZone={selectedZone}
+            calendarTriggerTick={calendarTriggerTick}
             onOpenLocation={() => setLocationOpen(true)}
             onOpenMyRide={() => setScreen('rides')}
             onOpenScan={() => setScreen('scan')}
             onOpenProfile={() => setScreen('profile')}
             onOpenWallet={openWallet}
             onOpenVehicleList={() => setScreen('vehicleList')}
+            onSearchVehicles={(tripPayload) => {
+              setTrip(tripPayload);
+              setScreen('vehicleList');
+            }}
             onOpenVehicle={(next) => {
               setVehicle(next);
               setVehicleFrom('home');
@@ -384,7 +429,15 @@ export default function App() {
             statusBarTranslucent
             onRequestClose={() => setLocationOpen(false)}
           >
-            <LocationScreen onBack={() => setLocationOpen(false)} />
+            <LocationScreen
+              selectedZone={selectedZone}
+              onBack={() => setLocationOpen(false)}
+              onSelectZone={(zone) => {
+                setSelectedZone(zone);
+                setLocationOpen(false);
+                setCalendarTriggerTick((tick) => tick + 1);
+              }}
+            />
           </Modal>
         </View>
       ) : screen === 'otp' ? (
@@ -416,6 +469,8 @@ export default function App() {
             setScreen('home');
           }}
         />
+      ) : screen === 'onboarding' ? (
+        <OnboardingScreen onFinish={() => setScreen('login')} />
       ) : (
         <LoginScreen
           onContinue={(nextPhone) => {

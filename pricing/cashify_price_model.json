@@ -1,0 +1,5971 @@
+{
+  "version": 1,
+  "source_rows": 700,
+  "trusted_rows": 56,
+  "tables": {
+    "elasticity": 0.06958058591532275,
+    "global_median": 13245.0,
+    "brands": {
+      "apple": 30810.0,
+      "google": 22000.0,
+      "motorola": 10730.0,
+      "nothing": 17275.0,
+      "oneplus": 12280.0,
+      "oppo": 12435.0,
+      "poco": 7260.0,
+      "realme": 6665.0,
+      "samsung": 11530.0,
+      "vivo": 12350.0,
+      "xiaomi": 5340.0
+    },
+    "models": [
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11",
+        "median": 10570.0,
+        "n": 11,
+        "brand": "Apple",
+        "model": "iPhone 11"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11 pro",
+        "median": 14470.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 11 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11 pro max",
+        "median": 12425.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 11 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12",
+        "median": 14800.0,
+        "n": 9,
+        "brand": "Apple",
+        "model": "iPhone 12"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 mini",
+        "median": 13010.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 12 Mini"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 pro max",
+        "median": 23075.0,
+        "n": 8,
+        "brand": "Apple",
+        "model": "iPhone 12 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13",
+        "median": 20775.0,
+        "n": 24,
+        "brand": "Apple",
+        "model": "iPhone 13"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 mini",
+        "median": 15645.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 13 Mini"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 pro",
+        "median": 31780.0,
+        "n": 4,
+        "brand": "Apple",
+        "model": "iPhone 13 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 pro max",
+        "median": 31270.0,
+        "n": 5,
+        "brand": "Apple",
+        "model": "iPhone 13 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14",
+        "median": 23890.0,
+        "n": 10,
+        "brand": "Apple",
+        "model": "iPhone 14"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 plus",
+        "median": 27270.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 14 Plus"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 pro",
+        "median": 40250.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 14 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 pro max",
+        "median": 36330.0,
+        "n": 13,
+        "brand": "Apple",
+        "model": "iPhone 14 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15",
+        "median": 32830.0,
+        "n": 15,
+        "brand": "Apple",
+        "model": "iPhone 15"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 plus",
+        "median": 34610.0,
+        "n": 9,
+        "brand": "Apple",
+        "model": "iPhone 15 Plus"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro",
+        "median": 50545.0,
+        "n": 4,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro max",
+        "median": 55010.0,
+        "n": 12,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16",
+        "median": 42440.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 16"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 plus",
+        "median": 44260.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 16 Plus"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 pro",
+        "median": 59260.0,
+        "n": 9,
+        "brand": "Apple",
+        "model": "iPhone 16 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 pro max",
+        "median": 69520.0,
+        "n": 12,
+        "brand": "Apple",
+        "model": "iPhone 16 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 17",
+        "median": 51690.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 17"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 17 pro",
+        "median": 77610.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 17 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 17 pro max",
+        "median": 94170.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 17 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone se 2022",
+        "median": 12190.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone SE 2022"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone xr",
+        "median": 8630.0,
+        "n": 6,
+        "brand": "Apple",
+        "model": "iPhone XR"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 6a",
+        "median": 10730.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 6A"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 8",
+        "median": 20050.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 8"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9",
+        "median": 29980.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 9"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9 pro",
+        "median": 37210.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 9 Pro"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9 pro xl",
+        "median": 42310.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 9 Pro XL"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9a",
+        "median": 21700.0,
+        "n": 3,
+        "brand": "Google",
+        "model": "Pixel 9A"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 20 fusion",
+        "median": 4190.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 20 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 40",
+        "median": 8215.0,
+        "n": 6,
+        "brand": "Motorola",
+        "model": "Moto Edge 40"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 40 neo",
+        "median": 11560.0,
+        "n": 3,
+        "brand": "Motorola",
+        "model": "Moto Edge 40 Neo"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 fusion",
+        "median": 11070.0,
+        "n": 5,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 neo",
+        "median": 12390.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Neo"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 pro",
+        "median": 10730.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Pro"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 60 fusion",
+        "median": 13570.0,
+        "n": 5,
+        "brand": "Motorola",
+        "model": "Moto Edge 60 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 60 pro",
+        "median": 15390.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 60 Pro"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g34 5g",
+        "median": 4680.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G34 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g57 power 5g",
+        "median": 7160.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G57 Power 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g73 5g",
+        "median": 7010.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G73 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g85 5g",
+        "median": 9945.0,
+        "n": 2,
+        "brand": "Motorola",
+        "model": "Moto G85 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "one power",
+        "median": 590.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "One Power"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 2a 5g",
+        "median": 13370.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 2a 5G"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 2a plus",
+        "median": 14510.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 2a Plus"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 3",
+        "median": 24030.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 3"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 4a",
+        "median": 20040.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 4a"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 10 pro 5g",
+        "median": 13280.0,
+        "n": 5,
+        "brand": "OnePlus",
+        "model": "One Plus 10 Pro 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 11 5g",
+        "median": 18740.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus 11 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 11r 5g",
+        "median": 14190.0,
+        "n": 8,
+        "brand": "OnePlus",
+        "model": "One Plus 11R 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 12",
+        "median": 26470.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus 12"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 12r",
+        "median": 21440.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus 12R"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13",
+        "median": 32510.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus 13"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13r",
+        "median": 26480.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus 13R"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13s",
+        "median": 28160.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 13S"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 15r",
+        "median": 32640.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 15R"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 5",
+        "median": 2600.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 5"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 7t",
+        "median": 5750.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 7T"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 8 pro",
+        "median": 8670.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 8 Pro"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 9 5g",
+        "median": 9190.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 9 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord",
+        "median": 6400.0,
+        "n": 4,
+        "brand": "OnePlus",
+        "model": "One Plus Nord"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 2 5g",
+        "median": 8015.0,
+        "n": 4,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 2 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 3 5g",
+        "median": 11365.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 3 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 4",
+        "median": 16660.0,
+        "n": 5,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 4"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 5",
+        "median": 20035.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 5"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 6 5g",
+        "median": 26930.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 6 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 2 5g",
+        "median": 8820.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 2 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 2 lite 5g",
+        "median": 5570.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 2 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 3 5g",
+        "median": 11000.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 3 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 3 lite 5g",
+        "median": 9490.0,
+        "n": 5,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 3 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 4 5g",
+        "median": 11680.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 4 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 4 lite 5g",
+        "median": 10140.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 4 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 5",
+        "median": 17065.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 5"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 5g",
+        "median": 4590.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a15s",
+        "median": 2310.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A15s"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a18",
+        "median": 1350.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A18"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a3 5g",
+        "median": 7430.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A3 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a53s 5g",
+        "median": 5345.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A53s 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a59 5g",
+        "median": 6460.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A59 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a5x 5g",
+        "median": 6580.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A5x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6 5g",
+        "median": 12360.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6 pro 5g",
+        "median": 13780.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6s 5g",
+        "median": 12720.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6s 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6x 5g",
+        "median": 8515.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A6x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a77 2022",
+        "median": 2510.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A77 2022"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f19 pro plus 5g",
+        "median": 7120.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "F19 Pro Plus 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f25 pro 5g",
+        "median": 5210.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F25 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f27 pro plus 5g",
+        "median": 11310.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "F27 Pro Plus 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f29 pro 5g",
+        "median": 13670.0,
+        "n": 3,
+        "brand": "Oppo",
+        "model": "F29 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f31 5g",
+        "median": 14750.0,
+        "n": 5,
+        "brand": "Oppo",
+        "model": "F31 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f33 5g",
+        "median": 19625.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F33 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f33 pro 5g",
+        "median": 22865.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F33 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "find x9 ultra",
+        "median": 77230.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Find X9 Ultra"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "k13 turbo pro 5g",
+        "median": 17300.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "K13 Turbo Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "k14x 5g",
+        "median": 11190.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "K14x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno10 5g",
+        "median": 6050.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno10 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno10 pro 5g",
+        "median": 9640.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno10 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno10 pro plus 5g",
+        "median": 15260.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno10 Pro Plus 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno11 5g",
+        "median": 12730.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "Reno11 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno12 5g",
+        "median": 12820.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno12 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno13 5g",
+        "median": 14345.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "Reno13 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno13 pro 5g",
+        "median": 18890.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno13 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno14 5g",
+        "median": 21220.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno14 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno14 pro 5g",
+        "median": 28270.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno14 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno15 5g",
+        "median": 19910.0,
+        "n": 3,
+        "brand": "Oppo",
+        "model": "Reno15 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno6 5g",
+        "median": 5940.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno6 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno7 pro 5g",
+        "median": 10860.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno7 Pro 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco c75 5g",
+        "median": 3980.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO C75 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco c85x",
+        "median": 8315.0,
+        "n": 2,
+        "brand": "Poco",
+        "model": "POCO C85x"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco f3 gt",
+        "median": 7430.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO F3 GT"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco m2 pro",
+        "median": 2520.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO M2 Pro"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco m8 5g",
+        "median": 13920.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO M8 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco x6 5g",
+        "median": 8360.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO X6 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco x6 neo 5g",
+        "median": 7090.0,
+        "n": 3,
+        "brand": "Poco",
+        "model": "POCO X6 Neo 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 10 pro 5g",
+        "median": 8550.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 10 Pro 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 10 pro plus 5g",
+        "median": 10420.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 10 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 11 pro plus 5g",
+        "median": 8460.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 11 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 11x 5g",
+        "median": 5990.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 11x 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 14 pro plus 5g",
+        "median": 14360.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 14 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 15 5g",
+        "median": 14470.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 15 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 15x 5g",
+        "median": 12870.0,
+        "n": 3,
+        "brand": "Realme",
+        "model": "Realme 15X 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 16 pro plus 5g",
+        "median": 24435.0,
+        "n": 4,
+        "brand": "Realme",
+        "model": "Realme 16 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 3",
+        "median": 2010.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 3"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 3 pro",
+        "median": 2590.0,
+        "n": 4,
+        "brand": "Realme",
+        "model": "Realme 3 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 6 pro",
+        "median": 4180.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 6 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 7",
+        "median": 4880.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 7"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 8 pro",
+        "median": 5415.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 8 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme c2",
+        "median": 790.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme C2"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme c55",
+        "median": 5370.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme C55"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt 6",
+        "median": 5470.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme GT 6"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt 6t 5g",
+        "median": 12170.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme GT 6T 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt master edition",
+        "median": 3880.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme GT Master Edition"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt neo 2",
+        "median": 8170.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme GT NEO 2"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme narzo 30 5g",
+        "median": 7340.0,
+        "n": 3,
+        "brand": "Realme",
+        "model": "Realme Narzo 30 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme narzo n53",
+        "median": 4330.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme Narzo N53"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme p4x 5g",
+        "median": 9010.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme P4x 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme x",
+        "median": 3430.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme X"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme x2 pro",
+        "median": 2170.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme X2 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme x7 max 5g",
+        "median": 8420.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme X7 Max 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a06 5g",
+        "median": 5560.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A06 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a14 5g",
+        "median": 5925.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A14 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a15 5g",
+        "median": 7425.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Galaxy A15 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a17 5g",
+        "median": 10770.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A17 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a21s",
+        "median": 3780.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A21s"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a22",
+        "median": 3080.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A22"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a23 5g",
+        "median": 7540.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A23 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a25 5g",
+        "median": 8030.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A25 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a26 5g",
+        "median": 8810.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A26 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a32",
+        "median": 4960.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A32"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a34 5g",
+        "median": 6245.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A34 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a35 5g",
+        "median": 10260.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy A35 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a36 5g",
+        "median": 14685.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A36 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a37 5g",
+        "median": 27230.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A37 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a51",
+        "median": 2530.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A51"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a52",
+        "median": 2020.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A52"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a52s 5g",
+        "median": 7065.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A52s 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a55 5g",
+        "median": 14550.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A55 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a56 5g",
+        "median": 18980.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy A56 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a7 2016",
+        "median": 1210.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A7 2016"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a71",
+        "median": 2060.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A71"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy f34 5g",
+        "median": 6705.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy F34 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy f62",
+        "median": 4740.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy F62"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy j6 plus",
+        "median": 400.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy J6 Plus"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy j7 nxt",
+        "median": 1060.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy J7 Nxt"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m01s",
+        "median": 1850.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M01s"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m02",
+        "median": 910.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy M02"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m12",
+        "median": 3880.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M12"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m13",
+        "median": 4120.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M13"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m14 5g",
+        "median": 6260.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy M14 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m17e 5g",
+        "median": 10590.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M17e 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m20",
+        "median": 1020.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M20"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m21 2021 edition",
+        "median": 3100.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M21 2021 Edition"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m30s",
+        "median": 2600.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M30s"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m32 prime edition",
+        "median": 3060.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M32 Prime Edition"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m33 5g",
+        "median": 6700.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M33 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m36 5g",
+        "median": 10430.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M36 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m51",
+        "median": 3330.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy M51"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s10",
+        "median": 1570.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S10"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s10 lite",
+        "median": 2700.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S10 Lite"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s10 plus",
+        "median": 6200.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S10 Plus"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s20",
+        "median": 3450.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S20"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s20 fe 5g",
+        "median": 9010.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S20 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s21 plus 5g",
+        "median": 8130.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S21 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s21 ultra 5g",
+        "median": 16710.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S21 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 5g",
+        "median": 15950.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S22 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 plus 5g",
+        "median": 16120.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S22 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 ultra 5g",
+        "median": 17030.0,
+        "n": 7,
+        "brand": "Samsung",
+        "model": "Galaxy S22 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 5g",
+        "median": 22680.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S23 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 fe 5g",
+        "median": 18205.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy S23 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 plus 5g",
+        "median": 16160.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S23 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 ultra 5g",
+        "median": 32890.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Galaxy S23 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 5g",
+        "median": 13620.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S24 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 fe 5g",
+        "median": 20460.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S24 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 ultra 5g",
+        "median": 48920.0,
+        "n": 7,
+        "brand": "Samsung",
+        "model": "Galaxy S24 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s25 plus 5g",
+        "median": 44110.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S25 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s25 ultra 5g",
+        "median": 54410.0,
+        "n": 9,
+        "brand": "Samsung",
+        "model": "Galaxy S25 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s26 ultra",
+        "median": 79900.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S26 Ultra"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s9 plus",
+        "median": 3025.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy S9 Plus"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z flip 7",
+        "median": 44910.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy Z Flip 7"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold 7",
+        "median": 80810.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold 7"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold4",
+        "median": 8730.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold4"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold5",
+        "median": 37820.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold5"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold6 5g",
+        "median": 52130.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold6 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "samsung galaxy s21 fe 5g",
+        "median": 11330.0,
+        "n": 6,
+        "brand": "Samsung",
+        "model": "Samsung Galaxy S21 FE 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "s1 pro",
+        "median": 3320.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "S1 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t2 pro 5g",
+        "median": 12230.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "T2 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t2x 5g",
+        "median": 7000.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T2x 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 5g",
+        "median": 13270.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "T4 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 pro 5g",
+        "median": 19260.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "T4 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 ultra 5g",
+        "median": 19540.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T4 Ultra 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4r 5g",
+        "median": 11800.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T4R 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t5x 5g",
+        "median": 15690.0,
+        "n": 5,
+        "brand": "Vivo",
+        "model": "T5x 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v19",
+        "median": 2240.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V19"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v20",
+        "median": 5930.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V20"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v21 5g",
+        "median": 3670.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V21 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v23 5g",
+        "median": 6820.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "V23 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v23e 5g",
+        "median": 5930.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V23e 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v27",
+        "median": 11195.0,
+        "n": 6,
+        "brand": "Vivo",
+        "model": "V27"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v27 pro",
+        "median": 13860.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V27 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v29",
+        "median": 12780.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "V29"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v29 pro",
+        "median": 8840.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V29 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v29e",
+        "median": 12120.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V29e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v30",
+        "median": 10500.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "V30"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v30 pro",
+        "median": 17110.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V30 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v40",
+        "median": 14800.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "V40"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v40e",
+        "median": 14240.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V40e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v5",
+        "median": 680.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V5"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v50",
+        "median": 16910.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "V50"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v50e",
+        "median": 12860.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V50e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v60",
+        "median": 14790.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V60"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v60e",
+        "median": 16885.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V60e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v7 plus",
+        "median": 1000.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V7 Plus"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v70 elite",
+        "median": 35030.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V70 Elite"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v70 fe",
+        "median": 21720.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V70 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x fold 3 pro",
+        "median": 30720.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X Fold 3 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x fold 5",
+        "median": 78750.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X Fold 5"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x200 fe",
+        "median": 29325.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "X200 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x300 fe",
+        "median": 44105.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "X300 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x300 pro",
+        "median": 53100.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X300 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y100 5g",
+        "median": 7900.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y100 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y11 5g",
+        "median": 8070.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y11 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y15 2019",
+        "median": 3680.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y15 2019"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y17s",
+        "median": 2300.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y17s"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y19 5g",
+        "median": 5800.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y19 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y200 pro 5g",
+        "median": 13950.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y200 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y200e 5g",
+        "median": 6400.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "Y200e 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y20g",
+        "median": 4020.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y20G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y20t",
+        "median": 4230.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y20T"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y21 2021",
+        "median": 3755.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y21 2021"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y21 5g",
+        "median": 8930.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y21 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y28 5g",
+        "median": 6720.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y28 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y29 5g",
+        "median": 8420.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "Y29 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y30",
+        "median": 4270.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y30"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y300 plus 5g",
+        "median": 13440.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y300 Plus 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y31 5g",
+        "median": 12350.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y31 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y400 5g",
+        "median": 13570.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y400 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y400 pro 5g",
+        "median": 13860.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y400 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y91",
+        "median": 2000.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y91"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "11 lite ne 5g",
+        "median": 6520.0,
+        "n": 3,
+        "brand": "Xiaomi",
+        "model": "11 Lite NE 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "11i hypercharge 5g",
+        "median": 7170.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "11i Hypercharge 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "12 pro 5g",
+        "median": 9280.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "12 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi 10i",
+        "median": 6770.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Mi 10i"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi 10t",
+        "median": 7590.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Mi 10T"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi a2",
+        "median": 1400.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Mi A2"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi a3",
+        "median": 4040.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Mi A3"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 10",
+        "median": 4700.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 10"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 10a",
+        "median": 1690.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 10A"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 11 prime",
+        "median": 4180.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 11 Prime"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 12",
+        "median": 2630.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 12"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 12 5g",
+        "median": 7480.0,
+        "n": 4,
+        "brand": "Xiaomi",
+        "model": "Redmi 12 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 13c 5g",
+        "median": 6180.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 13C 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 14c 5g",
+        "median": 5560.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 14C 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 15 5g",
+        "median": 11095.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi 15 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 15a 5g",
+        "median": 9490.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 15A 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 15c 5g",
+        "median": 10590.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 15C 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 5",
+        "median": 820.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 5"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 5a",
+        "median": 710.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi 5A"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 6a",
+        "median": 1440.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 6A"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 9 power",
+        "median": 2060.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 9 Power"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 9 prime",
+        "median": 2140.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 9 Prime"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 9i",
+        "median": 3100.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 9i"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi a2",
+        "median": 2810.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi A2"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi k20 pro",
+        "median": 1080.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi K20 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi k50i 5g",
+        "median": 5155.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi K50i 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 10 pro",
+        "median": 5455.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 10 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 10s",
+        "median": 4650.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 10s"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 11",
+        "median": 5000.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 11"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 11 pro plus 5g",
+        "median": 8190.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 11 Pro Plus 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 11s",
+        "median": 3900.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 11S"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 12 5g",
+        "median": 7230.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 12 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 12 pro 5g",
+        "median": 9930.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 12 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 13 5g",
+        "median": 8555.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 13 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 13 pro 5g",
+        "median": 10800.0,
+        "n": 3,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 13 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 14 pro 5g",
+        "median": 8960.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 14 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 14 pro plus 5g",
+        "median": 15860.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 14 Pro Plus 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 15 5g",
+        "median": 16030.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 15 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 15 pro 5g",
+        "median": 20970.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 15 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 5",
+        "median": 250.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 5"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 5 pro",
+        "median": 1880.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 5 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 7 pro",
+        "median": 3780.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 7 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 8",
+        "median": 2820.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 8"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 8 pro",
+        "median": 4520.0,
+        "n": 4,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 8 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9",
+        "median": 4310.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9 pro",
+        "median": 4310.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9 pro max",
+        "median": 4610.0,
+        "n": 3,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9 Pro Max"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi y2",
+        "median": 1240.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Y2"
+      }
+    ],
+    "phones": [
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11",
+        "storage_gb": 64,
+        "median": 10370.0,
+        "n": 9,
+        "brand": "Apple",
+        "model": "iPhone 11"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11",
+        "storage_gb": 128,
+        "median": 13180.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 11"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11 pro",
+        "storage_gb": 256,
+        "median": 14470.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 11 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11 pro max",
+        "storage_gb": 64,
+        "median": 13930.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 11 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 11 pro max",
+        "storage_gb": 256,
+        "median": 10920.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 11 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12",
+        "storage_gb": 64,
+        "median": 12005.0,
+        "n": 4,
+        "brand": "Apple",
+        "model": "iPhone 12"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12",
+        "storage_gb": 128,
+        "median": 15600.0,
+        "n": 5,
+        "brand": "Apple",
+        "model": "iPhone 12"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 mini",
+        "storage_gb": 64,
+        "median": 13310.0,
+        "n": 4,
+        "brand": "Apple",
+        "model": "iPhone 12 Mini"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 mini",
+        "storage_gb": 128,
+        "median": 8100.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 12 Mini"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 mini",
+        "storage_gb": 256,
+        "median": 13990.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 12 Mini"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 pro max",
+        "storage_gb": 128,
+        "median": 23640.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 12 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 pro max",
+        "storage_gb": 256,
+        "median": 20460.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 12 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 12 pro max",
+        "storage_gb": 512,
+        "median": 23290.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 12 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13",
+        "storage_gb": 128,
+        "median": 20680.0,
+        "n": 23,
+        "brand": "Apple",
+        "model": "iPhone 13"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13",
+        "storage_gb": 256,
+        "median": 20870.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 13"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 mini",
+        "storage_gb": 128,
+        "median": 15645.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 13 Mini"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 pro",
+        "storage_gb": 128,
+        "median": 27020.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 13 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 pro",
+        "storage_gb": 256,
+        "median": 31780.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 13 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 pro max",
+        "storage_gb": 128,
+        "median": 33740.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 13 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 13 pro max",
+        "storage_gb": 256,
+        "median": 28340.0,
+        "n": 4,
+        "brand": "Apple",
+        "model": "iPhone 13 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14",
+        "storage_gb": 128,
+        "median": 23570.0,
+        "n": 9,
+        "brand": "Apple",
+        "model": "iPhone 14"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14",
+        "storage_gb": 256,
+        "median": 24210.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 14"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 plus",
+        "storage_gb": 128,
+        "median": 27270.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 14 Plus"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 pro",
+        "storage_gb": 256,
+        "median": 40250.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 14 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 pro max",
+        "storage_gb": 128,
+        "median": 23690.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 14 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 pro max",
+        "storage_gb": 256,
+        "median": 42600.0,
+        "n": 5,
+        "brand": "Apple",
+        "model": "iPhone 14 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 14 pro max",
+        "storage_gb": 512,
+        "median": 46290.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 14 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15",
+        "storage_gb": 128,
+        "median": 32550.0,
+        "n": 13,
+        "brand": "Apple",
+        "model": "iPhone 15"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15",
+        "storage_gb": 256,
+        "median": 39150.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 15"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 plus",
+        "storage_gb": 128,
+        "median": 34610.0,
+        "n": 9,
+        "brand": "Apple",
+        "model": "iPhone 15 Plus"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro",
+        "storage_gb": 128,
+        "median": 47930.0,
+        "n": 2,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro",
+        "storage_gb": 256,
+        "median": 51760.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro",
+        "storage_gb": 1024,
+        "median": 55710.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro max",
+        "storage_gb": 256,
+        "median": 56410.0,
+        "n": 8,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro max",
+        "storage_gb": 512,
+        "median": 53530.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 15 pro max",
+        "storage_gb": 1024,
+        "median": 30590.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 15 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16",
+        "storage_gb": 128,
+        "median": 42440.0,
+        "n": 6,
+        "brand": "Apple",
+        "model": "iPhone 16"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16",
+        "storage_gb": 256,
+        "median": 42760.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 16"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 plus",
+        "storage_gb": 128,
+        "median": 44260.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 16 Plus"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 pro",
+        "storage_gb": 128,
+        "median": 59260.0,
+        "n": 6,
+        "brand": "Apple",
+        "model": "iPhone 16 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 pro",
+        "storage_gb": 256,
+        "median": 60640.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 16 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 pro max",
+        "storage_gb": 256,
+        "median": 69520.0,
+        "n": 11,
+        "brand": "Apple",
+        "model": "iPhone 16 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 16 pro max",
+        "storage_gb": 512,
+        "median": 65830.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone 16 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 17",
+        "storage_gb": 256,
+        "median": 51690.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 17"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 17 pro",
+        "storage_gb": 256,
+        "median": 77610.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone 17 Pro"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone 17 pro max",
+        "storage_gb": 256,
+        "median": 94170.0,
+        "n": 7,
+        "brand": "Apple",
+        "model": "iPhone 17 Pro Max"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone se 2022",
+        "storage_gb": 128,
+        "median": 12190.0,
+        "n": 1,
+        "brand": "Apple",
+        "model": "iPhone SE 2022"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone xr",
+        "storage_gb": 64,
+        "median": 8280.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone XR"
+      },
+      {
+        "brand_key": "apple",
+        "model_key": "iphone xr",
+        "storage_gb": 128,
+        "median": 8980.0,
+        "n": 3,
+        "brand": "Apple",
+        "model": "iPhone XR"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 6a",
+        "storage_gb": 128,
+        "median": 10730.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 6A"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 8",
+        "storage_gb": 128,
+        "median": 20050.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 8"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9",
+        "storage_gb": 256,
+        "median": 29980.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 9"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9 pro",
+        "storage_gb": 256,
+        "median": 37210.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 9 Pro"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9 pro xl",
+        "storage_gb": 256,
+        "median": 42310.0,
+        "n": 1,
+        "brand": "Google",
+        "model": "Pixel 9 Pro XL"
+      },
+      {
+        "brand_key": "google",
+        "model_key": "pixel 9a",
+        "storage_gb": 256,
+        "median": 21700.0,
+        "n": 3,
+        "brand": "Google",
+        "model": "Pixel 9A"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 20 fusion",
+        "storage_gb": 128,
+        "median": 4190.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 20 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 40",
+        "storage_gb": 256,
+        "median": 8215.0,
+        "n": 6,
+        "brand": "Motorola",
+        "model": "Moto Edge 40"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 40 neo",
+        "storage_gb": 256,
+        "median": 11560.0,
+        "n": 3,
+        "brand": "Motorola",
+        "model": "Moto Edge 40 Neo"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 fusion",
+        "storage_gb": 128,
+        "median": 10620.0,
+        "n": 3,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 fusion",
+        "storage_gb": 256,
+        "median": 12140.0,
+        "n": 2,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 neo",
+        "storage_gb": 256,
+        "median": 12390.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Neo"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 50 pro",
+        "storage_gb": 256,
+        "median": 10730.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 50 Pro"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 60 fusion",
+        "storage_gb": 256,
+        "median": 13570.0,
+        "n": 5,
+        "brand": "Motorola",
+        "model": "Moto Edge 60 Fusion"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto edge 60 pro",
+        "storage_gb": 256,
+        "median": 15390.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto Edge 60 Pro"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g34 5g",
+        "storage_gb": 128,
+        "median": 4680.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G34 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g57 power 5g",
+        "storage_gb": 128,
+        "median": 7160.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G57 Power 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g73 5g",
+        "storage_gb": 128,
+        "median": 7010.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G73 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g85 5g",
+        "storage_gb": 128,
+        "median": 9450.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G85 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "moto g85 5g",
+        "storage_gb": 256,
+        "median": 10440.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "Moto G85 5G"
+      },
+      {
+        "brand_key": "motorola",
+        "model_key": "one power",
+        "storage_gb": 64,
+        "median": 590.0,
+        "n": 1,
+        "brand": "Motorola",
+        "model": "One Power"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 2a 5g",
+        "storage_gb": 128,
+        "median": 13370.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 2a 5G"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 2a plus",
+        "storage_gb": 256,
+        "median": 14510.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 2a Plus"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 3",
+        "storage_gb": 256,
+        "median": 24030.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 3"
+      },
+      {
+        "brand_key": "nothing",
+        "model_key": "phone 4a",
+        "storage_gb": 256,
+        "median": 20040.0,
+        "n": 1,
+        "brand": "Nothing",
+        "model": "Phone 4a"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 10 pro 5g",
+        "storage_gb": 256,
+        "median": 13280.0,
+        "n": 5,
+        "brand": "OnePlus",
+        "model": "One Plus 10 Pro 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 11 5g",
+        "storage_gb": 128,
+        "median": 17560.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 11 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 11 5g",
+        "storage_gb": 256,
+        "median": 19920.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 11 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 11r 5g",
+        "storage_gb": 128,
+        "median": 16060.0,
+        "n": 5,
+        "brand": "OnePlus",
+        "model": "One Plus 11R 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 11r 5g",
+        "storage_gb": 256,
+        "median": 13740.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus 11R 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 12",
+        "storage_gb": 256,
+        "median": 26070.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus 12"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 12",
+        "storage_gb": 512,
+        "median": 30640.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 12"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 12r",
+        "storage_gb": 256,
+        "median": 21440.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus 12R"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13",
+        "storage_gb": 256,
+        "median": 31540.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 13"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13",
+        "storage_gb": 512,
+        "median": 33480.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 13"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13r",
+        "storage_gb": 256,
+        "median": 26480.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus 13R"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 13s",
+        "storage_gb": 256,
+        "median": 28160.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 13S"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 15r",
+        "storage_gb": 512,
+        "median": 32640.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 15R"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 5",
+        "storage_gb": 128,
+        "median": 2600.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 5"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 7t",
+        "storage_gb": 128,
+        "median": 5750.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 7T"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 8 pro",
+        "storage_gb": 256,
+        "median": 8670.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 8 Pro"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus 9 5g",
+        "storage_gb": 128,
+        "median": 9190.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus 9 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord",
+        "storage_gb": 256,
+        "median": 6400.0,
+        "n": 4,
+        "brand": "OnePlus",
+        "model": "One Plus Nord"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 2 5g",
+        "storage_gb": 128,
+        "median": 8015.0,
+        "n": 4,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 2 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 3 5g",
+        "storage_gb": 128,
+        "median": 11365.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 3 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 4",
+        "storage_gb": 128,
+        "median": 13470.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 4"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 4",
+        "storage_gb": 256,
+        "median": 16660.0,
+        "n": 4,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 4"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 5",
+        "storage_gb": 256,
+        "median": 20035.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 5"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord 6 5g",
+        "storage_gb": 256,
+        "median": 26930.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord 6 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 2 5g",
+        "storage_gb": 128,
+        "median": 8820.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 2 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 2 lite 5g",
+        "storage_gb": 128,
+        "median": 5570.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 2 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 3 5g",
+        "storage_gb": 128,
+        "median": 11000.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 3 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 3 lite 5g",
+        "storage_gb": 128,
+        "median": 8940.0,
+        "n": 3,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 3 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 3 lite 5g",
+        "storage_gb": 256,
+        "median": 10190.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 3 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 4 5g",
+        "storage_gb": 128,
+        "median": 11680.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 4 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 4 lite 5g",
+        "storage_gb": 128,
+        "median": 10140.0,
+        "n": 1,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 4 Lite 5G"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 5",
+        "storage_gb": 256,
+        "median": 17065.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 5"
+      },
+      {
+        "brand_key": "oneplus",
+        "model_key": "one plus nord ce 5g",
+        "storage_gb": 128,
+        "median": 4590.0,
+        "n": 2,
+        "brand": "OnePlus",
+        "model": "One Plus Nord CE 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a15s",
+        "storage_gb": 64,
+        "median": 2310.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A15s"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a18",
+        "storage_gb": 64,
+        "median": 1350.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A18"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a3 5g",
+        "storage_gb": 128,
+        "median": 7430.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A3 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a53s 5g",
+        "storage_gb": 128,
+        "median": 5345.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A53s 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a59 5g",
+        "storage_gb": 128,
+        "median": 6460.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A59 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a5x 5g",
+        "storage_gb": 128,
+        "median": 6580.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "A5x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6 5g",
+        "storage_gb": 128,
+        "median": 12360.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6 pro 5g",
+        "storage_gb": 256,
+        "median": 13780.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6s 5g",
+        "storage_gb": 128,
+        "median": 12720.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6s 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6x 5g",
+        "storage_gb": 64,
+        "median": 9170.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a6x 5g",
+        "storage_gb": 128,
+        "median": 7860.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A6x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "a77 2022",
+        "storage_gb": 128,
+        "median": 2510.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "A77 2022"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f19 pro plus 5g",
+        "storage_gb": 128,
+        "median": 7120.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "F19 Pro Plus 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f25 pro 5g",
+        "storage_gb": 128,
+        "median": 5210.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F25 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f27 pro plus 5g",
+        "storage_gb": 256,
+        "median": 11310.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "F27 Pro Plus 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f29 pro 5g",
+        "storage_gb": 128,
+        "median": 10895.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F29 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f29 pro 5g",
+        "storage_gb": 256,
+        "median": 13970.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "F29 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f31 5g",
+        "storage_gb": 128,
+        "median": 14750.0,
+        "n": 3,
+        "brand": "Oppo",
+        "model": "F31 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f31 5g",
+        "storage_gb": 256,
+        "median": 11260.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F31 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f33 5g",
+        "storage_gb": 128,
+        "median": 19625.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F33 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "f33 pro 5g",
+        "storage_gb": 256,
+        "median": 22865.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "F33 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "find x9 ultra",
+        "storage_gb": 512,
+        "median": 77230.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Find X9 Ultra"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "k13 turbo pro 5g",
+        "storage_gb": 256,
+        "median": 17300.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "K13 Turbo Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "k14x 5g",
+        "storage_gb": 128,
+        "median": 11190.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "K14x 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno10 5g",
+        "storage_gb": 256,
+        "median": 6050.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno10 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno10 pro 5g",
+        "storage_gb": 256,
+        "median": 9640.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno10 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno10 pro plus 5g",
+        "storage_gb": 256,
+        "median": 15260.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno10 Pro Plus 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno11 5g",
+        "storage_gb": 128,
+        "median": 12510.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno11 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno11 5g",
+        "storage_gb": 256,
+        "median": 12950.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno11 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno12 5g",
+        "storage_gb": 256,
+        "median": 12820.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno12 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno13 5g",
+        "storage_gb": 128,
+        "median": 13780.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno13 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno13 5g",
+        "storage_gb": 512,
+        "median": 14910.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno13 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno13 pro 5g",
+        "storage_gb": 512,
+        "median": 18890.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno13 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno14 5g",
+        "storage_gb": 512,
+        "median": 21220.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno14 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno14 pro 5g",
+        "storage_gb": 512,
+        "median": 28270.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno14 Pro 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno15 5g",
+        "storage_gb": 256,
+        "median": 18720.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno15 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno15 5g",
+        "storage_gb": 512,
+        "median": 22880.0,
+        "n": 2,
+        "brand": "Oppo",
+        "model": "Reno15 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno6 5g",
+        "storage_gb": 128,
+        "median": 5940.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno6 5G"
+      },
+      {
+        "brand_key": "oppo",
+        "model_key": "reno7 pro 5g",
+        "storage_gb": 256,
+        "median": 10860.0,
+        "n": 1,
+        "brand": "Oppo",
+        "model": "Reno7 Pro 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco c75 5g",
+        "storage_gb": 64,
+        "median": 3980.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO C75 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco c85x",
+        "storage_gb": 64,
+        "median": 8060.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO C85x"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco c85x",
+        "storage_gb": 128,
+        "median": 8570.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO C85x"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco f3 gt",
+        "storage_gb": 128,
+        "median": 7430.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO F3 GT"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco m2 pro",
+        "storage_gb": 64,
+        "median": 2520.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO M2 Pro"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco m8 5g",
+        "storage_gb": 128,
+        "median": 13920.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO M8 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco x6 5g",
+        "storage_gb": 256,
+        "median": 8360.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO X6 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco x6 neo 5g",
+        "storage_gb": 128,
+        "median": 5990.0,
+        "n": 1,
+        "brand": "Poco",
+        "model": "POCO X6 Neo 5G"
+      },
+      {
+        "brand_key": "poco",
+        "model_key": "poco x6 neo 5g",
+        "storage_gb": 256,
+        "median": 7090.0,
+        "n": 2,
+        "brand": "Poco",
+        "model": "POCO X6 Neo 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 10 pro 5g",
+        "storage_gb": 128,
+        "median": 8550.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 10 Pro 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 10 pro plus 5g",
+        "storage_gb": 128,
+        "median": 10420.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 10 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 11 pro plus 5g",
+        "storage_gb": 256,
+        "median": 8460.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 11 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 11x 5g",
+        "storage_gb": 128,
+        "median": 5990.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 11x 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 14 pro plus 5g",
+        "storage_gb": 256,
+        "median": 14360.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 14 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 15 5g",
+        "storage_gb": 128,
+        "median": 14470.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 15 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 15x 5g",
+        "storage_gb": 128,
+        "median": 12870.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 15X 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 15x 5g",
+        "storage_gb": 256,
+        "median": 13710.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 15X 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 16 pro plus 5g",
+        "storage_gb": 256,
+        "median": 24435.0,
+        "n": 4,
+        "brand": "Realme",
+        "model": "Realme 16 Pro Plus 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 3",
+        "storage_gb": 64,
+        "median": 2010.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 3"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 3 pro",
+        "storage_gb": 128,
+        "median": 2590.0,
+        "n": 4,
+        "brand": "Realme",
+        "model": "Realme 3 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 6 pro",
+        "storage_gb": 64,
+        "median": 4180.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 6 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 7",
+        "storage_gb": 64,
+        "median": 4880.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme 7"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme 8 pro",
+        "storage_gb": 128,
+        "median": 5415.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme 8 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme c2",
+        "storage_gb": 32,
+        "median": 790.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme C2"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme c55",
+        "storage_gb": 64,
+        "median": 5370.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme C55"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt 6",
+        "storage_gb": 256,
+        "median": 5470.0,
+        "n": 2,
+        "brand": "Realme",
+        "model": "Realme GT 6"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt 6t 5g",
+        "storage_gb": 256,
+        "median": 12170.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme GT 6T 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt master edition",
+        "storage_gb": 256,
+        "median": 3880.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme GT Master Edition"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme gt neo 2",
+        "storage_gb": 128,
+        "median": 8170.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme GT NEO 2"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme narzo 30 5g",
+        "storage_gb": 128,
+        "median": 7340.0,
+        "n": 3,
+        "brand": "Realme",
+        "model": "Realme Narzo 30 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme narzo n53",
+        "storage_gb": 64,
+        "median": 4100.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme Narzo N53"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme narzo n53",
+        "storage_gb": 128,
+        "median": 4560.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme Narzo N53"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme p4x 5g",
+        "storage_gb": 128,
+        "median": 9010.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme P4x 5G"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme x",
+        "storage_gb": 128,
+        "median": 3430.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme X"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme x2 pro",
+        "storage_gb": 256,
+        "median": 2170.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme X2 Pro"
+      },
+      {
+        "brand_key": "realme",
+        "model_key": "realme x7 max 5g",
+        "storage_gb": 128,
+        "median": 8420.0,
+        "n": 1,
+        "brand": "Realme",
+        "model": "Realme X7 Max 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a06 5g",
+        "storage_gb": 128,
+        "median": 5560.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A06 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a14 5g",
+        "storage_gb": 128,
+        "median": 5925.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A14 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a15 5g",
+        "storage_gb": 128,
+        "median": 7425.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Galaxy A15 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a17 5g",
+        "storage_gb": 128,
+        "median": 10230.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A17 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a17 5g",
+        "storage_gb": 256,
+        "median": 11310.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A17 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a21s",
+        "storage_gb": 128,
+        "median": 3780.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A21s"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a22",
+        "storage_gb": 128,
+        "median": 3080.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A22"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a23 5g",
+        "storage_gb": 128,
+        "median": 7540.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A23 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a25 5g",
+        "storage_gb": 128,
+        "median": 8030.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A25 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a26 5g",
+        "storage_gb": 128,
+        "median": 8810.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A26 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a32",
+        "storage_gb": 128,
+        "median": 4960.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A32"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a34 5g",
+        "storage_gb": 128,
+        "median": 3320.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A34 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a34 5g",
+        "storage_gb": 256,
+        "median": 9170.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A34 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a35 5g",
+        "storage_gb": 128,
+        "median": 11060.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A35 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a35 5g",
+        "storage_gb": 256,
+        "median": 7420.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A35 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a36 5g",
+        "storage_gb": 256,
+        "median": 14685.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A36 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a37 5g",
+        "storage_gb": 256,
+        "median": 27230.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A37 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a51",
+        "storage_gb": 128,
+        "median": 2530.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A51"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a52",
+        "storage_gb": 128,
+        "median": 2020.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A52"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a52s 5g",
+        "storage_gb": 128,
+        "median": 7065.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A52s 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a55 5g",
+        "storage_gb": 256,
+        "median": 14550.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A55 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a56 5g",
+        "storage_gb": 128,
+        "median": 17190.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A56 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a56 5g",
+        "storage_gb": 256,
+        "median": 19230.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy A56 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a7 2016",
+        "storage_gb": 16,
+        "median": 1210.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A7 2016"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy a71",
+        "storage_gb": 128,
+        "median": 2060.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy A71"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy f34 5g",
+        "storage_gb": 128,
+        "median": 6705.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy F34 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy f62",
+        "storage_gb": 128,
+        "median": 4740.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy F62"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy j6 plus",
+        "storage_gb": 64,
+        "median": 400.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy J6 Plus"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy j7 nxt",
+        "storage_gb": 16,
+        "median": 1060.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy J7 Nxt"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m01s",
+        "storage_gb": 32,
+        "median": 1850.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M01s"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m02",
+        "storage_gb": 32,
+        "median": 910.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy M02"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m12",
+        "storage_gb": 128,
+        "median": 3880.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M12"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m13",
+        "storage_gb": 128,
+        "median": 4120.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M13"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m14 5g",
+        "storage_gb": 128,
+        "median": 6260.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy M14 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m17e 5g",
+        "storage_gb": 128,
+        "median": 10590.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M17e 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m20",
+        "storage_gb": 64,
+        "median": 1020.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M20"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m21 2021 edition",
+        "storage_gb": 128,
+        "median": 3100.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M21 2021 Edition"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m30s",
+        "storage_gb": 64,
+        "median": 2600.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M30s"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m32 prime edition",
+        "storage_gb": 128,
+        "median": 3060.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M32 Prime Edition"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m33 5g",
+        "storage_gb": 128,
+        "median": 6700.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M33 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m36 5g",
+        "storage_gb": 128,
+        "median": 10430.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy M36 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy m51",
+        "storage_gb": 128,
+        "median": 3330.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy M51"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s10",
+        "storage_gb": 128,
+        "median": 1570.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S10"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s10 lite",
+        "storage_gb": 512,
+        "median": 2700.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S10 Lite"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s10 plus",
+        "storage_gb": 512,
+        "median": 6200.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S10 Plus"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s20",
+        "storage_gb": 128,
+        "median": 3450.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S20"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s20 fe 5g",
+        "storage_gb": 128,
+        "median": 9010.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S20 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s21 plus 5g",
+        "storage_gb": 256,
+        "median": 8130.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S21 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s21 ultra 5g",
+        "storage_gb": 256,
+        "median": 16710.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S21 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 5g",
+        "storage_gb": 128,
+        "median": 15650.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy S22 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 5g",
+        "storage_gb": 256,
+        "median": 16410.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S22 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 plus 5g",
+        "storage_gb": 128,
+        "median": 16120.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S22 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 ultra 5g",
+        "storage_gb": 256,
+        "median": 22910.0,
+        "n": 5,
+        "brand": "Samsung",
+        "model": "Galaxy S22 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s22 ultra 5g",
+        "storage_gb": 512,
+        "median": 11780.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy S22 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 5g",
+        "storage_gb": 128,
+        "median": 18005.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy S23 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 5g",
+        "storage_gb": 256,
+        "median": 24040.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S23 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 fe 5g",
+        "storage_gb": 128,
+        "median": 17900.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S23 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 fe 5g",
+        "storage_gb": 256,
+        "median": 18510.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S23 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 plus 5g",
+        "storage_gb": 512,
+        "median": 16160.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S23 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s23 ultra 5g",
+        "storage_gb": 256,
+        "median": 32890.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Galaxy S23 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 5g",
+        "storage_gb": 128,
+        "median": 13620.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S24 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 fe 5g",
+        "storage_gb": 256,
+        "median": 20460.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S24 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 ultra 5g",
+        "storage_gb": 256,
+        "median": 48920.0,
+        "n": 6,
+        "brand": "Samsung",
+        "model": "Galaxy S24 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s24 ultra 5g",
+        "storage_gb": 512,
+        "median": 58620.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S24 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s25 plus 5g",
+        "storage_gb": 256,
+        "median": 44110.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S25 Plus 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s25 ultra 5g",
+        "storage_gb": 12,
+        "median": 68390.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S25 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s25 ultra 5g",
+        "storage_gb": 256,
+        "median": 49940.0,
+        "n": 5,
+        "brand": "Samsung",
+        "model": "Galaxy S25 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s25 ultra 5g",
+        "storage_gb": 512,
+        "median": 54410.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy S25 Ultra 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s26 ultra",
+        "storage_gb": 256,
+        "median": 79900.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy S26 Ultra"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy s9 plus",
+        "storage_gb": 64,
+        "median": 3025.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy S9 Plus"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z flip 7",
+        "storage_gb": 512,
+        "median": 44910.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Galaxy Z Flip 7"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold 7",
+        "storage_gb": 256,
+        "median": 80810.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold 7"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold4",
+        "storage_gb": 256,
+        "median": 8730.0,
+        "n": 1,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold4"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold5",
+        "storage_gb": 256,
+        "median": 37820.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold5"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "galaxy z fold6 5g",
+        "storage_gb": 256,
+        "median": 52130.0,
+        "n": 3,
+        "brand": "Samsung",
+        "model": "Galaxy Z Fold6 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "samsung galaxy s21 fe 5g",
+        "storage_gb": 128,
+        "median": 11030.0,
+        "n": 4,
+        "brand": "Samsung",
+        "model": "Samsung Galaxy S21 FE 5G"
+      },
+      {
+        "brand_key": "samsung",
+        "model_key": "samsung galaxy s21 fe 5g",
+        "storage_gb": 256,
+        "median": 11940.0,
+        "n": 2,
+        "brand": "Samsung",
+        "model": "Samsung Galaxy S21 FE 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "s1 pro",
+        "storage_gb": 128,
+        "median": 3320.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "S1 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t2 pro 5g",
+        "storage_gb": 128,
+        "median": 12230.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T2 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t2 pro 5g",
+        "storage_gb": 256,
+        "median": 12430.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "T2 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t2x 5g",
+        "storage_gb": 128,
+        "median": 7000.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T2x 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 5g",
+        "storage_gb": 128,
+        "median": 13660.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "T4 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 5g",
+        "storage_gb": 256,
+        "median": 12880.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T4 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 pro 5g",
+        "storage_gb": 256,
+        "median": 19260.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "T4 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4 ultra 5g",
+        "storage_gb": 512,
+        "median": 19540.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T4 Ultra 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t4r 5g",
+        "storage_gb": 128,
+        "median": 11800.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T4R 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t5x 5g",
+        "storage_gb": 128,
+        "median": 14990.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "T5x 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "t5x 5g",
+        "storage_gb": 256,
+        "median": 15690.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "T5x 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v19",
+        "storage_gb": 128,
+        "median": 2240.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V19"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v20",
+        "storage_gb": 128,
+        "median": 5930.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V20"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v21 5g",
+        "storage_gb": 128,
+        "median": 3670.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V21 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v23 5g",
+        "storage_gb": 128,
+        "median": 6820.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "V23 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v23e 5g",
+        "storage_gb": 128,
+        "median": 5930.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V23e 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v27",
+        "storage_gb": 128,
+        "median": 11740.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V27"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v27",
+        "storage_gb": 256,
+        "median": 11000.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "V27"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v27 pro",
+        "storage_gb": 128,
+        "median": 13860.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V27 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v29",
+        "storage_gb": 128,
+        "median": 12780.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "V29"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v29 pro",
+        "storage_gb": 256,
+        "median": 8840.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V29 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v29e",
+        "storage_gb": 128,
+        "median": 12120.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V29e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v30",
+        "storage_gb": 128,
+        "median": 12510.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V30"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v30",
+        "storage_gb": 256,
+        "median": 10500.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V30"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v30 pro",
+        "storage_gb": 256,
+        "median": 17110.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V30 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v40",
+        "storage_gb": 128,
+        "median": 14800.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "V40"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v40",
+        "storage_gb": 256,
+        "median": 16730.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V40"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v40e",
+        "storage_gb": 128,
+        "median": 14240.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V40e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v5",
+        "storage_gb": 32,
+        "median": 680.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V5"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v50",
+        "storage_gb": 128,
+        "median": 15280.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V50"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v50",
+        "storage_gb": 256,
+        "median": 16910.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V50"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v50e",
+        "storage_gb": 128,
+        "median": 12860.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V50e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v60",
+        "storage_gb": 256,
+        "median": 14790.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V60"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v60e",
+        "storage_gb": 128,
+        "median": 16885.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "V60e"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v7 plus",
+        "storage_gb": 64,
+        "median": 1000.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V7 Plus"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v70 elite",
+        "storage_gb": 256,
+        "median": 35030.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V70 Elite"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "v70 fe",
+        "storage_gb": 256,
+        "median": 21720.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "V70 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x fold 3 pro",
+        "storage_gb": 512,
+        "median": 30720.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X Fold 3 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x fold 5",
+        "storage_gb": 512,
+        "median": 78750.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X Fold 5"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x200 fe",
+        "storage_gb": 512,
+        "median": 29325.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "X200 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x300 fe",
+        "storage_gb": 256,
+        "median": 44930.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "X300 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x300 fe",
+        "storage_gb": 512,
+        "median": 39670.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X300 FE"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "x300 pro",
+        "storage_gb": 512,
+        "median": 53100.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "X300 Pro"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y100 5g",
+        "storage_gb": 128,
+        "median": 7900.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y100 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y11 5g",
+        "storage_gb": 64,
+        "median": 8070.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y11 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y15 2019",
+        "storage_gb": 64,
+        "median": 3680.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y15 2019"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y17s",
+        "storage_gb": 64,
+        "median": 2300.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y17s"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y19 5g",
+        "storage_gb": 128,
+        "median": 5800.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y19 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y200 pro 5g",
+        "storage_gb": 128,
+        "median": 13950.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y200 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y200e 5g",
+        "storage_gb": 128,
+        "median": 6400.0,
+        "n": 4,
+        "brand": "Vivo",
+        "model": "Y200e 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y20g",
+        "storage_gb": 64,
+        "median": 4020.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y20G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y20t",
+        "storage_gb": 64,
+        "median": 4230.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y20T"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y21 2021",
+        "storage_gb": 64,
+        "median": 3755.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y21 2021"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y21 5g",
+        "storage_gb": 128,
+        "median": 8930.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y21 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y28 5g",
+        "storage_gb": 128,
+        "median": 6720.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y28 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y29 5g",
+        "storage_gb": 128,
+        "median": 8420.0,
+        "n": 3,
+        "brand": "Vivo",
+        "model": "Y29 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y30",
+        "storage_gb": 128,
+        "median": 4270.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y30"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y300 plus 5g",
+        "storage_gb": 128,
+        "median": 13440.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y300 Plus 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y31 5g",
+        "storage_gb": 128,
+        "median": 12350.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y31 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y400 5g",
+        "storage_gb": 128,
+        "median": 14290.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y400 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y400 5g",
+        "storage_gb": 256,
+        "median": 12850.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y400 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y400 pro 5g",
+        "storage_gb": 256,
+        "median": 13860.0,
+        "n": 2,
+        "brand": "Vivo",
+        "model": "Y400 Pro 5G"
+      },
+      {
+        "brand_key": "vivo",
+        "model_key": "y91",
+        "storage_gb": 32,
+        "median": 2000.0,
+        "n": 1,
+        "brand": "Vivo",
+        "model": "Y91"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "11 lite ne 5g",
+        "storage_gb": 128,
+        "median": 6520.0,
+        "n": 3,
+        "brand": "Xiaomi",
+        "model": "11 Lite NE 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "11i hypercharge 5g",
+        "storage_gb": 128,
+        "median": 7170.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "11i Hypercharge 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "12 pro 5g",
+        "storage_gb": 256,
+        "median": 9280.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "12 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi 10i",
+        "storage_gb": 128,
+        "median": 6770.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Mi 10i"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi 10t",
+        "storage_gb": 128,
+        "median": 7590.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Mi 10T"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi a2",
+        "storage_gb": 64,
+        "median": 1400.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Mi A2"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "mi a3",
+        "storage_gb": 128,
+        "median": 4040.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Mi A3"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 10",
+        "storage_gb": 128,
+        "median": 4700.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 10"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 10a",
+        "storage_gb": 64,
+        "median": 1690.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 10A"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 11 prime",
+        "storage_gb": 64,
+        "median": 4180.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 11 Prime"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 12",
+        "storage_gb": 128,
+        "median": 2630.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 12"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 12 5g",
+        "storage_gb": 128,
+        "median": 7480.0,
+        "n": 3,
+        "brand": "Xiaomi",
+        "model": "Redmi 12 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 12 5g",
+        "storage_gb": 256,
+        "median": 7620.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 12 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 13c 5g",
+        "storage_gb": 128,
+        "median": 6180.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 13C 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 14c 5g",
+        "storage_gb": 64,
+        "median": 5560.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 14C 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 15 5g",
+        "storage_gb": 128,
+        "median": 11095.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi 15 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 15a 5g",
+        "storage_gb": 128,
+        "median": 9490.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 15A 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 15c 5g",
+        "storage_gb": 128,
+        "median": 10590.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 15C 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 5",
+        "storage_gb": 32,
+        "median": 820.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 5"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 5a",
+        "storage_gb": 16,
+        "median": 710.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi 5A"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 6a",
+        "storage_gb": 32,
+        "median": 1440.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 6A"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 9 power",
+        "storage_gb": 64,
+        "median": 2060.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 9 Power"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 9 prime",
+        "storage_gb": 64,
+        "median": 2140.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 9 Prime"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi 9i",
+        "storage_gb": 64,
+        "median": 3100.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi 9i"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi a2",
+        "storage_gb": 64,
+        "median": 2810.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi A2"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi k20 pro",
+        "storage_gb": 128,
+        "median": 1080.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi K20 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi k50i 5g",
+        "storage_gb": 128,
+        "median": 5155.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi K50i 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 10 pro",
+        "storage_gb": 128,
+        "median": 5455.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 10 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 10s",
+        "storage_gb": 64,
+        "median": 4650.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 10s"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 11",
+        "storage_gb": 64,
+        "median": 5000.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 11"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 11 pro plus 5g",
+        "storage_gb": 128,
+        "median": 8190.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 11 Pro Plus 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 11s",
+        "storage_gb": 128,
+        "median": 3900.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 11S"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 12 5g",
+        "storage_gb": 128,
+        "median": 7230.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 12 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 12 pro 5g",
+        "storage_gb": 256,
+        "median": 9930.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 12 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 13 5g",
+        "storage_gb": 128,
+        "median": 8330.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 13 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 13 5g",
+        "storage_gb": 256,
+        "median": 8780.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 13 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 13 pro 5g",
+        "storage_gb": 128,
+        "median": 10550.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 13 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 13 pro 5g",
+        "storage_gb": 256,
+        "median": 10800.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 13 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 14 pro 5g",
+        "storage_gb": 128,
+        "median": 8960.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 14 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 14 pro plus 5g",
+        "storage_gb": 256,
+        "median": 15860.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 14 Pro Plus 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 15 5g",
+        "storage_gb": 256,
+        "median": 16030.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 15 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 15 pro 5g",
+        "storage_gb": 256,
+        "median": 20970.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 15 Pro 5G"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 5",
+        "storage_gb": 64,
+        "median": 250.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 5"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 5 pro",
+        "storage_gb": 64,
+        "median": 1880.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 5 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 7 pro",
+        "storage_gb": 64,
+        "median": 3780.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 7 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 8",
+        "storage_gb": 64,
+        "median": 2820.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 8"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 8 pro",
+        "storage_gb": 128,
+        "median": 4520.0,
+        "n": 4,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 8 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9",
+        "storage_gb": 128,
+        "median": 4310.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9 pro",
+        "storage_gb": 64,
+        "median": 4310.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9 Pro"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9 pro max",
+        "storage_gb": 64,
+        "median": 4330.0,
+        "n": 2,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9 Pro Max"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi note 9 pro max",
+        "storage_gb": 128,
+        "median": 5490.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Note 9 Pro Max"
+      },
+      {
+        "brand_key": "xiaomi",
+        "model_key": "redmi y2",
+        "storage_gb": 32,
+        "median": 1240.0,
+        "n": 1,
+        "brand": "Xiaomi",
+        "model": "Redmi Y2"
+      }
+    ]
+  },
+  "condition": {
+    "apply": true,
+    "rows": 47,
+    "alpha": 30.0,
+    "features": [
+      "age_months",
+      "warranty",
+      "battery_penalty",
+      "screen_damage",
+      "display_defect",
+      "panel_broken",
+      "charger_missing",
+      "has_bill",
+      "extra_tech"
+    ],
+    "reference": {
+      "age_months": 18.0,
+      "warranty": 0.0,
+      "calls_ok": 1.0,
+      "touch_ok": 1.0,
+      "screen_original": 1.0,
+      "battery_penalty": 0.0,
+      "screen_damage": 0.0,
+      "display_defect": 0.0,
+      "panel_broken": 0.0,
+      "body_damage": 0.0,
+      "charger_missing": 0.0,
+      "has_box": 1.0,
+      "has_bill": 0.0,
+      "extra_tech": 0.0
+    },
+    "scaler_mean": [
+      -2.234042553191489,
+      0.1702127659574468,
+      1.0851063829787233,
+      0.09574468085106383,
+      0.10638297872340426,
+      0.0425531914893617,
+      0.425531914893617,
+      0.3617021276595745,
+      0.06382978723404255
+    ],
+    "scaler_scale": [
+      5.089466660840431,
+      0.3758196113330999,
+      1.4116504183317762,
+      0.40787850026980454,
+      0.37097012285452546,
+      0.20184751022351363,
+      0.4944234058988191,
+      0.4804931825802644,
+      0.24444947432076722
+    ],
+    "coef": [
+      -0.017983354314562192,
+      0.012883993114304377,
+      -0.03717196264697326,
+      -0.06791066911892514,
+      -0.04461209571443615,
+      -0.019034891841797075,
+      -0.016971167024957833,
+      0.01992736720952833,
+      -0.03311468546702574
+    ],
+    "intercept": -0.058083461064153644,
+    "clip": [
+      -0.9,
+      0.5
+    ],
+    "loo_mae": 2341.6157611576364,
+    "loo_base_mae": 2694.0425531914893,
+    "loo_mape": 0.23193252278115845,
+    "loo_base_mape": 0.2684409394390546,
+    "loo_median_ape": 0.0978600968088141
+  },
+  "holdout": {
+    "catboost_mae": 5763.887551593858,
+    "catboost_mape": 0.4725187752103754,
+    "catboost_median_ape": 0.28967190179666313,
+    "lookup_mae": 4579.170407030655,
+    "lookup_mape": 0.5077778771633938,
+    "lookup_median_ape": 0.17919811734329982,
+    "test_rows": 140
+  },
+  "catboost_features": [
+    "brand_key",
+    "model_key",
+    "storage_gb",
+    "age_months",
+    "warranty",
+    "calls_ok",
+    "touch_ok",
+    "screen_original",
+    "battery_penalty",
+    "screen_damage",
+    "display_defect",
+    "panel_broken",
+    "body_damage",
+    "charger_missing",
+    "has_box",
+    "has_bill",
+    "extra_tech"
+  ],
+  "catboost_categorical": [
+    "brand_key",
+    "model_key"
+  ]
+}

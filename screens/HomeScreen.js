@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -40,6 +40,46 @@ const REVIEW_CARD_W = Math.round(SCREEN_W * 0.64);
 const REVIEW_CARD_H = 318;
 const REVIEW_GAP = 12;
 const REVIEW_SNAP = REVIEW_CARD_W + REVIEW_GAP;
+
+function indianCount(value) {
+  const digits = String(Math.max(0, Math.round(value)));
+  if (digits.length <= 3) return digits;
+  const tail = digits.slice(-3);
+  const head = digits.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return `${head},${tail}`;
+}
+
+function formatCount(kind, value) {
+  if (kind === 'riders') return `${indianCount(value)}+`;
+  if (kind === 'rating') return value.toFixed(1);
+  return `${Math.round(value)}+`;
+}
+
+const CountText = memo(function CountText({ play, to, kind, style }) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!play) return undefined;
+    const duration = 2400;
+    const start = performance.now();
+    let frame = 0;
+    let stopped = false;
+    const step = (now) => {
+      if (stopped) return;
+      const t = Math.min(1, (now - start) / duration);
+      const eased = t * t * (3 - 2 * t);
+      setValue(to * eased);
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => {
+      stopped = true;
+      cancelAnimationFrame(frame);
+    };
+  }, [play, to]);
+
+  return <Text style={style}>{formatCount(kind, value)}</Text>;
+});
 const REVIEW_PILLS = [
   'Fastest Growing',
   'Customer Supportive',
@@ -56,7 +96,7 @@ const CUSTOMER_REVIEWS = [
     name: 'Murthy Kasturi',
     city: 'Ahmedabad',
     quote:
-      'The entire process was seamless and very quick. I checked the quote online and Spinny executive came for evaluation the same day. The entire...',
+      'The entire process was seamless and very quick. I checked the quote online and EVegah executive came for evaluation the same day. The entire...',
     readMore: true,
     badge: 'Rent Evegah City',
     image:
@@ -67,7 +107,7 @@ const CUSTOMER_REVIEWS = [
     name: 'Surinder Pal Singh',
     city: 'Guwahati',
     quote:
-      'From inspection to paperwork, I completed the entire process from the comfort of home. Spinny team was very professional and friendly.',
+      'From inspection to paperwork, I completed the entire process from the comfort of home. EVegah team was very professional and friendly.',
     readMore: false,
     badge: 'Rent Evegeh Mink',
     image:
@@ -89,7 +129,7 @@ const CUSTOMER_REVIEWS = [
     name: 'Tejashree Kale',
     city: 'Vadodara',
     quote:
-      'I love my car and with Spinny I got the confidence that the car will be in safe custody till it gets transferred to the new owner.',
+      'I love my car and with EVegah I got the confidence that the car will be in safe custody till it gets transferred to the new owner.',
     readMore: false,
     badge: 'Rent Evegah Pro',
     image:
@@ -100,7 +140,7 @@ const CUSTOMER_REVIEWS = [
     name: 'Vikrant Jadhav',
     city: 'Aatapi',
     quote:
-      "Spinny valued our car with the best price for our car and I don't think anyone can compete with the prices offered",
+      "EVegah valued our car with the best price for our car and I don't think anyone can compete with the prices offered",
     readMore: false,
     badge: 'Rent Evegah City',
     image:
@@ -153,46 +193,63 @@ const SLIDES = [
   },
 ];
 const LOOP = [...SLIDES, SLIDES[0]];
-const RIDE_CARD_W = Math.round(SCREEN_W * 0.7);
-const RIDE_SNAP = Math.round(SCREEN_W * 0.54);
+const RIDE_CARD_W = Math.round(SCREEN_W * 0.74);
+const RIDE_SNAP = Math.round(SCREEN_W * 0.58);
 const VEHICLES = [
   {
     name: 'Evegah Fly',
-    tag: 'E-Scooter',
+    tag: 'Lite EV',
+    year: '2026',
+    price: '₹149/day',
+    swap: '2 min swap',
     line: 'Light for every day',
     range: '40-60 km',
     speed: '25 km/h',
     tint: '#EEF3FF',
+    accent: '#3B5BDB',
     image: require('../assets/home/vehicle-fly.png'),
   },
   {
     name: 'Evegah Mink',
-    tag: 'E-Scooter',
+    tag: 'Most Popular',
+    year: '2026',
+    price: '₹199/day',
+    swap: '2 min swap',
     line: 'Smooth city miles',
     range: '70-90 km',
     speed: '45 km/h',
     tint: '#F6F1FC',
+    accent: '#4A168C',
     image: require('../assets/home/vehicle-mink.png'),
   },
   {
     name: 'Evegah City',
-    tag: 'E-Scooter',
+    tag: 'Urban Pro',
+    year: '2026',
+    price: '₹229/day',
+    swap: '2 min swap',
     line: 'Quiet across town',
     range: '80-90 km',
     speed: '45 km/h',
     tint: '#F3FBF6',
+    accent: '#15803D',
     image: require('../assets/home/vehicle-city.png'),
   },
   {
     name: 'Evegah Pro',
-    tag: 'E-Scooter',
+    tag: 'Long Range',
+    year: '2026',
+    price: '₹279/day',
+    swap: 'Dual Pack',
     line: 'Built for longer rides',
     range: '110-130 km',
     speed: '75 km/h',
     tint: '#FFF6F2',
+    accent: '#C2410C',
     image: require('../assets/home/vehicle-pro.png'),
   },
 ];
+
 
 function GyroFooterArt() {
   const rotateZ = useSharedValue(0);
@@ -257,7 +314,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 function RideCard({ vehicle, index, totalCount, scrollX, active, onOpenVehicle }) {
   const [saved, setSaved] = useState(false);
   const paint = useSharedValue(active ? 1 : 0);
-  const btnWidth = useSharedValue(RIDE_CARD_W - 32);
+  const btnWidth = useSharedValue(RIDE_CARD_W - 28);
   const style = useAnimatedStyle(() => {
     const input = [(index - 1) * RIDE_SNAP, index * RIDE_SNAP, (index + 1) * RIDE_SNAP];
     const raw = interpolate(scrollX.value, input, [-1, 0, 1], Extrapolation.CLAMP);
@@ -266,7 +323,7 @@ function RideCard({ vehicle, index, totalCount, scrollX, active, onOpenVehicle }
       zIndex: Math.abs(raw) < 0.5 ? 8 : 1,
       transform: [
         { translateX: eased * 14 },
-        { scale: 1 - Math.abs(eased) * 0.08 },
+        { scale: 1 - Math.abs(eased) * 0.085 },
       ],
     };
   });
@@ -282,7 +339,7 @@ function RideCard({ vehicle, index, totalCount, scrollX, active, onOpenVehicle }
 
   useEffect(() => {
     paint.value = withTiming(active ? 1 : 0, {
-      duration: 560,
+      duration: 520,
       easing: Easing.inOut(Easing.cubic),
     });
   }, [active, paint]);
@@ -296,48 +353,123 @@ function RideCard({ vehicle, index, totalCount, scrollX, active, onOpenVehicle }
         style,
       ]}
     >
-      <View style={[styles.rideCard, { backgroundColor: vehicle.tint }]}>
-        <View style={styles.rideTop}>
-          <View style={styles.ridePill}>
-            <Text style={styles.ridePillText}>{vehicle.tag}</Text>
-          </View>
-          <Pressable hitSlop={8} style={styles.rideHeart} onPress={() => setSaved((value) => !value)}>
-            <Ionicons name={saved ? 'heart' : 'heart-outline'} size={18} color={saved ? '#E2557A' : '#7A7388'} />
-          </Pressable>
-        </View>
-        <Text style={styles.rideName}>{vehicle.name}</Text>
-        <Text style={styles.rideLine}>{vehicle.line}</Text>
-        <Image source={vehicle.image} style={styles.rideImage} contentFit="contain" />
-        <View style={styles.rideSpecs}>
-          <View style={styles.rideSpec}>
-            <Ionicons name="navigate" size={15} color={TAB_PURPLE} />
-            <Text style={styles.rideSpecValue}>{vehicle.range}</Text>
-            <Text style={styles.rideSpecLabel}>Range</Text>
-          </View>
-          <View style={styles.rideSpec}>
-            <Ionicons name="speedometer" size={15} color={TAB_PURPLE} />
-            <Text style={styles.rideSpecValue}>{vehicle.speed}</Text>
-            <Text style={styles.rideSpecLabel}>Top Speed</Text>
-          </View>
-        </View>
-        <AnimatedPressable
-          style={[styles.rideBtn, buttonStyle]}
-          onPress={() => onOpenVehicle?.(vehicle)}
-          onLayout={(event) => {
-            btnWidth.value = event.nativeEvent.layout.width;
-          }}
+      <View
+        style={[
+          styles.rideCard,
+          active && styles.rideCardActive,
+        ]}
+      >
+        {/* Top Studio Stage */}
+        <LinearGradient
+          colors={[vehicle.tint || '#F6F1FC', '#FFFFFF']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={styles.rideStageBox}
         >
-          <View style={styles.rideBtnFace}>
-            <Text style={styles.rideBtnText}>View Details</Text>
-            <Ionicons name="arrow-forward" size={14} color={TAB_PURPLE} />
+          <View style={styles.rideTop}>
+            <View style={styles.rideAssuredPill}>
+              <Ionicons name="flash" size={11} color={TAB_PURPLE} />
+              <Text style={styles.ridePillText}>{vehicle.tag}</Text>
+            </View>
+            <Pressable
+              hitSlop={8}
+              style={styles.rideHeart}
+              onPress={() => setSaved((value) => !value)}
+            >
+              <Ionicons
+                name={saved ? 'heart' : 'heart-outline'}
+                size={17}
+                color={saved ? '#E2557A' : '#5E5470'}
+              />
+            </Pressable>
           </View>
-          <Animated.View pointerEvents="none" style={[styles.rideBtnPaint, paintStyle]}>
-            <Animated.View style={[styles.rideBtnPaintLabel, paintLabelStyle]}>
-              <Text style={[styles.rideBtnText, styles.rideBtnTextOn]}>Book This Ride</Text>
-              <Ionicons name="arrow-forward" size={14} color="#FFFFFF" />
+
+          <View style={styles.rideHaloCircle} />
+          <View style={styles.rideFloorShadow} />
+          <Image
+            source={vehicle.image}
+            style={styles.rideImage}
+            contentFit="contain"
+          />
+
+          <View style={styles.ridePriceFloatPill}>
+            <Text style={styles.ridePriceFloatText}>
+              {vehicle.price || '₹199/day'}
+            </Text>
+          </View>
+        </LinearGradient>
+
+        {/* Vehicle Identity & Telemetry */}
+        <View style={styles.rideBodyContent}>
+          <View style={styles.rideTitleHeaderRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.rideName} numberOfLines={1}>
+                {vehicle.name}
+              </Text>
+              <Text style={styles.rideLine} numberOfLines={1}>
+                {vehicle.line}
+              </Text>
+            </View>
+            <View style={styles.rideYearTag}>
+              <Text style={styles.rideYearTagText}>2026 EV</Text>
+            </View>
+          </View>
+
+          <View style={styles.rideSpecs}>
+            <View style={styles.rideSpec}>
+              <View style={styles.rideSpecIconBox}>
+                <Ionicons name="navigate" size={13} color={TAB_PURPLE} />
+              </View>
+              <Text style={styles.rideSpecValue}>{vehicle.range}</Text>
+              <Text style={styles.rideSpecLabel}>Range</Text>
+            </View>
+
+            <View style={styles.rideSpecDivider} />
+
+            <View style={styles.rideSpec}>
+              <View style={styles.rideSpecIconBox}>
+                <Ionicons name="speedometer" size={13} color={TAB_PURPLE} />
+              </View>
+              <Text style={styles.rideSpecValue}>{vehicle.speed}</Text>
+              <Text style={styles.rideSpecLabel}>Top Speed</Text>
+            </View>
+
+            <View style={styles.rideSpecDivider} />
+
+            <View style={styles.rideSpec}>
+              <View style={styles.rideSpecIconBox}>
+                <Ionicons name="battery-charging" size={13} color="#15803D" />
+              </View>
+              <Text style={styles.rideSpecValue}>{vehicle.swap || '2m Swap'}</Text>
+              <Text style={styles.rideSpecLabel}>Fast Hub</Text>
+            </View>
+          </View>
+
+          <AnimatedPressable
+            style={[styles.rideBtn, buttonStyle]}
+            onPress={() => onOpenVehicle?.(vehicle)}
+            onLayout={(event) => {
+              btnWidth.value = event.nativeEvent.layout.width;
+            }}
+          >
+            <View style={styles.rideBtnFace}>
+              <Text style={styles.rideBtnText}>View Details</Text>
+              <Ionicons name="arrow-forward" size={14} color={TAB_PURPLE} />
+            </View>
+            <Animated.View
+              pointerEvents="none"
+              style={[styles.rideBtnPaint, paintStyle]}
+            >
+              <Animated.View style={[styles.rideBtnPaintLabel, paintLabelStyle]}>
+                <Ionicons name="flash" size={14} color="#FDE68A" />
+                <Text style={[styles.rideBtnText, styles.rideBtnTextOn]}>
+                  Book This Ride
+                </Text>
+                <Ionicons name="arrow-forward" size={14} color="#FFFFFF" />
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </AnimatedPressable>
+          </AnimatedPressable>
+        </View>
       </View>
     </Animated.View>
   );
@@ -696,7 +828,419 @@ function ReviewPillTicker() {
   );
 }
 
+const PACKAGE_OPTIONS = [
+  { id: 'daily', label: 'Daily', sub: '24 hrs', days: 1 },
+  { id: 'weekly', label: 'Weekly', sub: '7 days', days: 7 },
+  { id: 'monthly', label: 'Monthly', sub: '30 days', days: 30 },
+  { id: 'custom', label: 'Custom', sub: 'Flexi', days: null },
+];
+
+const HOUR_SLOTS = [
+  { hour24: 6, label: '06 AM', full: '6:00AM' },
+  { hour24: 7, label: '07 AM', full: '7:00AM' },
+  { hour24: 8, label: '08 AM', full: '8:00AM' },
+  { hour24: 9, label: '09 AM', full: '9:00AM' },
+  { hour24: 10, label: '10 AM', full: '10:00AM' },
+  { hour24: 11, label: '11 AM', full: '11:00AM' },
+  { hour24: 12, label: '12 PM', full: '12:00PM' },
+  { hour24: 13, label: '01 PM', full: '1:00PM' },
+  { hour24: 14, label: '02 PM', full: '2:00PM' },
+  { hour24: 15, label: '03 PM', full: '3:00PM' },
+  { hour24: 16, label: '04 PM', full: '4:00PM' },
+  { hour24: 17, label: '05 PM', full: '5:00PM' },
+  { hour24: 18, label: '06 PM', full: '6:00PM' },
+  { hour24: 19, label: '07 PM', full: '7:00PM' },
+  { hour24: 20, label: '08 PM', full: '8:00PM' },
+  { hour24: 21, label: '09 PM', full: '9:00PM' },
+  { hour24: 22, label: '10 PM', full: '10:00PM' },
+];
+
+const CAL_WEEKDAYS_MON = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+function cleanDay(d) {
+  const next = new Date(d);
+  next.setHours(0, 0, 0, 0);
+  return next;
+}
+
+function addDaysToDate(d, days) {
+  const next = cleanDay(d);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function combineDateAndHour(day, hour24) {
+  const next = cleanDay(day);
+  next.setHours(hour24, 0, 0, 0);
+  return next.getTime();
+}
+
+function formatBoxDateTime(day, hour24) {
+  if (!day) return 'Select';
+  const monthShort = day.toLocaleDateString('en-US', { month: 'short' });
+  const dNum = day.getDate();
+  const h12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+  const ampm = hour24 >= 12 ? 'PM' : 'AM';
+  return `${monthShort} ${dNum}, ${h12}${ampm}`;
+}
+
+function formatPopupRangeLine(startDay, startHour, endDay, endHour) {
+  const fmtOne = (d, h) => {
+    if (!d) return 'Select';
+    const wk = d.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayNum = d.getDate();
+    const mon = d.toLocaleDateString('en-US', { month: 'short' });
+    const yr = String(d.getFullYear()).slice(-2);
+    const slot = HOUR_SLOTS.find((s) => s.hour24 === h) || HOUR_SLOTS[2];
+    return `${wk}, ${dayNum} ${mon} '${yr}, ${slot.full}`;
+  };
+  return `${fmtOne(startDay, startHour)} → ${fmtOne(endDay, endHour)}`;
+}
+
+function buildMonthCellsMondayFirst(year, month) {
+  const first = new Date(year, month, 1);
+  const monFirstOffset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells = Array.from({ length: monFirstOffset }, () => null);
+  for (let d = 1; d <= daysInMonth; d += 1) {
+    cells.push(new Date(year, month, d));
+  }
+  return cells;
+}
+
+const TIME_WHEEL_ITEM_H = 40;
+const AVAILABLE_ZONES_QUICK = [
+  { id: 'bill', name: 'Bill, Vadodara-391410', shortName: 'Bill', count: '14 EVs' },
+  { id: 'manjalpur', name: 'Manjalpur, Vadodara-390011', shortName: 'Manjalpur', count: '9 EVs' },
+  { id: 'gotri', name: 'Gotri, Vadodara-390021', shortName: 'Gotri', count: '18 EVs' },
+  { id: 'aatapi', name: 'Aatapi, Vadodara-391510', shortName: 'Aatapi', count: '11 EVs' },
+];
+
+function TimeWheelColumn({ title, hour24, onChangeHour }) {
+  const wheelRef = useRef(null);
+  const idx = Math.max(
+    0,
+    HOUR_SLOTS.findIndex((s) => s.hour24 === hour24)
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      wheelRef.current?.scrollTo({
+        y: idx * TIME_WHEEL_ITEM_H,
+        animated: true,
+      });
+    }, 60);
+    return () => clearTimeout(timer);
+  }, [idx]);
+
+  const handleMomentumEnd = (e) => {
+    const offsetY = e.nativeEvent.contentOffset.y;
+    const nextIdx = Math.min(
+      HOUR_SLOTS.length - 1,
+      Math.max(0, Math.round(offsetY / TIME_WHEEL_ITEM_H))
+    );
+    const chosen = HOUR_SLOTS[nextIdx];
+    if (chosen && chosen.hour24 !== hour24) {
+      onChangeHour(chosen.hour24);
+    }
+  };
+
+  return (
+    <View style={styles.timeWheelCol}>
+      <Text style={styles.timeWheelTitle}>{title}</Text>
+
+      <View style={styles.timeWheelViewport}>
+        <View pointerEvents="none" style={styles.timeWheelCenterHighlight} />
+        <ScrollView
+          ref={wheelRef}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          snapToInterval={TIME_WHEEL_ITEM_H}
+          decelerationRate="fast"
+          contentContainerStyle={{
+            paddingVertical: TIME_WHEEL_ITEM_H,
+          }}
+          onMomentumScrollEnd={handleMomentumEnd}
+          onScrollEndDrag={handleMomentumEnd}
+        >
+          {HOUR_SLOTS.map((slot, sIdx) => {
+            const isSelected = slot.hour24 === hour24;
+            return (
+              <Pressable
+                key={slot.hour24}
+                onPress={() => {
+                  onChangeHour(slot.hour24);
+                  wheelRef.current?.scrollTo({
+                    y: sIdx * TIME_WHEEL_ITEM_H,
+                    animated: true,
+                  });
+                }}
+                style={styles.timeWheelItemRow}
+              >
+                <Text
+                  style={[
+                    styles.timeWheelGhostText,
+                    isSelected && styles.timeWheelSelectedText,
+                  ]}
+                >
+                  {slot.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+    </View>
+  );
+}
+
+function BookingCalendarModal({
+  visible,
+  zoneName,
+  zoneShortName,
+  packageId,
+  startDay,
+  endDay,
+  pickupHour,
+  dropHour,
+  onSelectPackage,
+  onChangeDates,
+  onChangeHours,
+  onClear,
+  onChangeZone,
+  onConfirm,
+  onClose,
+}) {
+  const insets = useSafeAreaInsets();
+  const baseDate = startDay || cleanDay(new Date(2026, 9, 14));
+  const monthsToShow = [
+    new Date(baseDate.getFullYear(), baseDate.getMonth(), 1),
+    new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1),
+    new Date(baseDate.getFullYear(), baseDate.getMonth() + 2, 1),
+  ];
+
+  const handleDayPress = (day) => {
+    const clicked = cleanDay(day);
+    const pkg = PACKAGE_OPTIONS.find((p) => p.id === packageId);
+    if (pkg && pkg.days) {
+      const autoEnd = addDaysToDate(clicked, pkg.days);
+      onChangeDates(clicked, autoEnd);
+      onChangeHours(pickupHour, pickupHour);
+      return;
+    }
+    if (!startDay || (startDay && endDay && endDay.getTime() !== startDay.getTime())) {
+      onChangeDates(clicked, clicked);
+      return;
+    }
+    if (clicked.getTime() < startDay.getTime()) {
+      onChangeDates(clicked, startDay);
+    } else {
+      onChangeDates(startDay, clicked);
+    }
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <View style={[styles.calModalRoot, { paddingTop: insets.top + 8 }]}>
+        <StatusBar style="dark" />
+
+        {/* Back Button */}
+        <View style={styles.calTopBar}>
+          <Pressable hitSlop={10} onPress={onClose} style={styles.calBackBtn}>
+            <Ionicons name="arrow-back" size={24} color="#24083C" />
+          </Pressable>
+        </View>
+
+        {/* Where Location Summary Bar */}
+        <Pressable onPress={onChangeZone} style={styles.calWhereCard}>
+          <Text style={styles.calWhereLabel}>Pickup Zone</Text>
+          <View style={styles.calWhereRight}>
+            <View style={styles.calZoneDot} />
+            <Text style={styles.calWhereValue} numberOfLines={1}>
+              {zoneName || zoneShortName || 'Bill, Vadodara-391410'}
+            </Text>
+            <Ionicons name="chevron-down" size={14} color={TAB_PURPLE} />
+          </View>
+        </Pressable>
+
+        {/* Main White Calendar + Scrollable Time Card */}
+        <View
+          style={[
+            styles.calSheetCard,
+            { marginBottom: Math.max(insets.bottom, 12) },
+          ]}
+        >
+          <View style={styles.calCardHeaderRow}>
+            <Text style={styles.calCardMainTitle}>
+              Select <Text style={styles.customerReviewAccent}>Date &amp; Time</Text>
+            </Text>
+            <Pressable hitSlop={8} onPress={onClear}>
+              <Text style={styles.calClearText}>CLEAR</Text>
+            </Pressable>
+          </View>
+
+          <Text style={styles.calRangeSubText} numberOfLines={1}>
+            {formatPopupRangeLine(startDay, pickupHour, endDay, dropHour)}
+          </Text>
+
+          {/* Package Pills inside Popup (Auto-selects End Date & Time) */}
+          <View style={styles.calPackageRow}>
+            {PACKAGE_OPTIONS.map((pkg) => {
+              const isSelected = packageId === pkg.id;
+              return (
+                <Pressable
+                  key={pkg.id}
+                  onPress={() => onSelectPackage(pkg.id)}
+                  style={[
+                    styles.calPkgChip,
+                    isSelected && styles.calPkgChipActive,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.calPkgChipLabel,
+                      isSelected && styles.calPkgChipLabelActive,
+                    ]}
+                  >
+                    {pkg.label}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.calPkgChipSub,
+                      isSelected && styles.calPkgChipSubActive,
+                    ]}
+                  >
+                    {pkg.sub}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {/* Weekday Header Row (M T W T F S S) */}
+          <View style={styles.calWeekdayBar}>
+            {CAL_WEEKDAYS_MON.map((dayChar, idx) => (
+              <Text key={`${dayChar}-${idx}`} style={styles.calWeekdayText}>
+                {dayChar}
+              </Text>
+            ))}
+          </View>
+
+          {/* Scrollable Multi-Month Calendar */}
+          <ScrollView
+            style={styles.calMonthsScroll}
+            showsVerticalScrollIndicator={false}
+          >
+            {monthsToShow.map((mDate) => {
+              const yr = mDate.getFullYear();
+              const mo = mDate.getMonth();
+              const monthTitle = `${mDate.toLocaleDateString('en-US', {
+                month: 'long',
+              })} '${String(yr).slice(-2)}`;
+              const cells = buildMonthCellsMondayFirst(yr, mo);
+
+              return (
+                <View key={`${yr}-${mo}`} style={styles.calMonthBlock}>
+                  <Text style={styles.calMonthHeading}>{monthTitle}</Text>
+                  <View style={styles.calMonthGrid}>
+                    {cells.map((cellDate, cIdx) => {
+                      if (!cellDate) {
+                        return (
+                          <View key={`empty-${cIdx}`} style={styles.calDayCell} />
+                        );
+                      }
+                      const t = cleanDay(cellDate).getTime();
+                      const sT = startDay ? cleanDay(startDay).getTime() : null;
+                      const eT = endDay ? cleanDay(endDay).getTime() : null;
+                      const isStart = sT === t;
+                      const isEnd = eT === t;
+                      const inRange =
+                        sT != null && eT != null && t > sT && t < eT;
+
+                      return (
+                        <Pressable
+                          key={cellDate.toISOString()}
+                          onPress={() => handleDayPress(cellDate)}
+                          style={[
+                            styles.calDayCell,
+                            inRange && styles.calDayCellInRange,
+                            isStart && eT > sT && styles.calDayCellRangeStart,
+                            isEnd && eT > sT && styles.calDayCellRangeEnd,
+                          ]}
+                        >
+                          <View
+                            style={[
+                              styles.calDayCircle,
+                              (isStart || isEnd) && styles.calDayCircleSelected,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.calDayNumText,
+                                inRange && styles.calDayNumInRangeText,
+                                (isStart || isEnd) && styles.calDayNumSelectedText,
+                              ]}
+                            >
+                              {String(cellDate.getDate()).padStart(2, '0')}
+                            </Text>
+                          </View>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
+              );
+            })}
+          </ScrollView>
+
+          <View style={styles.calTimeDivider} />
+
+          {/* Scrollable Pickup Time & Drop Off Time Wheels */}
+          <View style={styles.calTimeColumnsRow}>
+            <TimeWheelColumn
+              title="Pickup Time"
+              hour24={pickupHour}
+              onChangeHour={(nextH) => {
+                const pkg = PACKAGE_OPTIONS.find((p) => p.id === packageId);
+                if (pkg && pkg.days) {
+                  onChangeHours(nextH, nextH);
+                } else {
+                  onChangeHours(nextH, dropHour);
+                }
+              }}
+            />
+
+            <TimeWheelColumn
+              title="Drop Off Time"
+              hour24={dropHour}
+              onChangeHour={(nextH) => onChangeHours(pickupHour, nextH)}
+            />
+          </View>
+
+          <Pressable
+            onPress={() => {
+              onConfirm?.();
+              onClose?.();
+            }}
+            style={styles.calContinueBtn}
+          >
+            <Text style={styles.calContinueBtnText}>Confirm Date &amp; Time</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export default function HomeScreen({
+  selectedZone,
+  calendarTriggerTick,
   onOpenLocation,
   onOpenMyRide,
   onOpenScan,
@@ -704,6 +1248,7 @@ export default function HomeScreen({
   onOpenWallet,
   onOpenVehicle,
   onOpenVehicleList,
+  onSearchVehicles,
   onOpenNotifications,
   onOpenInsights,
   onOpenBms,
@@ -711,6 +1256,58 @@ export default function HomeScreen({
 }) {
   const insets = useSafeAreaInsets();
   const [vehicles, setVehicles] = useState(VEHICLES);
+  const [packageId, setPackageId] = useState('daily');
+  const [startDay, setStartDay] = useState(() => cleanDay(new Date(2026, 9, 14)));
+  const [endDay, setEndDay] = useState(() => cleanDay(new Date(2026, 9, 15)));
+  const [pickupHour, setPickupHour] = useState(8);
+  const [dropHour, setDropHour] = useState(8);
+  const [deliveryAnywhere, setDeliveryAnywhere] = useState(false);
+  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+  const [localZone, setLocalZone] = useState(null);
+
+  useEffect(() => {
+    if (calendarTriggerTick && calendarTriggerTick > 0) {
+      setLocalZone(selectedZone || AVAILABLE_ZONES_QUICK[0]);
+      const timer = setTimeout(() => {
+        setCalendarModalOpen(true);
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [calendarTriggerTick, selectedZone]);
+
+  const handleSelectPackage = (nextPkgId) => {
+    setPackageId(nextPkgId);
+    const pkg = PACKAGE_OPTIONS.find((p) => p.id === nextPkgId);
+    if (pkg && pkg.days) {
+      const base = startDay || cleanDay(new Date(2026, 9, 14));
+      setStartDay(base);
+      setEndDay(addDaysToDate(base, pkg.days));
+      setDropHour(pickupHour);
+    }
+  };
+
+  const effectiveZone = localZone || selectedZone || AVAILABLE_ZONES_QUICK[0];
+  const activeZoneLabel = effectiveZone?.name || 'Bill, Vadodara-391410';
+  const activeZoneShort = effectiveZone?.shortName || 'Bill';
+
+  const handleSearchPress = () => {
+    const pAt = combineDateAndHour(startDay, pickupHour);
+    const dAt = combineDateAndHour(endDay, dropHour);
+    const tripPayload = {
+      pickupName: activeZoneShort,
+      pickupFullAddress: effectiveZone?.address || activeZoneLabel,
+      dropName: activeZoneShort,
+      pickupAt: pAt,
+      dropAt: dAt,
+      packageId,
+      flexiEnabled: deliveryAnywhere,
+    };
+    if (onSearchVehicles) {
+      onSearchVehicles(tripPayload);
+    } else {
+      onOpenVehicleList?.();
+    }
+  };
 
   useEffect(() => {
     apiGet('/vehicles/models')
@@ -752,12 +1349,29 @@ export default function HomeScreen({
   const rideRef = useRef(null);
   const [rideIndex, setRideIndex] = useState(initialRideIdx);
   const [activeSocialIndex, setActiveSocialIndex] = useState(null);
+  const [trustPlay, setTrustPlay] = useState(false);
+  const trustPlayed = useRef(false);
+  const trustOffsets = useRef({ sheet: 0, section: 0 });
   const pageRef = useRef(0);
   const timerRef = useRef(null);
 
   const reviewRef = useRef(null);
   const reviewIdxRef = useRef(CUSTOMER_REVIEWS.length);
   const reviewDraggingRef = useRef(false);
+
+  const playTrust = () => {
+    if (trustPlayed.current) return;
+    trustPlayed.current = true;
+    setTrustPlay(true);
+  };
+
+  const onPageScroll = (event) => {
+    const { contentOffset, layoutMeasurement } = event.nativeEvent;
+    const target = trustOffsets.current.sheet + trustOffsets.current.section;
+    if (target > 40 && contentOffset.y + layoutMeasurement.height > target + 36) {
+      playTrust();
+    }
+  };
 
   const onScroll = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -858,6 +1472,8 @@ export default function HomeScreen({
         style={styles.mainScroll}
         showsVerticalScrollIndicator={false}
         bounces={false}
+        scrollEventThrottle={16}
+        onScroll={onPageScroll}
       >
         <View style={styles.slider}>
           {LOOP.map((slide, index) => (
@@ -908,7 +1524,7 @@ export default function HomeScreen({
                   <View style={styles.hamShort} />
                 </Pressable>
                 <Pressable hitSlop={12} onPress={() => onOpenLocation?.()} style={styles.location}>
-                  <Text style={styles.locationText}>Gotri, Vadodara</Text>
+                  <Text style={styles.locationText}>{activeZoneShort}, Vadodara</Text>
                   <Ionicons name="chevron-down" size={16} color="#FFFFFF" />
                 </Pressable>
               </View>
@@ -920,77 +1536,94 @@ export default function HomeScreen({
           </View>
         </View>
 
-        <View style={styles.sheet}>
-          <View style={styles.planHead}>
-          <Text style={styles.rentalTitle}>Choose Your Plan</Text>
-          <Pressable style={styles.planCustom} onPress={onOpenVehicleList}>
-            <Text style={styles.planCustomText}>Custom</Text>
-          </Pressable>
-        </View>
-        <View style={styles.planRow}>
-          <Animated.View entering={cardEnter(0)} style={[styles.planCard, styles.planDaily]}>
-            <View style={styles.popular}>
-              <Text style={styles.popularText}>Most Popular</Text>
-            </View>
-            <Text style={styles.planName}>Daily Plan</Text>
-            <View style={styles.planBody}>
-              <View style={styles.planCopy}>
-                <Text style={styles.planDrive} numberOfLines={1}>
-                  Daily drive
-                </Text>
-                <Text style={styles.planLength} numberOfLines={1}>
-                  24 hours
+        <View
+          style={styles.sheet}
+          onLayout={(event) => {
+            trustOffsets.current.sheet = event.nativeEvent.layout.y;
+          }}
+        >
+          <Animated.View entering={cardEnter(0)} style={styles.bookingSearchCard}>
+            <Pressable
+              onPress={() => onOpenLocation?.()}
+              style={({ pressed }) => [
+                styles.bookingLocationInput,
+                pressed && { opacity: 0.88 },
+              ]}
+            >
+              <View style={styles.bookingLocationIconWrap}>
+                <Ionicons name="location" size={18} color={TAB_PURPLE} />
+              </View>
+              <View style={styles.bookingLocationCopy}>
+                <Text style={styles.bookingLocationText} numberOfLines={1}>
+                  {activeZoneLabel}
                 </Text>
               </View>
-              <Image
-                source={require('../assets/home/vehicle-mink.png')}
-                style={styles.planVehicle}
-                contentFit="contain"
-                contentPosition="left"
-              />
-            </View>
-            {['Unlimited km', 'Swap anytime', 'Doorstep delivery'].map((item) => (
-              <View key={item} style={styles.planPoint}>
-                <Ionicons name="checkmark" size={12} color="#1F8A4C" />
-                <Text style={styles.planPointText}>{item}</Text>
-              </View>
-            ))}
-            <View style={styles.planSpacer} />
-            <Pressable style={styles.planBtn} onPress={onOpenVehicleList}>
-              <Text style={styles.planBtnText}>Book Daily</Text>
+              <Ionicons name="chevron-forward" size={18} color="#8A819C" />
             </Pressable>
-          </Animated.View>
 
-          <Animated.View entering={cardEnter(1)} style={[styles.planCard, styles.planMonthly]}>
-            <Text style={styles.planName}>Monthly Plan</Text>
-            <View style={styles.planBody}>
-              <View style={styles.planCopy}>
-                <Text style={styles.planDrive} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
-                  Monthly drive
+            <View style={styles.bookingDatesRow}>
+              <Pressable
+                onPress={() => setCalendarModalOpen(true)}
+                style={styles.bookingDateBox}
+              >
+                <View style={styles.bookingDateLabelRow}>
+                  <Ionicons name="calendar-outline" size={13} color={TAB_PURPLE} />
+                  <Text style={styles.bookingDateLabel}>Ride Start</Text>
+                </View>
+                <Text style={styles.bookingDateValue} numberOfLines={1}>
+                  {formatBoxDateTime(startDay, pickupHour)}
                 </Text>
-                <Text style={styles.planLength} numberOfLines={1}>
-                  30 days
+              </Pressable>
+
+              <Pressable
+                onPress={() => setCalendarModalOpen(true)}
+                style={[styles.bookingDateBox, styles.bookingDateBoxRight]}
+              >
+                <View style={styles.bookingDateLabelRow}>
+                  <Text style={[styles.bookingDateLabel, styles.textRight]}>
+                    Ride End
+                  </Text>
+                  <Ionicons name="time-outline" size={13} color={TAB_PURPLE} />
+                </View>
+                <Text
+                  style={[styles.bookingDateValue, styles.textRight]}
+                  numberOfLines={1}
+                >
+                  {formatBoxDateTime(endDay, dropHour)}
                 </Text>
-              </View>
-              <Image
-                source={require('../assets/home/vehicle-city.png')}
-                style={styles.planVehicle}
-                contentFit="contain"
-                contentPosition="left"
-              />
+              </Pressable>
             </View>
-            {['Unlimited km', 'Priority support', 'Best value'].map((item) => (
-              <View key={item} style={styles.planPoint}>
-                <Ionicons name="checkmark" size={12} color="#1F8A4C" />
-                <Text style={styles.planPointText}>{item}</Text>
+
+            <Pressable
+              onPress={() => setDeliveryAnywhere((v) => !v)}
+              style={styles.bookingDeliveryCheckRow}
+            >
+              <View
+                style={[
+                  styles.bookingCheckbox,
+                  deliveryAnywhere && styles.bookingCheckboxChecked,
+                ]}
+              >
+                {deliveryAnywhere ? (
+                  <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+                ) : null}
               </View>
-            ))}
-            <View style={styles.planSpacer} />
-            <Pressable style={[styles.planBtn, styles.planBtnSoft]} onPress={onOpenVehicleList}>
-              <Text style={[styles.planBtnText, styles.planBtnTextSoft]}>Book Monthly</Text>
+              <Text style={styles.bookingDeliveryCheckLabel}>
+                Delivery &amp; Pick-up, from anywhere
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={handleSearchPress}
+              style={({ pressed }) => [
+                styles.bookingSearchBtn,
+                pressed && { opacity: 0.92, transform: [{ scale: 0.99 }] },
+              ]}
+            >
+              <Text style={styles.bookingSearchBtnText}>Rent Your EV</Text>
+              <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
             </Pressable>
           </Animated.View>
-        </View>
 
         <View style={styles.sectionHead}>
           <View style={styles.sectionText}>
@@ -1149,7 +1782,13 @@ export default function HomeScreen({
           </ScrollView>
         </Animated.View>
 
-        <Animated.View entering={cardEnter(8)} style={styles.trustedSection}>
+        <Animated.View
+          entering={cardEnter(8)}
+          style={styles.trustedSection}
+          onLayout={(event) => {
+            trustOffsets.current.section = event.nativeEvent.layout.y;
+          }}
+        >
           <Text style={styles.trustedHeading}>
             <Text style={styles.trustedAccent}>Trusted</Text> by people across India
           </Text>
@@ -1165,7 +1804,7 @@ export default function HomeScreen({
             <View style={styles.trustedWave3} />
 
             <View style={styles.trustedHeroCopy}>
-              <Text style={styles.trustedHeroNumber}>2,63,923+</Text>
+              <CountText play={trustPlay} to={263923} kind="riders" style={styles.trustedHeroNumber} />
               <Text style={styles.trustedHeroSub}>
                 riders trusted Evegah in EV 
               </Text>
@@ -1195,7 +1834,7 @@ export default function HomeScreen({
               <View style={styles.trustedCitiesGrid} />
               <View style={styles.trustedCitiesCopy}>
                 <Text style={styles.trustedSmallLabel}>Spread across</Text>
-                <Text style={styles.trustedCitiesNum}>25+</Text>
+                <CountText play={trustPlay} to={25} kind="zones" style={styles.trustedCitiesNum} />
                 <Text style={styles.trustedCitiesSub}>Zones in India</Text>
               </View>
               <View style={styles.trustedMapGraphic}>
@@ -1216,7 +1855,7 @@ export default function HomeScreen({
             >
               <View style={styles.trustedRatingChevron} />
               <Text style={styles.trustedSmallLabel}>Ratings</Text>
-              <Text style={styles.trustedRatingNum}>4.9</Text>
+              <CountText play={trustPlay} to={4.9} kind="rating" style={styles.trustedRatingNum} />
               <View style={styles.trustedStarsRow}>
                 <Ionicons name="star" size={18} color="#FFD21E" />
                 <Ionicons name="star" size={18} color="#FFD21E" />
@@ -1244,6 +1883,39 @@ export default function HomeScreen({
         </Animated.View>
         </View>
       </ScrollView>
+
+      <BookingCalendarModal
+        visible={calendarModalOpen}
+        zoneName={activeZoneLabel}
+        zoneShortName={activeZoneShort}
+        packageId={packageId}
+        startDay={startDay}
+        endDay={endDay}
+        pickupHour={pickupHour}
+        dropHour={dropHour}
+        onSelectPackage={handleSelectPackage}
+        onChangeDates={(nextStart, nextEnd) => {
+          setStartDay(nextStart);
+          setEndDay(nextEnd);
+        }}
+        onChangeHours={(nextPickupH, nextDropH) => {
+          setPickupHour(nextPickupH);
+          setDropHour(nextDropH);
+        }}
+        onClear={() => {
+          const defStart = cleanDay(new Date(2026, 9, 14));
+          setStartDay(defStart);
+          setEndDay(addDaysToDate(defStart, 1));
+          setPackageId('daily');
+          setPickupHour(8);
+          setDropHour(8);
+        }}
+        onChangeZone={() => {
+          setCalendarModalOpen(false);
+          onOpenLocation?.();
+        }}
+        onClose={() => setCalendarModalOpen(false)}
+      />
 
       <Modal
         visible={activeSocialIndex !== null}
@@ -1547,124 +2219,555 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     zIndex: 2,
   },
-  rentalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1C1C1C',
+  bookingSearchCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 16,
+    borderWidth: 1.2,
+    borderColor: '#E5DFEF',
+    shadowColor: '#1A0F30',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 4,
   },
-  planHead: {
+  bookingCardTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
   },
-  planCustom: {
-    backgroundColor: TAB_PURPLE,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  bookingCardHeading: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#24083C',
+    letterSpacing: -0.3,
   },
-  planCustomText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  planRow: {
+  bookingReadyBadge: {
     flexDirection: 'row',
-    gap: 12,
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F3EEFA',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
   },
-  planCard: {
-    flex: 1,
-    borderRadius: 18,
-    paddingHorizontal: 12,
-    paddingTop: 36,
-    paddingBottom: 12,
-    overflow: 'hidden',
+  bookingReadyDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#8B7BA3',
   },
-  planDaily: {
-    backgroundColor: '#F4EEFB',
+  bookingReadyDotActive: {
+    backgroundColor: '#12804A',
   },
-  planMonthly: {
+  bookingReadyText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#5F5475',
+  },
+  bookingReadyTextActive: {
+    color: '#12804A',
+  },
+  bookingLocationInput: {
+    minHeight: 56,
+    borderRadius: 14,
+    borderWidth: 1.3,
+    borderColor: '#DFD9EA',
     backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E6DDF3',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  popular: {
-    position: 'absolute',
-    top: 10,
-    left: 12,
-    backgroundColor: TAB_PURPLE,
+  bookingLocationInputSelected: {
+    borderColor: TAB_PURPLE,
+    backgroundColor: '#FAF7FE',
+  },
+  bookingLocationIconWrap: {
+    width: 34,
+    height: 34,
     borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    backgroundColor: '#F3E8FF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  popularText: {
-    fontSize: 9,
+  bookingLocationIconWrapActive: {
+    backgroundColor: TAB_PURPLE,
+  },
+  bookingLocationCopy: {
+    flex: 1,
+  },
+  bookingLocationText: {
+    fontSize: 13.5,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#24083C',
   },
-  planName: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1C1C1C',
+  bookingLocationPlaceholder: {
+    color: '#736D80',
+    fontWeight: '600',
   },
-  planBody: {
+  bookingZoneAvailInline: {
     marginTop: 2,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 5,
   },
-  planCopy: {
-    flexShrink: 0,
+  bookingZoneAvailDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#12804A',
   },
-  planDrive: {
-    fontSize: 12,
-    lineHeight: 16,
-    color: '#6E6E6E',
-  },
-  planLength: {
-    marginTop: 1,
-    fontSize: 13,
-    lineHeight: 17,
+  bookingZoneAvailText: {
+    fontSize: 11.5,
     fontWeight: '700',
-    color: TAB_PURPLE,
+    color: '#12804A',
   },
-  planPoint: {
-    marginTop: 6,
+  bookingZoneHintText: {
+    marginTop: 2,
+    fontSize: 11.5,
+    fontWeight: '500',
+    color: '#8B8499',
+  },
+  bookingZoneTagPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#E8F8F0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  bookingZoneTagText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#12804A',
+  },
+  bookingQuickZonesRow: {
+    paddingTop: 10,
+    paddingBottom: 2,
+    gap: 8,
+  },
+  bookingQuickZoneChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#E4DDF0',
+    backgroundColor: '#FAF8FD',
+  },
+  bookingQuickZoneChipActive: {
+    backgroundColor: TAB_PURPLE,
+    borderColor: TAB_PURPLE,
+  },
+  bookingQuickZoneDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#12804A',
+  },
+  bookingQuickZoneDotActive: {
+    backgroundColor: '#7FFFD4',
+  },
+  bookingQuickZoneName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#280D42',
+  },
+  bookingQuickZoneNameActive: {
+    color: '#FFFFFF',
+  },
+  bookingQuickZoneCount: {
+    fontSize: 10.5,
+    fontWeight: '600',
+    color: '#736D80',
+  },
+  bookingQuickZoneCountActive: {
+    color: '#E9D5FF',
+  },
+  bookingDatesRow: {
+    marginTop: 10,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  bookingDateBox: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1.3,
+    borderColor: '#DFD9EA',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    justifyContent: 'center',
+  },
+  bookingDateBoxConfirmed: {
+    borderColor: TAB_PURPLE,
+    backgroundColor: '#FAF7FE',
+  },
+  bookingDateBoxRight: {
+    alignItems: 'flex-end',
+  },
+  bookingDateLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  bookingDateLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#736D80',
+  },
+  bookingDateValue: {
+    marginTop: 4,
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#24083C',
+    letterSpacing: -0.2,
+  },
+  bookingDatePlaceholder: {
+    fontWeight: '600',
+    color: '#8B8499',
+  },
+  textRight: {
+    textAlign: 'right',
+  },
+  bookingDeliveryCheckRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+  },
+  bookingCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1.6,
+    borderColor: '#363042',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  bookingCheckboxChecked: {
+    backgroundColor: TAB_PURPLE,
+    borderColor: TAB_PURPLE,
+  },
+  bookingDeliveryCheckLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#280D42',
+  },
+  bookingSearchBtn: {
+    marginTop: 14,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: TAB_PURPLE,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    shadowColor: TAB_PURPLE,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  bookingSearchBtnDisabled: {
+    backgroundColor: '#EAE6F2',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  bookingSearchBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+  bookingSearchBtnTextDisabled: {
+    color: '#8A819C',
+    fontSize: 13.5,
+    fontWeight: '700',
+  },
+  calModalRoot: {
+    flex: 1,
+    backgroundColor: '#F6F5F8',
+    paddingHorizontal: 14,
+  },
+  calTopBar: {
+    height: 42,
+    justifyContent: 'center',
+  },
+  calBackBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calWhereCard: {
+    marginTop: 4,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#160E29',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  calWhereLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#736D80',
+  },
+  calWhereRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  planPointText: {
-    flex: 1,
-    fontSize: 11,
-    color: '#3A3A3A',
+  calWhereValue: {
+    fontSize: 13.5,
+    fontWeight: '700',
+    color: '#24083C',
   },
-  planVehicle: {
+  calSheetCard: {
     flex: 1,
-    height: 74,
-    marginLeft: -2,
-    marginRight: -8,
+    marginTop: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 14,
+    shadowColor: '#160E29',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 3,
   },
-  planSpacer: {
+  calCardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  calCardMainTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#24083C',
+    letterSpacing: -0.3,
+  },
+  calClearText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: TAB_PURPLE,
+    letterSpacing: 0.4,
+  },
+  calRangeSubText: {
+    marginTop: 6,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#280D42',
+  },
+  calPackageRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  calPkgChip: {
     flex: 1,
-    minHeight: 14,
-  },
-  planBtn: {
-    backgroundColor: TAB_PURPLE,
-    borderRadius: 12,
-    paddingVertical: 9,
+    paddingVertical: 7,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderColor: '#E5DFEF',
+    backgroundColor: '#FAF8FD',
     alignItems: 'center',
   },
-  planBtnSoft: {
-    backgroundColor: '#F3EEF8',
+  calPkgChipActive: {
+    backgroundColor: TAB_PURPLE,
+    borderColor: TAB_PURPLE,
   },
-  planBtnText: {
+  calPkgChipLabel: {
     fontSize: 12,
     fontWeight: '700',
+    color: '#24083C',
+  },
+  calPkgChipLabelActive: {
     color: '#FFFFFF',
   },
-  planBtnTextSoft: {
+  calPkgChipSub: {
+    fontSize: 10,
+    color: '#7E7690',
+    fontWeight: '600',
+  },
+  calPkgChipSubActive: {
+    color: '#E9D5FF',
+  },
+  calWeekdayBar: {
+    marginTop: 14,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ECE9F2',
+    flexDirection: 'row',
+  },
+  calWeekdayText: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#6E687A',
+  },
+  calMonthsScroll: {
+    flex: 1,
+    marginTop: 6,
+  },
+  calMonthBlock: {
+    marginBottom: 16,
+  },
+  calMonthHeading: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#24083C',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  calMonthGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  calDayCell: {
+    width: `${100 / 7}%`,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 2,
+  },
+  calDayCellInRange: {
+    backgroundColor: '#F3E8FF',
+  },
+  calDayCellRangeStart: {
+    backgroundColor: '#F3E8FF',
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  calDayCellRangeEnd: {
+    backgroundColor: '#F3E8FF',
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  calDayCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calDayCircleSelected: {
+    backgroundColor: TAB_PURPLE,
+  },
+  calDayNumText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#24083C',
+  },
+  calDayNumInRangeText: {
     color: TAB_PURPLE,
+    fontWeight: '700',
+  },
+  calDayNumSelectedText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+  },
+  calTimeDivider: {
+    height: 1,
+    backgroundColor: '#ECE9F2',
+    marginVertical: 8,
+  },
+  calTimeColumnsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 4,
+    gap: 14,
+  },
+  timeWheelCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  timeWheelTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#24083C',
+    marginBottom: 6,
+  },
+  timeWheelViewport: {
+    width: '94%',
+    height: TIME_WHEEL_ITEM_H * 3,
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  timeWheelHighlightPill: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: TIME_WHEEL_ITEM_H,
+    height: TIME_WHEEL_ITEM_H,
+    borderRadius: 19,
+    backgroundColor: '#F2EFF7',
+    borderWidth: 1,
+    borderColor: '#E2DAF0',
+  },
+  timeWheelItemRow: {
+    height: TIME_WHEEL_ITEM_H,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timeWheelGhostText: {
+    fontSize: 13.5,
+    fontWeight: '600',
+    color: '#B6AEC4',
+    letterSpacing: 0.3,
+  },
+  timeWheelSelectedText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#24083C',
+    letterSpacing: 0.2,
+  },
+  calContinueBtn: {
+    marginTop: 10,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: TAB_PURPLE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calContinueBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  fleetEyebrowPill: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F3E8FF',
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    marginBottom: 5,
+  },
+  fleetEyebrowText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: TAB_PURPLE,
+    letterSpacing: 0.5,
   },
   sectionHead: {
     marginTop: 18,
@@ -1703,7 +2806,7 @@ const styles = StyleSheet.create({
   },
   rideDeck: {
     marginHorizontal: -16,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   rideTrack: {
     paddingHorizontal: (SCREEN_W - RIDE_CARD_W) / 2,
@@ -1718,84 +2821,174 @@ const styles = StyleSheet.create({
   },
   rideCard: {
     borderRadius: 28,
-    paddingTop: 16,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#EDE7F6',
+    overflow: 'hidden',
     shadowColor: '#1A1030',
     shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.16,
+    shadowOpacity: 0.14,
     shadowRadius: 22,
     elevation: 8,
   },
-  rideTop: {
-    minHeight: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+  rideCardActive: {
+    borderColor: '#C9A9F5',
+    shadowColor: TAB_PURPLE,
+    shadowOpacity: 0.22,
   },
-  ridePill: {
-    backgroundColor: 'rgba(255,255,255,0.82)',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+  rideStageBox: {
+    paddingTop: 14,
+    paddingHorizontal: 14,
+    paddingBottom: 10,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  rideTop: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 3,
+  },
+  rideAssuredPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4.5,
+    borderWidth: 1,
+    borderColor: '#E9D8FD',
   },
   ridePillText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#6E6880',
+    fontWeight: '700',
+    color: TAB_PURPLE,
   },
   rideHeart: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rideHaloCircle: {
     position: 'absolute',
-    right: 0,
-    top: 2,
+    top: 30,
+    width: 126,
+    height: 126,
+    borderRadius: 63,
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
   },
-  rideName: {
-    marginTop: 12,
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#1C1430',
-    textAlign: 'center',
-  },
-  rideLine: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#8A8496',
-    textAlign: 'center',
+  rideFloorShadow: {
+    position: 'absolute',
+    bottom: 14,
+    width: '68%',
+    height: 14,
+    borderRadius: 999,
+    backgroundColor: 'rgba(36, 12, 70, 0.08)',
   },
   rideImage: {
     width: '100%',
     height: 132,
-    marginTop: 6,
+    marginTop: 4,
+  },
+  ridePriceFloatPill: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#240646',
+    borderRadius: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    marginTop: -6,
+  },
+  ridePriceFloatText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FDE68A',
+  },
+  rideBodyContent: {
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  rideTitleHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  rideName: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#24083C',
+    letterSpacing: -0.3,
+  },
+  rideLine: {
+    marginTop: 2,
+    fontSize: 13,
+    color: '#280D42',
+    fontWeight: '600',
+  },
+  rideYearTag: {
+    backgroundColor: '#F5F0FC',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  rideYearTagText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: TAB_PURPLE,
   },
   rideSpecs: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 4,
+    alignItems: 'center',
+    backgroundColor: '#F9F7FC',
+    borderRadius: 16,
+    paddingVertical: 9,
+    paddingHorizontal: 6,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#EFEAF6',
   },
   rideSpec: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.72)',
-    borderRadius: 16,
-    paddingVertical: 10,
-    gap: 2,
+  },
+  rideSpecIconBox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#EFE6FA',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 3,
+  },
+  rideSpecDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#E5DFEF',
   },
   rideSpecValue: {
-    marginTop: 2,
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     color: '#1C1430',
   },
   rideSpecLabel: {
-    fontSize: 10,
-    color: '#8A8496',
+    fontSize: 9.5,
+    color: '#827A90',
+    fontWeight: '600',
   },
   rideBtn: {
-    marginTop: 14,
+    marginTop: 12,
     height: 46,
-    borderRadius: 23,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: '#E4D8F4',
-    backgroundColor: 'rgba(255,255,255,0.7)',
+    backgroundColor: '#FBF9FE',
     overflow: 'hidden',
     justifyContent: 'center',
   },
@@ -1825,12 +3018,13 @@ const styles = StyleSheet.create({
   },
   rideBtnText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
     color: TAB_PURPLE,
   },
   rideBtnTextOn: {
     color: '#FFFFFF',
   },
+
   impactCard: {
     marginTop: 18,
     backgroundColor: '#F3FBF6',

@@ -20,6 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
+import { EVEGAH_ZONES } from './LocationScreen';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PURPLE = '#4A168C';
@@ -103,6 +104,14 @@ function whenLabel(day, time) {
 
 function shortDate(date) {
   return date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' });
+}
+
+function formatRentBoxDateTime(day, time) {
+  if (!day) return 'Select';
+  const monthShort = day.toLocaleDateString('en-US', { month: 'short' });
+  const dNum = day.getDate();
+  const timeStr = String(time || '8:00 AM').replace(/\s+/g, '');
+  return `${monthShort} ${dNum}, ${timeStr}`;
 }
 
 function presetIndex(day) {
@@ -481,12 +490,14 @@ export default function RentScreen({ vehicle, onBack, onContinue }) {
   const [tabWidth, setTabWidth] = useState(0);
   const [mode, setMode] = useState('pickup');
   const [sameDrop, setSameDrop] = useState(true);
-  const [pickupZone, setPickupZone] = useState(null);
-  const [dropZone, setDropZone] = useState(null);
-  const [pickupDay, setPickupDay] = useState(null);
-  const [dropDay, setDropDay] = useState(null);
-  const [pickupTime, setPickupTime] = useState(null);
-  const [dropTime, setDropTime] = useState(null);
+  const [pickupZone, setPickupZone] = useState(() => EVEGAH_ZONES[0] || ZONES[0]);
+  const [dropZone, setDropZone] = useState(() => EVEGAH_ZONES[0] || ZONES[0]);
+  const [pickupDay, setPickupDay] = useState(() => startOfDay(0));
+  const [dropDay, setDropDay] = useState(() => startOfDay(1));
+  const [pickupTime, setPickupTime] = useState('8:00 AM');
+  const [dropTime, setDropTime] = useState('8:00 AM');
+  const [deliveryAnywhere, setDeliveryAnywhere] = useState(false);
+  const [zoneModalOpen, setZoneModalOpen] = useState(false);
   const [clockFor, setClockFor] = useState(null);
   const [dateFor, setDateFor] = useState(null);
   const [rideSettled, setRideSettled] = useState(false);
@@ -662,6 +673,7 @@ export default function RentScreen({ vehicle, onBack, onContinue }) {
       dropName: dropPlace?.name,
       pickupAt: pickupAt?.getTime() || null,
       dropAt: dropAt?.getTime() || null,
+      deliveryAnywhere: Boolean(deliveryAnywhere),
     });
   };
 
@@ -854,275 +866,173 @@ export default function RentScreen({ vehicle, onBack, onContinue }) {
         ) : null}
       </View>
 
-      <View style={styles.tripBar}>
-        <Text style={styles.kicker}>Rent your EV · {vehicle?.name || 'Your scooter'}</Text>
-        <View style={styles.tripRow}>
-          <View style={styles.tripEnd}>
-            <Text style={styles.tripKicker}>Pickup</Text>
-            <Text style={styles.tripPlace} numberOfLines={1}>
-              {pickupZone?.name || 'Select'}
+      <View style={styles.cardContainer}>
+        <Animated.View entering={cardEnter(0)} style={styles.rentSearchCard}>
+          {/* Zone Search Pill */}
+          <Pressable
+            onPress={() => setZoneModalOpen(true)}
+            style={({ pressed }) => [
+              styles.zonePill,
+              pressed && { opacity: 0.88 },
+            ]}
+          >
+            <Ionicons name="search" size={18} color="#24083C" style={styles.zoneSearchIcon} />
+            <Text style={styles.zonePillText} numberOfLines={1}>
+              {pickupZone?.name || 'Bill, Vadodara-391410'}
             </Text>
-            <Text style={[styles.tripWhen, pickupTime && styles.tripWhenOn]} numberOfLines={1}>
-              {pickupDay && pickupTime ? whenLabel(pickupDay, pickupTime) : 'Select'}
-            </Text>
-          </View>
-          <View style={styles.tripMid}>
-            {showDuration ? (
-              <Animated.Text entering={FadeIn.duration(320)} style={styles.tripDuration}>
-                {duration}
-              </Animated.Text>
-            ) : null}
-          </View>
-          <View style={[styles.tripEnd, styles.tripEndRight]}>
-            <Text style={styles.tripKicker}>Drop</Text>
-            <Text style={styles.tripPlace} numberOfLines={1}>
-              {dropPlace?.name || 'Select'}
-            </Text>
-            <Text style={[styles.tripWhen, dropTime && styles.tripWhenOn]} numberOfLines={1}>
-              {dropDay && dropTime ? whenLabel(dropDay, dropTime) : 'Select'}
-            </Text>
-          </View>
-        </View>
-      </View>
+            <Pressable
+              hitSlop={8}
+              onPress={() => setZoneModalOpen(true)}
+              style={styles.zoneLocateBtn}
+            >
+              <Ionicons name="locate-outline" size={20} color={PURPLE} />
+            </Pressable>
+          </Pressable>
 
-        <View style={styles.sheetClip}>
-        <ScrollView
-          ref={listRef}
-          style={styles.scroll}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 108 }}
-        >
-        <Animated.View entering={cardEnter(0)} style={styles.sheet}>
-          <View
-            style={styles.tabs}
-            onLayout={(event) => setTabWidth(event.nativeEvent.layout.width)}
+          {/* Trip Start / Trip End 2 Column Boxes */}
+          <View style={styles.tripBoxesRow}>
+            <Pressable
+              onPress={() => setDateFor('range')}
+              style={styles.tripDateBox}
+            >
+              <Text style={styles.tripBoxLabel}>Trip Start</Text>
+              <Text style={styles.tripBoxValue} numberOfLines={1}>
+                {formatRentBoxDateTime(pickupDay, pickupTime)}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setDateFor('range')}
+              style={styles.tripDateBox}
+            >
+              <Text style={styles.tripBoxLabel}>Trip End</Text>
+              <Text style={styles.tripBoxValue} numberOfLines={1}>
+                {formatRentBoxDateTime(dropDay, dropTime)}
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Delivery & Pick-up, from anywhere Checkbox */}
+          <Pressable
+            onPress={() => setDeliveryAnywhere((v) => !v)}
+            style={styles.deliveryCheckRow}
+          >
+            <View
+              style={[
+                styles.deliveryCheckbox,
+                deliveryAnywhere && styles.deliveryCheckboxChecked,
+              ]}
+            >
+              {deliveryAnywhere ? (
+                <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+              ) : null}
+            </View>
+            <Text style={styles.deliveryCheckLabel}>
+              Delivery &amp; Pick-up, from anywhere
+            </Text>
+          </Pressable>
+
+          {/* Search EV Full-Width Purple Button with Animation */}
+          <Pressable
+            disabled={riding}
+            onPress={() => {
+              const missed = missingStep({
+                pickupZone,
+                dropPlace,
+                pickupDay,
+                pickupTime,
+                dropDay,
+                dropTime,
+              });
+              if (missed) {
+                showToast(missed);
+                return;
+              }
+              playContinueRide();
+            }}
+            onPressIn={() => {
+              if (riding) return;
+              btnScale.value = withSpring(0.97, { damping: 18, stiffness: 280 });
+            }}
+            onPressOut={() => {
+              btnScale.value = withSpring(1, { damping: 14, stiffness: 220 });
+            }}
           >
             <Animated.View
-              pointerEvents="none"
-              style={[styles.tabMark, { width: Math.max((tabWidth - 8) / 2, 0) }, tabStyle]}
-            />
-            <Pressable style={styles.tab} onPress={() => setMode(mode === 'drop' ? 'drop' : 'pickup')}>
-              <Text style={[styles.tabText, mode !== 'time' && styles.tabTextOn]}>Place</Text>
-            </Pressable>
-            <Pressable
-              style={styles.tab}
-              onPress={() => {
-                const missed = missingStep({ pickupZone, dropPlace, pickupDay: true, pickupTime: true, dropDay: true, dropTime: true });
-                if (missed) {
-                  showToast(missed);
-                  return;
-                }
-                setMode('time');
+              onLayout={(event) => {
+                buttonWidthRef.current = event.nativeEvent.layout.width;
               }}
+              style={[styles.searchEvBtn, btnAnimStyle]}
             >
-              <Text style={[styles.tabText, mode === 'time' && styles.tabTextOn]}>When</Text>
-            </Pressable>
-          </View>
-
-          {mode === 'time' ? (
-            <Animated.View key="time" entering={FadeIn.duration(320)}>
-              <Text style={styles.sheetTitle}>Pickup</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dayRow}>
-                {DAYS.map((day, index) => {
-                  const on = pickupDay?.getTime() === day.getTime();
-                  return (
-                    <Pressable key={day.toISOString()} onPress={() => choosePickupDay(day)} style={[styles.day, on && styles.dayOn]}>
-                      <Text style={[styles.dayText, on && styles.dayTextOn]}>{dayName(day, index)}</Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={openDate}
-                  style={[styles.day, presetIndex(pickupDay) < 0 && pickupDay && styles.dayOn]}
-                >
-                  <Text style={[styles.dayText, presetIndex(pickupDay) < 0 && pickupDay && styles.dayTextOn]}>
-                    {customDateLabel(pickupDay)}
-                  </Text>
-                </Pressable>
-              </ScrollView>
-              <View style={styles.timeGrid}>
-                {TIMES.map((time) => {
-                  const on = pickupTime === time;
-                  return (
-                    <Pressable key={`p-${time}`} onPress={() => choosePickupTime(time)} style={[styles.time, on && styles.timeOn]}>
-                      <Text style={[styles.timeText, on && styles.timeTextOn]}>{time}</Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={() => openClock('pickup')}
-                  style={[styles.time, pickupTime && !TIMES.includes(pickupTime) && styles.timeOn]}
-                >
-                  <Text style={[styles.timeText, pickupTime && !TIMES.includes(pickupTime) && styles.timeTextOn]}>
-                    {customTimeLabel(pickupTime)}
-                  </Text>
-                </Pressable>
-              </View>
-
-              <Text style={[styles.sheetTitle, styles.sheetTitleGap]}>Drop</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dayRow}>
-                {DAYS.map((day, index) => {
-                  const blocked = pickupDay && day.getTime() < pickupDay.getTime();
-                  const on = dropDay?.getTime() === day.getTime();
-                  return (
-                    <Pressable
-                      key={`d-${day.toISOString()}`}
-                      disabled={blocked}
-                      onPress={() => chooseDropDay(day)}
-                      style={[styles.day, on && styles.dayOn, blocked && styles.dayOff]}
-                    >
-                      <Text style={[styles.dayText, on && styles.dayTextOn, blocked && styles.dayTextOff]}>
-                        {dayName(day, index)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={openDate}
-                  style={[styles.day, presetIndex(dropDay) < 0 && dropDay && styles.dayOn]}
-                >
-                  <Text style={[styles.dayText, presetIndex(dropDay) < 0 && dropDay && styles.dayTextOn]}>
-                    {customDateLabel(dropDay)}
-                  </Text>
-                </Pressable>
-              </ScrollView>
-              <View style={styles.timeGrid}>
-                {TIMES.map((time) => {
-                  const on = dropTime === time;
-                  return (
-                    <Pressable key={`r-${time}`} onPress={() => chooseDropTime(time)} style={[styles.time, on && styles.timeOn]}>
-                      <Text style={[styles.timeText, on && styles.timeTextOn]}>{time}</Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={() => openClock('drop')}
-                  style={[styles.time, dropTime && !TIMES.includes(dropTime) && styles.timeOn]}
-                >
-                  <Text style={[styles.timeText, dropTime && !TIMES.includes(dropTime) && styles.timeTextOn]}>
-                    {customTimeLabel(dropTime)}
-                  </Text>
-                </Pressable>
-              </View>
-            </Animated.View>
-          ) : (
-            <Animated.View key={mode} entering={FadeIn.duration(320)}>
-              <View style={styles.sheetHead}>
-                <Text style={[styles.sheetTitle, styles.sheetTitleInline]}>
-                  {mode === 'drop' ? 'Where does it end?' : 'Where do you pick it up?'}
-                </Text>
-                {mode === 'drop' ? (
-                  <Pressable hitSlop={8} onPress={() => setMode('pickup')}>
-                    <Text style={styles.backLinkText}>Change pickup</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-              {ZONES.map((zone) => {
-                const selected = (mode === 'drop' ? dropZone?.id : pickupZone?.id) === zone.id;
-                return (
-                  <Pressable
-                    key={zone.id}
-                    onPress={() => (mode === 'drop' ? chooseDrop(zone) : choosePickup(zone))}
-                    style={[styles.zone, selected && styles.zoneOn]}
-                  >
-                    <View style={[styles.zoneMark, selected && styles.zoneMarkOn]}>
-                      {selected ? <Ionicons name="checkmark" size={14} color="#FFFFFF" /> : null}
+              <Animated.Text style={[styles.searchEvBtnText, continueTextStyle]}>
+                Search EV
+              </Animated.Text>
+              {riding ? (
+                <>
+                  <Animated.View style={[styles.rideLine, rideLineStyle]} pointerEvents="none">
+                    {ROAD_DASHES.map((dash) => (
+                      <View key={dash} style={styles.roadDash} />
+                    ))}
+                  </Animated.View>
+                  <Animated.View style={[styles.scooterWrap, scooterSlideStyle]} pointerEvents="none">
+                    <View style={styles.speedLines}>
+                      <View style={[styles.speedDash, styles.speedDashLong]} />
+                      <View style={[styles.speedDash, styles.speedDashMid]} />
+                      <View style={[styles.speedDash, styles.speedDashShort]} />
                     </View>
-                    <View style={styles.zoneCopy}>
-                      <Text style={styles.zoneName}>{zone.name}</Text>
-                      <Text style={styles.zoneArea}>{zone.area}</Text>
-                    </View>
-                    <Text style={styles.zoneDistance}>{zone.distance}</Text>
-                  </Pressable>
-                );
-              })}
-
-              {mode === 'pickup' ? (
-                <View style={styles.sameRow}>
-                  <Pressable
-                    onPress={() => {
-                      setSameDrop(true);
-                      if (pickupZone) setDropZone(pickupZone);
-                    }}
-                    style={[styles.sameBtn, sameDrop && styles.sameBtnOn]}
-                  >
-                    <Text style={[styles.sameText, sameDrop && styles.sameTextOn]}>Same zone</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      setSameDrop(false);
-                      setDropZone(null);
-                      setMode('drop');
-                      listRef.current?.scrollTo({ y: 0, animated: true });
-                    }}
-                    style={[styles.sameBtn, !sameDrop && styles.sameBtnOn]}
-                  >
-                    <Text style={[styles.sameText, !sameDrop && styles.sameTextOn]}>Other zone</Text>
-                  </Pressable>
-                </View>
+                    <RNImage
+                      source={require('../assets/login/evegah-scooter.png')}
+                      style={styles.scooter}
+                      resizeMode="contain"
+                    />
+                  </Animated.View>
+                </>
               ) : null}
             </Animated.View>
-          )}
+          </Pressable>
         </Animated.View>
-      </ScrollView>
-        </View>
-
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-        <Pressable
-          disabled={riding}
-          onPress={() => {
-            const missed = missingStep({ pickupZone, dropPlace, pickupDay, pickupTime, dropDay, dropTime });
-            if (missed) {
-              showToast(missed);
-              return;
-            }
-            playContinueRide();
-          }}
-          onPressIn={() => {
-            if (!ready || riding) return;
-            btnScale.value = withSpring(0.96, { damping: 18, stiffness: 280 });
-          }}
-          onPressOut={() => {
-            btnScale.value = withSpring(1, { damping: 14, stiffness: 220 });
-          }}
-        >
-          <Animated.View
-            onLayout={(event) => {
-              buttonWidthRef.current = event.nativeEvent.layout.width;
-            }}
-            style={[styles.cta, ready && styles.ctaOn, btnAnimStyle]}
-          >
-            <Animated.Text style={[styles.ctaText, ready && styles.ctaTextOn, continueTextStyle]}>
-              Continue
-            </Animated.Text>
-            <Animated.View style={[styles.arrowCircle, !ready && styles.arrowCircleOff, arrowSlideStyle]}>
-              <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
-            </Animated.View>
-            {riding ? (
-              <>
-                <Animated.View style={[styles.rideLine, rideLineStyle]} pointerEvents="none">
-                  {ROAD_DASHES.map((dash) => (
-                    <View key={dash} style={styles.roadDash} />
-                  ))}
-                </Animated.View>
-                <Animated.View style={[styles.scooterWrap, scooterSlideStyle]} pointerEvents="none">
-                  <View style={styles.speedLines}>
-                    <View style={[styles.speedDash, styles.speedDashLong]} />
-                    <View style={[styles.speedDash, styles.speedDashMid]} />
-                    <View style={[styles.speedDash, styles.speedDashShort]} />
-                  </View>
-                  <RNImage
-                    source={require('../assets/login/evegah-scooter.png')}
-                    style={styles.scooter}
-                    resizeMode="contain"
-                  />
-                </Animated.View>
-              </>
-            ) : null}
-          </Animated.View>
-        </Pressable>
       </View>
       </BlurTargetView>
+
+      {/* Zone Selection Modal */}
+      {zoneModalOpen ? (
+        <PopupShell blurTarget={blurTargetRef} onClose={() => setZoneModalOpen(false)}>
+          {(requestClose) => (
+            <>
+              <Text style={styles.popupTitle}>Select EV Zone</Text>
+              <Text style={styles.popupHint}>Pick where you would like to start your ride</Text>
+              <ScrollView style={{ maxHeight: 280, marginTop: 12 }}>
+                {EVEGAH_ZONES.map((zone) => {
+                  const isSelected = pickupZone?.id === zone.id;
+                  return (
+                    <Pressable
+                      key={zone.id}
+                      onPress={() => {
+                        setPickupZone(zone);
+                        if (sameDrop) setDropZone(zone);
+                        requestClose();
+                      }}
+                      style={[styles.zoneItem, isSelected && styles.zoneItemActive]}
+                    >
+                      <View style={[styles.zoneRadioDot, isSelected && styles.zoneRadioDotActive]}>
+                        {isSelected ? <Ionicons name="checkmark" size={13} color="#FFFFFF" /> : null}
+                      </View>
+                      <View style={{ flex: 1, marginLeft: 10 }}>
+                        <Text style={styles.zoneItemTitle}>{zone.name}</Text>
+                        <Text style={styles.zoneItemSub}>{zone.address || zone.shortName}</Text>
+                      </View>
+                      <Text style={styles.zoneItemDistance}>{zone.distance}</Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+              <Pressable onPress={requestClose} style={[styles.popupCancel, { marginTop: 14 }]}>
+                <Text style={styles.popupCancelText}>Close</Text>
+              </Pressable>
+            </>
+          )}
+        </PopupShell>
+      ) : null}
       {clockFor ? (
         <ClockPopup
           blurTarget={blurTargetRef}
@@ -1286,286 +1196,165 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     borderTopColor: PURPLE,
   },
-  tripBar: {
+  cardContainer: {
     marginTop: -28,
-    marginBottom: 14,
     marginHorizontal: 16,
+    zIndex: 4,
+  },
+  rentSearchCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 14,
-    zIndex: 2,
-    shadowColor: '#1A1030',
+    borderRadius: 24,
+    padding: 16,
+    borderWidth: 1.2,
+    borderColor: '#E5DFEF',
+    shadowColor: '#1A0F30',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
     elevation: 4,
   },
-  tripRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  tripEnd: {
-    flex: 1,
-  },
-  tripEndRight: {
-    alignItems: 'flex-end',
-  },
-  tripKicker: {
-    color: '#8A8496',
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  tripPlace: {
-    marginTop: 4,
-    color: '#1C1C1C',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  tripWhen: {
-    marginTop: 2,
-    color: '#B0A8BC',
-    fontSize: 12,
-  },
-  tripWhenOn: {
-    color: PURPLE,
-    fontWeight: '600',
-  },
-  tripMid: {
-    minWidth: 64,
-    alignItems: 'center',
-    paddingTop: 16,
-  },
-  tripDuration: {
-    color: PURPLE,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  sheet: {
-    flexGrow: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 24,
-  },
-  tabs: {
-    flexDirection: 'row',
-    backgroundColor: '#F4F4F6',
+  zonePill: {
+    minHeight: 52,
     borderRadius: 14,
-    padding: 4,
-    marginBottom: 18,
-    position: 'relative',
+    borderWidth: 1.3,
+    borderColor: '#DFD9EA',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  tab: {
+  zoneSearchIcon: {
+    marginRight: 2,
+  },
+  zonePillText: {
     flex: 1,
-    height: 36,
+    fontSize: 14.5,
+    fontWeight: '700',
+    color: '#24083C',
+    letterSpacing: -0.2,
+  },
+  zoneLocateBtn: {
+    padding: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1,
   },
-  tabText: {
-    color: '#8A8496',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  tabTextOn: {
-    color: '#1C1C1C',
-  },
-  tabMark: {
-    position: 'absolute',
-    left: 4,
-    top: 4,
-    bottom: 4,
-    borderRadius: 11,
-    backgroundColor: '#FFFFFF',
-  },
-  sheetHead: {
+  tripBoxesRow: {
+    marginTop: 12,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
     gap: 12,
   },
-  sheetTitle: {
-    color: '#1C1C1C',
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 12,
-  },
-  sheetTitleInline: {
+  tripDateBox: {
     flex: 1,
-    marginBottom: 0,
-  },
-  sheetTitleGap: {
-    marginTop: 18,
-  },
-  zone: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#EEEEF2',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    marginBottom: 8,
-  },
-  zoneOn: {
-    borderColor: PURPLE,
-    backgroundColor: '#F8F4FC',
-  },
-  zoneMark: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: '#D9D4E2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  zoneMarkOn: {
-    borderColor: PURPLE,
-    backgroundColor: PURPLE,
-  },
-  zoneCopy: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  zoneName: {
-    color: '#1C1C1C',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  zoneArea: {
-    marginTop: 1,
-    color: '#8A8496',
-    fontSize: 12,
-  },
-  zoneDistance: {
-    color: PURPLE,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  sameRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
-  sameBtn: {
-    flex: 1,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#F4F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sameBtnOn: {
-    backgroundColor: '#F3EAFB',
-  },
-  sameText: {
-    color: '#8A8496',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  sameTextOn: {
-    color: PURPLE,
-  },
-  backLinkText: {
-    color: PURPLE,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  dayRow: {
-    gap: 8,
-    paddingRight: 8,
-  },
-  day: {
-    height: 36,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    backgroundColor: '#F4F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayOn: {
-    backgroundColor: PURPLE,
-  },
-  dayOff: {
-    opacity: 0.35,
-  },
-  dayText: {
-    color: '#3C3846',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  dayTextOn: {
-    color: '#FFFFFF',
-  },
-  dayTextOff: {
-    color: '#8A8496',
-  },
-  timeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 12,
-  },
-  time: {
-    width: '31%',
-    flexGrow: 1,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#F4F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timeOn: {
-    backgroundColor: '#F3EAFB',
-    borderWidth: 1,
-    borderColor: PURPLE,
-  },
-  timeText: {
-    color: '#3C3846',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  timeTextOn: {
-    color: PURPLE,
-  },
-  footer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    borderRadius: 14,
+    borderWidth: 1.3,
+    borderColor: '#DFD9EA',
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F1F3',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    justifyContent: 'center',
   },
-  cta: {
+  tripBoxLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#736D80',
+  },
+  tripBoxValue: {
+    marginTop: 4,
+    fontSize: 14.5,
+    fontWeight: '800',
+    color: '#24083C',
+    letterSpacing: -0.2,
+  },
+  deliveryCheckRow: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  deliveryCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1.6,
+    borderColor: '#363042',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  deliveryCheckboxChecked: {
+    backgroundColor: PURPLE,
+    borderColor: PURPLE,
+  },
+  deliveryCheckLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#280D42',
+  },
+  searchEvBtn: {
+    marginTop: 16,
     height: 52,
     borderRadius: 14,
-    backgroundColor: '#EEEAF3',
+    backgroundColor: PURPLE,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 14,
     overflow: 'hidden',
+    position: 'relative',
+    shadowColor: PURPLE,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  ctaOn: {
+  searchEvBtnText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
+  },
+  zoneItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ECE7F4',
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 8,
+    backgroundColor: '#FAF8FD',
+  },
+  zoneItemActive: {
+    borderColor: PURPLE,
+    backgroundColor: '#F3EAFB',
+  },
+  zoneRadioDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#B9AFC8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zoneRadioDotActive: {
+    borderColor: PURPLE,
     backgroundColor: PURPLE,
   },
-  ctaText: {
-    color: '#8A8496',
-    fontSize: 16,
+  zoneItemTitle: {
+    fontSize: 13.5,
     fontWeight: '700',
+    color: '#24083C',
   },
-  ctaTextOn: {
-    color: '#FFFFFF',
+  zoneItemSub: {
+    fontSize: 11.5,
+    color: '#766F85',
+    marginTop: 1,
+  },
+  zoneItemDistance: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: PURPLE,
   },
   arrowCircle: {
     position: 'absolute',

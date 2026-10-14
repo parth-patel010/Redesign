@@ -28,8 +28,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PURPLE = '#4A168C';
 const BUTTON = '#C5B4E6';
-const DIGITS = 6;
-const INVALID_OTP = '111111';
+const DIGITS = 4;
+const INVALID_OTP = '1111';
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const RIDER_WIDTH = Math.round(SCREEN_W * 0.86);
 const GREY = '#E4E4E7';
@@ -323,9 +323,9 @@ export default function OtpScreen({ phone, onEdit, onSuccess }) {
           </Animated.View>
         </View>
 
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + 20, minHeight: SCREEN_H * 0.58 }]}>
+        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 22) }]}>
           <Text style={styles.title}>OTP Verification</Text>
-          <Text style={styles.subtitle}>Enter the 6-digit code we sent to</Text>
+          <Text style={styles.subtitle}>Enter the 4-digit code we sent to</Text>
 
           <View style={styles.phonePill}>
             <Text style={styles.phoneText}>{formatPhone(phone)}</Text>
@@ -367,7 +367,7 @@ export default function OtpScreen({ phone, onEdit, onSuccess }) {
           </Text>
 
           <Pressable
-            style={[styles.verifyBtn, !ready && styles.verifyBtnDisabled]}
+            style={[styles.verifyBtn, ready && styles.verifyBtnReady, !ready && styles.verifyBtnDisabled]}
             disabled={!ready}
             onPress={() => judge(code)}
           >
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   riderWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 56,
+    marginTop: 36,
   },
   rider: {
     width: RIDER_WIDTH,
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingHorizontal: 24,
-    paddingTop: 28,
+    paddingTop: 26,
   },
   title: {
     textAlign: 'center',
@@ -468,14 +468,14 @@ const styles = StyleSheet.create({
   },
   codeRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
+    justifyContent: 'center',
+    gap: 14,
     marginTop: 22,
   },
   codeBox: {
-    flex: 1,
-    height: 52,
-    borderRadius: 12,
+    width: 62,
+    height: 58,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: GREY,
     backgroundColor: GREY,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   codeInput: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
     color: '#1C1C1C',
     paddingVertical: 0,
@@ -509,8 +509,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
+  verifyBtnReady: {
+    backgroundColor: PURPLE,
+  },
   verifyBtnDisabled: {
-    opacity: 0.55,
+    opacity: 0.75,
   },
   verifyText: {
     color: '#FFFFFF',
