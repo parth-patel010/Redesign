@@ -918,23 +918,42 @@ const AVAILABLE_ZONES_QUICK = [
 
 function TimeWheelColumn({ title, hour24, onChangeHour }) {
   const wheelRef = useRef(null);
+  const isInteractingRef = useRef(false);
+  const settleTimeoutRef = useRef(null);
+  const mountedRef = useRef(false);
+
   const idx = Math.max(
     0,
     HOUR_SLOTS.findIndex((s) => s.hour24 === hour24)
   );
 
   useEffect(() => {
+    // Prevent programmatic scrollTo from interrupting user drag or momentum
+    if (isInteractingRef.current) return;
+
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      const timer = setTimeout(() => {
+        wheelRef.current?.scrollTo({
+          y: idx * TIME_WHEEL_ITEM_H,
+          animated: false,
+        });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+
     const timer = setTimeout(() => {
-      wheelRef.current?.scrollTo({
-        y: idx * TIME_WHEEL_ITEM_H,
-        animated: true,
-      });
+      if (!isInteractingRef.current) {
+        wheelRef.current?.scrollTo({
+          y: idx * TIME_WHEEL_ITEM_H,
+          animated: true,
+        });
+      }
     }, 60);
     return () => clearTimeout(timer);
   }, [idx]);
 
-  const handleMomentumEnd = (e) => {
-    const offsetY = e.nativeEvent.contentOffset.y;
+  const commitOffset = (offsetY) => {
     const nextIdx = Math.min(
       HOUR_SLOTS.length - 1,
       Math.max(0, Math.round(offsetY / TIME_WHEEL_ITEM_H))
@@ -943,6 +962,44 @@ function TimeWheelColumn({ title, hour24, onChangeHour }) {
     if (chosen && chosen.hour24 !== hour24) {
       onChangeHour(chosen.hour24);
     }
+    wheelRef.current?.scrollTo({
+      y: nextIdx * TIME_WHEEL_ITEM_H,
+      animated: true,
+    });
+    if (settleTimeoutRef.current) clearTimeout(settleTimeoutRef.current);
+    settleTimeoutRef.current = setTimeout(() => {
+      isInteractingRef.current = false;
+    }, 120);
+  };
+
+  const handleScrollBeginDrag = () => {
+    isInteractingRef.current = true;
+    if (settleTimeoutRef.current) clearTimeout(settleTimeoutRef.current);
+  };
+
+  const handleScrollEndDrag = (e) => {
+    const velocityY = Math.abs(e.nativeEvent.velocity?.y || 0);
+    // If released without velocity, snap and commit immediately
+    if (velocityY < 0.05) {
+      commitOffset(e.nativeEvent.contentOffset.y);
+    }
+  };
+
+  const handleMomentumScrollEnd = (e) => {
+    commitOffset(e.nativeEvent.contentOffset.y);
+  };
+
+  const handleSelectSlot = (slotIndex, slotHour) => {
+    isInteractingRef.current = true;
+    onChangeHour(slotHour);
+    wheelRef.current?.scrollTo({
+      y: slotIndex * TIME_WHEEL_ITEM_H,
+      animated: true,
+    });
+    if (settleTimeoutRef.current) clearTimeout(settleTimeoutRef.current);
+    settleTimeoutRef.current = setTimeout(() => {
+      isInteractingRef.current = false;
+    }, 180);
   };
 
   return (
@@ -950,31 +1007,29 @@ function TimeWheelColumn({ title, hour24, onChangeHour }) {
       <Text style={styles.timeWheelTitle}>{title}</Text>
 
       <View style={styles.timeWheelViewport}>
-        <View pointerEvents="none" style={styles.timeWheelCenterHighlight} />
+        <View pointerEvents="none" style={styles.timeWheelHighlightPill} />
         <ScrollView
           ref={wheelRef}
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           snapToInterval={TIME_WHEEL_ITEM_H}
+          snapToAlignment="center"
+          disableIntervalMomentum={true}
           decelerationRate="fast"
+          contentOffset={{ y: idx * TIME_WHEEL_ITEM_H, x: 0 }}
           contentContainerStyle={{
             paddingVertical: TIME_WHEEL_ITEM_H,
           }}
-          onMomentumScrollEnd={handleMomentumEnd}
-          onScrollEndDrag={handleMomentumEnd}
+          onScrollBeginDrag={handleScrollBeginDrag}
+          onScrollEndDrag={handleScrollEndDrag}
+          onMomentumScrollEnd={handleMomentumScrollEnd}
         >
           {HOUR_SLOTS.map((slot, sIdx) => {
             const isSelected = slot.hour24 === hour24;
             return (
               <Pressable
                 key={slot.hour24}
-                onPress={() => {
-                  onChangeHour(slot.hour24);
-                  wheelRef.current?.scrollTo({
-                    y: sIdx * TIME_WHEEL_ITEM_H,
-                    animated: true,
-                  });
-                }}
+                onPress={() => handleSelectSlot(sIdx, slot.hour24)}
                 style={styles.timeWheelItemRow}
               >
                 <Text
@@ -2710,17 +2765,20 @@ const styles = StyleSheet.create({
     height: TIME_WHEEL_ITEM_H * 3,
     position: 'relative',
     justifyContent: 'center',
+    borderRadius: 14,
+    backgroundColor: '#FAF8FD',
+    overflow: 'hidden',
   },
   timeWheelHighlightPill: {
     position: 'absolute',
-    left: 0,
-    right: 0,
+    left: 4,
+    right: 4,
     top: TIME_WHEEL_ITEM_H,
     height: TIME_WHEEL_ITEM_H,
-    borderRadius: 19,
-    backgroundColor: '#F2EFF7',
-    borderWidth: 1,
-    borderColor: '#E2DAF0',
+    borderRadius: 12,
+    backgroundColor: '#F3EEFB',
+    borderWidth: 1.5,
+    borderColor: '#D8B4FE',
   },
   timeWheelItemRow: {
     height: TIME_WHEEL_ITEM_H,

@@ -232,7 +232,12 @@ export default function App() {
       ) : screen === 'insights' ? (
         <InsightsScreen onBack={() => setScreen('home')} />
       ) : screen === 'transaction' ? (
-        <TransactionScreen tx={tx} onBack={() => setScreen('wallet')} />
+        <TransactionScreen
+          tx={tx}
+          phone={profile.phone}
+          onBack={() => setScreen('wallet')}
+          onOpenHelp={() => setScreen('help')}
+        />
       ) : screen === 'wallet' ? (
         <WalletScreen
           enterCards={false}
@@ -246,6 +251,10 @@ export default function App() {
           }}
           onOpenTx={(item) => {
             setTx(item);
+            setScreen('transaction');
+          }}
+          onOpenHistory={() => {
+            setTx(null);
             setScreen('transaction');
           }}
           phone={profile.phone}

@@ -82,6 +82,7 @@ export default function WalletScreen({
   onOpenProfile,
   onOffers,
   onOpenTx,
+  onOpenHistory,
   phone,
   enterCards = true,
 }) {
@@ -139,8 +140,14 @@ export default function WalletScreen({
     setSheet(mode);
   };
 
-  const showHistory = () => {
-    scrollRef.current?.scrollToEnd({ animated: true });
+  const handleOpenHistory = () => {
+    if (onOpenHistory) {
+      onOpenHistory();
+    } else if (onOpenTx) {
+      onOpenTx(null);
+    } else {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }
   };
 
   const confirmSheet = () => {
@@ -200,7 +207,7 @@ export default function WalletScreen({
             <Pressable hitSlop={8} style={styles.round} onPress={onOpenHome}>
               <Ionicons name="chevron-back" size={20} color="#FFFFFF" />
             </Pressable>
-            <Pressable hitSlop={8} style={styles.historyBtn} onPress={showHistory}>
+            <Pressable hitSlop={8} style={styles.historyBtn} onPress={handleOpenHistory}>
               <Ionicons name="time-outline" size={14} color="#FFFFFF" />
               <Text style={styles.historyText}>History</Text>
             </Pressable>
@@ -265,7 +272,7 @@ export default function WalletScreen({
                 onPress={() => {
                   if (item.id === 'add') openSheet('add');
                   else if (item.id === 'out') openSheet('out');
-                  else showHistory();
+                  else handleOpenHistory();
                 }}
               >
                 <View style={styles.actionIcon}>
@@ -297,7 +304,7 @@ export default function WalletScreen({
 
           <View style={styles.sectionRow}>
             <Text style={styles.section}>Recent Transactions</Text>
-            <Pressable hitSlop={8} onPress={showHistory} style={styles.seeAll}>
+            <Pressable hitSlop={8} onPress={handleOpenHistory} style={styles.seeAll}>
               <Text style={styles.link}>See all</Text>
               <Ionicons name="chevron-forward" size={14} color="#8A8496" />
             </Pressable>
@@ -362,12 +369,25 @@ export default function WalletScreen({
           <Pressable style={styles.shadeFill} onPress={() => setSheet(null)} />
           <View style={[styles.money, { paddingBottom: Math.max(insets.bottom, 16) }]}>
             <View style={styles.moneyHandle} />
-            <Text style={styles.moneyTitle}>{sheet === 'add' ? 'Add money' : 'Withdraw'}</Text>
-            <Text style={styles.moneySub}>
-              {sheet === 'add'
-                ? 'Choose an amount to keep in your wallet.'
-                : 'Main balance can be withdrawn. The ₹250 deposit stays refundable.'}
-            </Text>
+            <View style={styles.moneyHeaderRow}>
+              <View style={styles.moneyTitleWrap}>
+                <Text style={styles.moneyTitle}>{sheet === 'add' ? 'Add money' : 'Withdraw'}</Text>
+                <Text style={styles.moneySub}>
+                  {sheet === 'add'
+                    ? 'Choose an amount to keep in your wallet.'
+                    : 'Main balance can be withdrawn. The ₹250 deposit stays refundable.'}
+                </Text>
+              </View>
+              <Pressable
+                hitSlop={10}
+                onPress={() => setSheet(null)}
+                style={styles.moneyCloseBtn}
+                accessibilityRole="button"
+                accessibilityLabel="Close"
+              >
+                <Ionicons name="close" size={20} color="#25084A" />
+              </Pressable>
+            </View>
             <View style={styles.amountRow}>
               {AMOUNTS.map((value) => {
                 const active = !custom.trim() && picked === value;
@@ -397,6 +417,9 @@ export default function WalletScreen({
               <Text style={styles.moneyBtnText}>
                 {sheet === 'add' ? `Add ${moneyLabel(amount)}` : `Withdraw ${moneyLabel(amount)}`}
               </Text>
+            </Pressable>
+            <Pressable style={styles.moneyCancelBtn} onPress={() => setSheet(null)}>
+              <Text style={styles.moneyCancelText}>Cancel</Text>
             </Pressable>
           </View>
         </View>
@@ -905,6 +928,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#E4DCEF',
     marginBottom: 14,
   },
+  moneyHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  moneyTitleWrap: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  moneyCloseBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#F3EEFB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   moneyTitle: {
     fontSize: 22,
     fontWeight: '800',
@@ -961,5 +1002,18 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '800',
+  },
+  moneyCancelBtn: {
+    marginTop: 10,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F6F4F9',
+  },
+  moneyCancelText: {
+    color: '#6E6878',
+    fontSize: 14,
+    fontWeight: '700',
   },
 });
