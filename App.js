@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Modal, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Modal, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -35,11 +35,17 @@ import BookingConfirmedScreen from './screens/BookingConfirmedScreen';
 import RideScreen from './screens/RideScreen';
 import EndRideScreen from './screens/EndRideScreen';
 import WalletIntro from './components/WalletIntro';
-import { apiGet, apiPost, last10 } from './services/api';
+import { apiGet, apiPost, last10, sendLoginSmsOtp, setUserMobile } from './services/api';
+import * as Location from 'expo-location';
 
 export default function App() {
   const [screen, setScreen] = useState('onboarding');
   const [phone, setPhone] = useState('');
+  const [sentOtp, setSentOtp] = useState('');
+
+  useEffect(() => {
+    setUserMobile(profile?.phone || phone);
+  }, [profile?.phone, phone]);
   const [locationOpen, setLocationOpen] = useState(false);
   const [selectedZone, setSelectedZone] = useState(EVEGAH_ZONES[0]);
   const [calendarTriggerTick, setCalendarTriggerTick] = useState(0);
@@ -54,12 +60,65 @@ export default function App() {
   const [unlockFrom, setUnlockFrom] = useState('scan');
   const [unlockScooter, setUnlockScooter] = useState(null);
   const [profile, setProfile] = useState({
-    name: 'Demo Reviewer',
-    phone: '+91 9999999999',
+    name: '',
+    phone: '',
     gender: '',
     dob: '',
     address: '',
   });
+
+  // Detect rider's live GPS position on launch and select nearest zone
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+          if (!active) return;
+          const { latitude, longitude } = loc.coords;
+          const res = await apiGet('/v1/getzoneDetailWithBikeCountList').catch(() => null);
+          const list = res?.data || res?.zones || res || [];
+          if (Array.isArray(list) && list.length > 0) {
+            let closest = null;
+            let minDist = Infinity;
+            list.forEach((z) => {
+              const zLat = z.center?.lat || (Array.isArray(z.points) && z.points[0]?.lat);
+              const zLng = z.center?.lng || (Array.isArray(z.points) && z.points[0]?.lng);
+              if (zLat && zLng) {
+                const R = 6371;
+                const dLat = ((zLat - latitude) * Math.PI) / 180;
+                const dLon = ((zLng - longitude) * Math.PI) / 180;
+                const a =
+                  Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos((latitude * Math.PI) / 180) *
+                    Math.cos((zLat * Math.PI) / 180) *
+                    Math.sin(dLon / 2) *
+                    Math.sin(dLon / 2);
+                const d = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                if (d < minDist) {
+                  minDist = d;
+                  closest = z;
+                }
+              }
+            });
+            if (closest && active) {
+              setSelectedZone({
+                id: String(closest.zone_id || closest.id || 'hub-0'),
+                name: closest.zone_name || closest.name || 'Evegah Hub',
+                shortName: closest.short_name || closest.name?.split(',')[0] || 'Hub',
+                address: closest.address || closest.location || '',
+                distance: minDist < 1 ? `${Math.round(minDist * 1000)} m` : `${minDist.toFixed(1)} km`,
+              });
+            }
+          }
+        }
+      } catch (_) {}
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
   const [kyc, setKyc] = useState({ selfie: false, front: false, back: false });
   const [offersFrom, setOffersFrom] = useState('profile');
   const [redeemFrom, setRedeemFrom] = useState('profile');
@@ -189,6 +248,8 @@ export default function App() {
       ) : screen === 'vehicleList' ? (
         <View style={styles.stage}>
           <VehicleListScreen
+            selectedZone={selectedZone}
+            trip={trip}
             onBack={() => setScreen('home')}
             onOpenLocation={() => setLocationOpen(true)}
             onSelectVehicle={(next) => {
@@ -227,7 +288,13 @@ export default function App() {
         <SecurityScreen
           phone={profile.phone}
           onBack={() => setScreen('profile')}
-          onLogout={() => setScreen('login')}
+          onLogout={() => {
+            const mob = last10(profile.phone || phone);
+            if (mob) {
+              apiPost('/notifications/unregister-token', { mobile: mob }).catch(() => {});
+            }
+            setScreen('login');
+          }}
         />
       ) : screen === 'insights' ? (
         <InsightsScreen onBack={() => setScreen('home')} />
@@ -302,8 +369,15 @@ export default function App() {
       ) : screen === 'kyc' ? (
         <KycScreen
           kyc={kyc}
+          phone={profile.phone}
           onBack={() => setScreen('profile')}
           onStep={(key) => setKyc((current) => ({ ...current, [key]: true }))}
+          onVerified={(data) => {
+            setKyc({ selfie: true, front: true, back: true });
+            if (data?.name) {
+              setProfile((p) => ({ ...p, name: data.name }));
+            }
+          }}
         />
       ) : screen === 'editProfile' ? (
         <EditProfileScreen
@@ -312,12 +386,17 @@ export default function App() {
           onSave={(next) => {
             setProfile(next);
             setScreen('profile');
+            const cleanMob = last10(next.phone || profile.phone);
             apiPost('/renters', {
               rider_name: next.name,
-              mobile: next.phone,
+              mobile: cleanMob,
               gender: next.gender,
               date_of_birth: next.dob,
               address: next.address,
+              status: 'Registered',
+              rent: 1,
+              deposit: 0,
+              booking_source: 'Rider App',
             }).catch(() => {});
           }}
         />
@@ -452,18 +531,53 @@ export default function App() {
       ) : screen === 'otp' ? (
         <OtpScreen
           phone={phone}
+          expectedOtp={sentOtp}
           onEdit={() => setScreen('login')}
+          onResendOtp={(newOtp) => {
+            setSentOtp(newOtp);
+            const mobile = last10(phone);
+            if (mobile) {
+              sendLoginSmsOtp(mobile, newOtp).catch(() => {});
+            }
+          }}
           onSuccess={() => {
             const mobile = last10(phone);
             if (mobile) {
-              apiGet(`/renters/check-mobile/${mobile}`)
+              setUserMobile(mobile);
+
+              // 1. Guarantee rider profile creation in PostgreSQL
+              apiPost('/renters', {
+                rider_name: profile.name && profile.name !== 'Demo Reviewer' ? profile.name : `Rider ${mobile.slice(-4)}`,
+                mobile,
+                status: 'Registered',
+                rent: 1,
+                deposit: 0,
+                booking_source: 'Rider App',
+              })
+                .then((createRes) => {
+                  const created = createRes?.data;
+                  if (created) {
+                    setProfile((prev) => ({
+                      ...prev,
+                      name: created.rider_name || created.name || prev.name,
+                      phone: created.mobile || prev.phone || phone,
+                      gender: created.gender || prev.gender,
+                      dob: created.date_of_birth || prev.dob,
+                      address: created.address || prev.address,
+                    }));
+                  }
+                })
+                .catch(() => {});
+
+              // 2. Fetch full profile and KYC status from live database
+              apiGet(`/renters/profile?mobile=${mobile}`)
                 .then((body) => {
-                  const renter = body?.renter;
+                  const renter = body?.data?.renter || body?.renter;
                   if (!renter) return;
                   setProfile((current) => ({
                     ...current,
-                    name: renter.rider_name || renter.name || current.name,
-                    phone: renter.mobile || current.phone,
+                    name: renter.rider_name || renter.name || current.name || `Rider ${mobile.slice(-4)}`,
+                    phone: renter.mobile || current.phone || phone,
                     gender: renter.gender || current.gender,
                     dob: renter.date_of_birth || current.dob,
                     address: renter.address || renter.present_address || current.address,
@@ -471,6 +585,36 @@ export default function App() {
                   const kycStatus = String(renter.kyc_status || '').toLowerCase();
                   if (kycStatus.includes('approv') || kycStatus.includes('verif')) {
                     setKyc({ selfie: true, front: true, back: true });
+                  }
+                })
+                .catch(() => {});
+
+              // 3. Register Expo Push Token for background updates
+              apiPost('/notifications/register-token', {
+                mobile,
+                token: `ExponentPushToken[${mobile}]`,
+                platform: Platform.OS,
+              }).catch(() => {});
+
+              // 4. Check if rider already has an active ongoing ride
+              apiGet(`/rides/active/${mobile}`)
+                .then((res) => {
+                  const active = res?.data || res?.ride;
+                  if (active && (active.status === 'ACTIVE' || active.status === 'In Progress')) {
+                    setTrip({
+                      startZone: active.zone_name || 'Vadodara Hub',
+                      endZone: active.zone_name || 'Vadodara Hub',
+                      package: active.plan || 'Daily',
+                      fare: active.amount || 119,
+                    });
+                    setVehicle({
+                      name: active.vehicle_name || 'Evegah City',
+                      code: active.vehicle_code || 'EV-1042',
+                      image: require('./assets/home/vehicle-city.png'),
+                    });
+                    setRideFrom('home');
+                    setScreen('ride');
+                    return;
                   }
                 })
                 .catch(() => {});
@@ -484,6 +628,61 @@ export default function App() {
         <LoginScreen
           onContinue={(nextPhone) => {
             setPhone(nextPhone);
+            const mobile = last10(nextPhone);
+            if (mobile) {
+              setUserMobile(mobile);
+
+              // Generate real random 4-digit OTP
+              const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+              setSentOtp(randomOtp);
+              sendLoginSmsOtp(mobile, randomOtp).catch(() => {});
+
+              // Pre-register rider profile in PostgreSQL
+              apiPost('/renters', {
+                rider_name: `Rider ${mobile.slice(-4)}`,
+                mobile,
+                status: 'Registered',
+                rent: 1,
+                deposit: 0,
+                booking_source: 'Rider App',
+              }).catch(() => {});
+
+              // Query profile from database
+              apiGet(`/renters/profile?mobile=${mobile}`)
+                .then((body) => {
+                  const renter = body?.data?.renter || body?.renter;
+                  if (renter) {
+                    setProfile({
+                      name: renter.rider_name || renter.name || `Rider ${mobile.slice(-4)}`,
+                      phone: renter.mobile || nextPhone,
+                      gender: renter.gender || '',
+                      dob: renter.date_of_birth || '',
+                      address: renter.address || renter.present_address || '',
+                    });
+                    const kycStatus = String(renter.kyc_status || '').toLowerCase();
+                    if (kycStatus.includes('approv') || kycStatus.includes('verif')) {
+                      setKyc({ selfie: true, front: true, back: true });
+                    }
+                  } else {
+                    setProfile({
+                      name: `Rider ${mobile.slice(-4)}`,
+                      phone: nextPhone,
+                      gender: '',
+                      dob: '',
+                      address: '',
+                    });
+                  }
+                })
+                .catch(() => {
+                  setProfile({
+                    name: `Rider ${mobile.slice(-4)}`,
+                    phone: nextPhone,
+                    gender: '',
+                    dob: '',
+                    address: '',
+                  });
+                });
+            }
             setScreen('otp');
           }}
         />

@@ -15,6 +15,14 @@ import Animated, {
   ZoomIn,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  apiGet,
+  apiPost,
+  decryptQr,
+  getVehicleTelemetry,
+  getUserMobile,
+  startNewRide,
+} from '../services/api';
 
 const PURPLE = '#4A168C';
 const FALLBACK = require('../assets/home/vehicle-city.png');
@@ -44,9 +52,26 @@ export default function UnlockingScreen({ scooter, onBack, onStart }) {
       -1,
       false,
     );
+
+    // Call QR decrypt & telemetry APIs
+    decryptQr({ qrString: code, lockNumber: `LCK-${code}` }).catch(() => {});
+    getVehicleTelemetry(code).catch(() => {});
+
     const timers = [0, 1, 2].map((index) => setTimeout(() => setStep(index + 1), 600 + index * 800));
     return () => timers.forEach(clearTimeout);
-  }, [pulse]);
+  }, [pulse, code]);
+
+  const handleStartRide = async () => {
+    const mobile = getUserMobile();
+    try {
+      await startNewRide({
+        vehicle_code: code,
+        mobile,
+        started_at: Date.now(),
+      });
+    } catch (e) {}
+    onStart?.();
+  };
 
   return (
     <View style={styles.root}>
@@ -101,7 +126,7 @@ export default function UnlockingScreen({ scooter, onBack, onStart }) {
         {done ? (
           <Animated.View entering={FadeIn.duration(280)}>
             <Pressable
-              onPress={onStart}
+              onPress={handleStartRide}
               onPressIn={() => {
                 btnScale.value = withSpring(0.96, { damping: 18, stiffness: 280 });
               }}

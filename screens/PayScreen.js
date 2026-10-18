@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
+import { apiGet, apiPost, getUserMobile, last10 } from '../services/api';
 
 const PURPLE = '#4A168C';
 const EASE = Easing.bezier(0.22, 1, 0.36, 1);
@@ -174,6 +175,8 @@ export default function PayScreen({ vehicle, trip, onBack, onPay }) {
   const [appliedCode, setAppliedCode] = useState('FIRST50');
   const [appliedDiscountAmt, setAppliedDiscountAmt] = useState(50);
   const [couponPopupOpen, setCouponPopupOpen] = useState(false);
+  const [couponsList, setCouponsList] = useState(CHECKOUT_COUPONS);
+  const [gateways, setGateways] = useState(['phonepe', 'payu', 'upi']);
   const [expandedMap, setExpandedMap] = useState({
     first50: true,
     navratri100: true,
@@ -186,6 +189,108 @@ export default function PayScreen({ vehicle, trip, onBack, onPay }) {
   const btnStyle = useAnimatedStyle(() => ({
     transform: [{ scale: btnScale.value }],
   }));
+
+  useEffect(() => {
+    apiGet('/payments/gateways/config')
+      .then((body) => {
+        const list = body?.gateways || body?.data;
+        if (Array.isArray(list) && list.length > 0) setGateways(list);
+      })
+      .catch(() => {});
+
+    apiGet('/coupons')
+      .then((body) => {
+        const list = body?.data || body?.coupons || body || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setCouponsList(
+            list.map((c, idx) => ({
+              id: String(c.id || c.code || `coupon-${idx}`),
+              title: c.title || (c.discount ? `Flat ₹${c.discount} OFF` : 'Special Discount'),
+              subtitle: `Use code ${c.code || 'EVEGAH'}`,
+              code: String(c.code || 'EVEGAH').toUpperCase(),
+              discount: Number(c.discount || 50),
+              bullets: [
+                c.description || 'Valid on Evegah electric scooter booking.',
+                'Includes free battery swap at Evegah hubs.',
+              ],
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handlePayPress = async () => {
+    const mobile = getUserMobile() || '9999999999';
+    let resId = `RES-${Date.now().toString().slice(-6)}`;
+    try {
+      const res = await apiPost('/reservations', {
+        vehicle_id: vehicle?.id || 'city',
+        model_name: vehicle?.name || 'Evegah City',
+        mobile,
+        pickup_at: trip?.pickupAt,
+        drop_at: trip?.dropAt,
+        pickup_zone: trip?.pickupName || 'Gotri',
+        drop_zone: trip?.dropName || 'Gotri',
+        fare,
+        deposit,
+        total_amount: total,
+        payment_method: method === 'upi' ? 'ICICI UPI' : 'PayU India',
+        coupon_applied: offerOn ? appliedCode : null,
+      });
+      if (res?.data?.id || res?.id) {
+        resId = String(res?.data?.id || res?.id);
+      }
+    } catch (e) {}
+
+    // Link real live payment gateway
+    if (method === 'upi') {
+      try {
+        const upiRes = await apiPost('/payments/icici/initiate', {
+          amount: total,
+          rider_name: 'Evegah Rider',
+          mobile,
+          notes: 'Evegah EV Ride Booking',
+          purpose: 'ride',
+          reservation_id: resId,
+        });
+        const upiString = upiRes?.data?.upi_string || upiRes?.qrString;
+        if (upiString) {
+          Linking.openURL(upiString).catch(() => {});
+        }
+      } catch (e) {}
+    } else {
+      // PayU Cards / NetBanking / Hosted Checkout
+      try {
+        const payuRes = await apiPost('/payments/payu/initiate', {
+          amount: total,
+          rider_name: 'Evegah Rider',
+          mobile,
+          email: `rider_${mobile}@evegah.com`,
+          purpose: 'ride',
+          reservation_id: resId,
+          return_url: 'https://evegah.cloud/payment/success',
+        });
+        const checkoutUrl = payuRes?.data?.checkout_url || payuRes?.data?.action_url;
+        if (checkoutUrl) {
+          Linking.openURL(checkoutUrl).catch(() => {});
+        }
+      } catch (e) {}
+    }
+
+    onPay?.({
+      total,
+      fare,
+      flexiFee,
+      discount,
+      deposit,
+      days,
+      method,
+      depositWhen,
+      offerOn,
+      reservationId: resId,
+    });
+  };
 
   const days = billDays(trip?.pickupAt, trip?.dropAt);
   const rate = DAY_RATE[vehicle?.name] || DAY_RATE['Evegah Mink'];
@@ -493,19 +598,7 @@ export default function PayScreen({ vehicle, trip, onBack, onPay }) {
           <Text style={styles.footerAmount}>{rupee(total)}</Text>
         </View>
         <Pressable
-          onPress={() =>
-            onPay?.({
-              total,
-              fare,
-              flexiFee,
-              discount,
-              deposit,
-              days,
-              method,
-              depositWhen,
-              offerOn,
-            })
-          }
+          onPress={handlePayPress}
           onPressIn={() => {
             btnScale.value = withSpring(0.96, { damping: 18, stiffness: 280 });
           }}

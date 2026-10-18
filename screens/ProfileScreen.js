@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
+import { apiGet, last10 } from '../services/api';
 
 const PURPLE = '#4A168C';
 const INDIGO = '#3D2CE0';
@@ -61,10 +62,43 @@ export default function ProfileScreen({
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('Overview');
   const [periodIdx, setPeriodIdx] = useState(0);
+  const [renterData, setRenterData] = useState(null);
+  const [documents, setDocuments] = useState([]);
 
-  const rawName = profile?.name || '';
+  useEffect(() => {
+    const mobile = last10(profile?.phone);
+    if (!mobile) return;
+    apiGet(`/renters/profile?mobile=${mobile}`)
+      .then((body) => {
+        const d = body?.data || body?.renter || body;
+        if (d) setRenterData(d);
+      })
+      .catch(() => {});
+
+    apiGet(`/renters/documents?mobile=${mobile}`)
+      .then((body) => {
+        const docs = body?.data || body?.documents || [];
+        if (Array.isArray(docs)) setDocuments(docs);
+      })
+      .catch(() => {});
+  }, [profile?.phone]);
+
+  const rawName = renterData?.rider_name || renterData?.name || profile?.name || '';
+  const cleanMobile = last10(profile?.phone || renterData?.mobile);
   const displayName =
-    !rawName || rawName === 'Demo Reviewer' ? 'Himanshu Chavda' : rawName;
+    rawName && rawName !== 'Demo Reviewer'
+      ? rawName
+      : cleanMobile
+      ? `Rider ${cleanMobile.slice(-4)}`
+      : 'Evegah Rider';
+  const rawId = renterData?.id || cleanMobile || '45892';
+  const riderIdCode = `#EVG${String(rawId).replace(/\D/g, '').slice(-5) || '1001'}`;
+  const reservationsCount = Array.isArray(renterData?.reservations)
+    ? renterData.reservations.length
+    : renterData?.rides_count || 0;
+  const totalRides = reservationsCount;
+  const totalKm = Math.round(totalRides * 18.5);
+  const co2Val = (totalRides * 2.4).toFixed(1);
   const currentPeriod = PERIODS[periodIdx];
 
   const menuCategories = [
@@ -235,7 +269,7 @@ export default function ProfileScreen({
               </Text>
               <Text style={styles.riderIdText}>
                 Rider ID{'  '}
-                <Text style={styles.riderIdCode}>#EVG45892</Text>
+                <Text style={styles.riderIdCode}>{riderIdCode}</Text>
               </Text>
             </View>
 
@@ -257,7 +291,7 @@ export default function ProfileScreen({
             <View style={styles.statIconWrap}>
               <Ionicons name="bicycle" size={22} color={INDIGO} />
             </View>
-            <Text style={styles.statVal}>128</Text>
+            <Text style={styles.statVal}>{totalRides}</Text>
             <Text style={styles.statLbl}>Total Rides</Text>
           </View>
 
@@ -267,7 +301,7 @@ export default function ProfileScreen({
             <View style={styles.statIconWrap}>
               <Ionicons name="location-outline" size={21} color={INDIGO} />
             </View>
-            <Text style={styles.statVal}>3,420 km</Text>
+            <Text style={styles.statVal}>{totalRides > 0 ? `${totalKm.toLocaleString('en-IN')} km` : '0 km'}</Text>
             <Text style={styles.statLbl}>Distance</Text>
           </View>
 
@@ -277,7 +311,7 @@ export default function ProfileScreen({
             <View style={styles.statIconWrap}>
               <Ionicons name="leaf" size={20} color="#34A853" />
             </View>
-            <Text style={styles.statVal}>12,450 kg</Text>
+            <Text style={styles.statVal}>{totalRides > 0 ? `${co2Val} kg` : '0 kg'}</Text>
             <Text style={styles.statLbl}>CO₂ Saved</Text>
           </View>
         </Animated.View>

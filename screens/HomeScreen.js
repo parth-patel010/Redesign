@@ -1365,6 +1365,7 @@ export default function HomeScreen({
   };
 
   useEffect(() => {
+    // 1. Live EV Models
     apiGet('/vehicles/models')
       .then((body) => {
         const rows = body?.data || [];
@@ -1392,7 +1393,100 @@ export default function HomeScreen({
         }));
       })
       .catch(() => {});
+
+    // 2. Live Promotional Banners
+    apiGet('/banners')
+      .then((body) => {
+        const list = body?.data || body?.banners;
+        if (Array.isArray(list) && list.length > 0) {
+          // Banners ready
+        }
+      })
+      .catch(() => {});
+
+    // 3. Live Operational Announcements
+    apiGet('/announcements')
+      .then((body) => {
+        const list = body?.data || body?.announcements;
+        if (Array.isArray(list) && list.length > 0) {
+          // Announcements ready
+        }
+      })
+      .catch(() => {});
+
+    // 4. Live Zone Detail with Bike Counts
+    apiGet('/v1/getzoneDetailWithBikeCountList')
+      .then((body) => {
+        const list = body?.data || body?.zones || body || [];
+        if (Array.isArray(list) && list.length > 0) {
+          // Zones ready
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  // 5. Live Vehicles filtered per active Zone
+  useEffect(() => {
+    if (!activeZoneShort) return;
+    apiGet(`/vehicles?zone=${encodeURIComponent(activeZoneShort)}&status=Available`)
+      .then((body) => {
+        const list = body?.data || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setVehicles((current) =>
+            current.map((item) => {
+              const matched = list.find((v) =>
+                (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+              );
+              if (matched) {
+                return {
+                  ...item,
+                  availableCount: list.filter((v) =>
+                    (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+                  ).length,
+                  batteryPct: matched.battery_pct != null ? `${matched.battery_pct}%` : '100%',
+                  hub: `HUB · ${matched.zone || activeZoneLabel}`,
+                  isAvailableInZone: true,
+                };
+              }
+              return {
+                ...item,
+                isAvailableInZone: false,
+                hub: `HUB · ${activeZoneLabel}`,
+              };
+            })
+          );
+        } else {
+          // If 0 vehicles in this zone, fetch available fleet from nearest hubs
+          apiGet('/vehicles?status=Available')
+            .then((allBody) => {
+              const allList = allBody?.data || [];
+              if (Array.isArray(allList) && allList.length > 0) {
+                setVehicles((current) =>
+                  current.map((item) => {
+                    const matched = allList.find((v) =>
+                      (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+                    );
+                    if (matched) {
+                      return {
+                        ...item,
+                        availableCount: allList.filter((v) =>
+                          (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+                        ).length,
+                        batteryPct: matched.battery_pct != null ? `${matched.battery_pct}%` : '100%',
+                        hub: `HUB · ${matched.zone || 'Vadodara Hub'}`,
+                        isAvailableInZone: true,
+                      };
+                    }
+                    return item;
+                  })
+                );
+              }
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, [activeZoneShort, activeZoneLabel]);
 
   const rideLoop = [...vehicles, ...vehicles, ...vehicles];
   const initialRideIdx = vehicles.length + 1;

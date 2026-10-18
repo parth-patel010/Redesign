@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
-import { apiGet, last10, shortDate } from '../services/api';
+import { apiGet, apiPost, last10, shortDate } from '../services/api';
 
 const PURPLE = '#4A168C';
 const FILTERS = ['All', 'Rides', 'Wallet', 'Offers', 'System'];
@@ -42,6 +42,24 @@ export default function NotificationsScreen({ notes, phone, onRead, onReadAll, o
       .catch(() => {});
   }, [phone]);
 
+  const handleReadAll = () => {
+    setItems((list) => list.map((item) => ({ ...item, read: true })));
+    const mobile = last10(phone);
+    if (mobile) {
+      apiPost('/notifications/mark-read', { all: true, mobile }).catch(() => {});
+    }
+    onReadAll?.();
+  };
+
+  const handleReadOne = (item) => {
+    setItems((list) => list.map((row) => (row.id === item.id ? { ...row, read: true } : row)));
+    const mobile = last10(phone);
+    if (mobile && !item.read) {
+      apiPost('/notifications/mark-read', { id: item.id, mobile }).catch(() => {});
+    }
+    onRead?.(item.id);
+  };
+
   const visible = items.filter((item) => filter === 'All' || item.kind === filter);
   const unread = items.some((item) => !item.read);
 
@@ -56,10 +74,7 @@ export default function NotificationsScreen({ notes, phone, onRead, onReadAll, o
         <Pressable
           hitSlop={8}
           disabled={!unread}
-          onPress={() => {
-            setItems((list) => list.map((item) => ({ ...item, read: true })));
-            onReadAll?.();
-          }}
+          onPress={handleReadAll}
           style={styles.mark}
         >
           <Text style={[styles.markText, !unread && styles.markOff]}>Read all</Text>
@@ -92,10 +107,7 @@ export default function NotificationsScreen({ notes, phone, onRead, onReadAll, o
             {visible.map((item, index) => (
               <Pressable
                 key={item.id}
-                onPress={() => {
-                  setItems((list) => list.map((row) => (row.id === item.id ? { ...row, read: true } : row)));
-                  onRead?.(item.id);
-                }}
+                onPress={() => handleReadOne(item)}
                 style={[styles.row, index > 0 && styles.rowLine]}
               >
                 <View style={[styles.dot, item.read && styles.dotRead]} />

@@ -54,7 +54,7 @@ export default function SecurityScreen({ phone, onBack, onLogout }) {
 
         <Animated.View entering={cardEnter(1)} style={styles.account}>
           <Text style={styles.accountLabel}>Signed in as</Text>
-          <Text style={styles.accountPhone}>{phone || '+91 9999999999'}</Text>
+          <Text style={styles.accountPhone}>{phone || 'Active Rider'}</Text>
         </Animated.View>
 
         <Pressable onPress={onLogout} style={styles.logout}>

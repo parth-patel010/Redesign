@@ -180,11 +180,25 @@ export default function MyRidesScreen({ onOpenHome, onOpenScan, onOpenProfile, o
   useEffect(() => {
     const mobile = last10(phone);
     if (!mobile) return;
+    apiGet(`/rides/history/${mobile}`)
+      .then((body) => {
+        const list = body?.data || body?.rides || body || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setRides(list.map(mapRide));
+        }
+      })
+      .catch(() => {});
+
     apiGet(`/reservations?mobile=${mobile}&limit=20`)
       .then((body) => {
         const list = body?.data || [];
-        if (!list.length) return;
-        setRides(list.map(mapRide));
+        if (Array.isArray(list) && list.length > 0) {
+          setRides((prev) => {
+            const mapped = list.map(mapRide);
+            const ids = new Set(mapped.map((m) => m.id));
+            return [...mapped, ...prev.filter((p) => !ids.has(p.id))];
+          });
+        }
       })
       .catch(() => {});
   }, [phone]);

@@ -23,7 +23,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { apiGet } from '../services/api';
+import { apiGet, apiPost } from '../services/api';
 
 const PURPLE = '#4A168C';
 const DARK_TEXT = '#24083C';
@@ -242,7 +242,7 @@ export default function RideScreen({
     }, 2200);
   };
 
-  const handleConfirmExtend = () => {
+  const handleConfirmExtend = async () => {
     const addedMs = chosenOption.hours * 3600 * 1000;
     const nextExtraMs = extraMs + addedMs;
     const nextExtraFare = extraFareTotal + chosenOption.price;
@@ -254,10 +254,38 @@ export default function RideScreen({
       newDropText: formatDropDate(baseDropAt + nextExtraMs),
       price: chosenOption.price,
     });
+
+    try {
+      await apiPost('/rides/extend', {
+        vehicle_code: vehicle?.code || 'EV-1042',
+        added_hours: chosenOption.hours,
+        amount: chosenOption.price,
+        new_drop_at: baseDropAt + nextExtraMs,
+      });
+    } catch (e) {}
+
     onExtendRide?.({
       addedHours: chosenOption.hours,
       addedPrice: chosenOption.price,
       newDropAt: baseDropAt + nextExtraMs,
+    });
+  };
+
+  const handleEndRide = async () => {
+    try {
+      await apiPost('/rides/return', {
+        vehicle_code: vehicle?.code || 'EV-1042',
+        duration_seconds: seconds,
+        distance_km: (distKm).toFixed(1),
+        returned_at: Date.now(),
+      });
+    } catch (e) {}
+
+    onEnd?.({
+      elapsed: clock(seconds),
+      distance: distKm.toFixed(1),
+      battery: bmsSoc,
+      dropTime: formatDropTimeOnly(effectiveDropAt),
     });
   };
 
@@ -674,7 +702,7 @@ export default function RideScreen({
                   stiffness: 300,
                 });
               }}
-              onPress={onEnd}
+              onPress={handleEndRide}
               style={styles.endBtn}
             >
               <Ionicons name="lock-closed" size={16} color="#FFFFFF" />

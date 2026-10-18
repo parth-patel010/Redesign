@@ -36,7 +36,7 @@ export default function EditProfileScreen({ profile, onBack, onSave }) {
     if (!nextName) return;
     onSave?.({
       name: nextName,
-      phone: profile?.phone || '+91 9999999999',
+      phone: profile?.phone || '',
       gender,
       dob,
       address: address.trim(),
@@ -78,7 +78,7 @@ export default function EditProfileScreen({ profile, onBack, onSave }) {
 
           <Text style={styles.label}>Phone</Text>
           <View style={styles.locked}>
-            <Text style={styles.lockedText}>{profile?.phone || '+91 9999999999'}</Text>
+            <Text style={styles.lockedText}>{profile?.phone || 'Not provided'}</Text>
             <Ionicons name="lock-closed" size={14} color="#A39AAD" />
           </View>
 

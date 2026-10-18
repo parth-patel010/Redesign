@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
-import { apiGet, last10, rupee, shortDate } from '../services/api';
+import { apiGet, apiPost, last10, rupee, shortDate } from '../services/api';
 
 const PURPLE = '#4A168C';
 const PURPLE_DARK = '#25084A';
@@ -152,17 +152,56 @@ export default function WalletScreen({
 
   const confirmSheet = () => {
     if (!amount) return;
+    const mobile = last10(phone);
     if (sheet === 'add') {
+      if (mobile) {
+        // Initiate live payment gateway session via dynamic gateway config
+        apiPost('/wallet/create-payment-link', {
+          amount,
+          mobile,
+          name: 'Evegah Rider',
+        })
+          .then((res) => {
+            const checkoutUrl = res?.payment_url || res?.upi_string || res?.data?.checkout_url;
+            if (checkoutUrl) {
+              Linking.openURL(checkoutUrl).catch(() => {});
+            }
+          })
+          .catch(() => {
+            // Fallback to direct PayU initiation
+            apiPost('/payments/payu/initiate', {
+              amount,
+              mobile,
+              rider_name: 'Evegah Rider',
+              email: `rider_${mobile}@evegah.com`,
+              purpose: 'wallet',
+            })
+              .then((res) => {
+                const checkoutUrl = res?.data?.checkout_url || res?.data?.action_url;
+                if (checkoutUrl) {
+                  Linking.openURL(checkoutUrl).catch(() => {});
+                }
+              })
+              .catch(() => {});
+          });
+
+        apiPost('/wallet/add-money', {
+          mobile,
+          amount,
+          payment_method: 'PayU India',
+          title: 'Wallet Top-Up',
+        }).catch(() => {});
+      }
       setAdded((value) => value + amount);
       setRows((current) => [
         {
           id: `add-${Date.now()}`,
           title: 'Wallet Top-Up',
-          detail: 'Added in the app',
+          detail: 'PayU India Checkout',
           date: 'Today',
           amount: rupee(amount, true),
           credit: true,
-          method: 'Wallet',
+          method: 'PayU India',
           status: 'Completed',
         },
         ...current,
@@ -170,16 +209,23 @@ export default function WalletScreen({
     } else {
       const take = Math.min(amount, mainNum);
       if (take > 0) {
+        if (mobile) {
+          apiPost('/wallet/withdraw', {
+            mobile,
+            amount: take,
+            title: 'Withdrawal to Bank',
+          }).catch(() => {});
+        }
         setAdded((value) => value - take);
         setRows((current) => [
           {
             id: `out-${Date.now()}`,
             title: 'Withdrawal',
-            detail: 'From main balance',
+            detail: 'Refund to bank account',
             date: 'Today',
             amount: rupee(take, false),
             credit: false,
-            method: 'Wallet',
+            method: 'Bank Transfer',
             status: 'Completed',
           },
           ...current,

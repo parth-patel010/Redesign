@@ -684,25 +684,32 @@ export default function RentScreen({ vehicle, onBack, onContinue }) {
     textFade.value = 1;
     arrowShift.value = 0;
     lineShift.value = 40;
-    textShift.value = withTiming(-46, { duration: 420, easing: Easing.out(Easing.cubic) });
-    textFade.value = withTiming(0, { duration: 360 });
-    arrowShift.value = withTiming(72, { duration: 480, easing: Easing.out(Easing.cubic) });
-    lineShift.value = withDelay(500, withTiming(0, { duration: 420, easing: Easing.out(Easing.cubic) }));
+    textShift.value = withTiming(-46, { duration: 220, easing: Easing.out(Easing.cubic) });
+    textFade.value = withTiming(0, { duration: 180 });
+    arrowShift.value = withTiming(72, { duration: 240, easing: Easing.out(Easing.cubic) });
+    lineShift.value = withDelay(
+      240,
+      withTiming(0, { duration: 200, easing: Easing.out(Easing.cubic) }),
+    );
     scooterX.value = -RIDE_GROUP_WIDTH;
     scooterX.value = withDelay(
-      920,
+      440,
       withTiming(
         buttonWidthRef.current,
-        { duration: 2200, easing: Easing.inOut(Easing.cubic) },
+        { duration: 1100, easing: Easing.inOut(Easing.cubic) },
         (finished) => {
           if (!finished) return;
-          lineShift.value = withTiming(40, { duration: 420, easing: Easing.in(Easing.cubic) }, (roadDone) => {
+          lineShift.value = withTiming(40, { duration: 200, easing: Easing.in(Easing.cubic) }, (roadDone) => {
             if (!roadDone) return;
-            textShift.value = withTiming(0, { duration: 420, easing: Easing.out(Easing.cubic) });
-            textFade.value = withTiming(1, { duration: 360 });
-            arrowShift.value = withTiming(0, { duration: 480, easing: Easing.out(Easing.cubic) }, (backDone) => {
-              if (backDone) runOnJS(finishRide)();
-            });
+            textShift.value = withTiming(0, { duration: 220, easing: Easing.out(Easing.cubic) });
+            textFade.value = withTiming(1, { duration: 180 });
+            arrowShift.value = withTiming(
+              0,
+              { duration: 240, easing: Easing.out(Easing.cubic) },
+              (backDone) => {
+                if (backDone) runOnJS(finishRide)();
+              },
+            );
           });
         },
       ),

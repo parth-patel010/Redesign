@@ -28,6 +28,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { apiGet } from '../services/api';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const GRID_GAP = 14;
@@ -576,6 +577,30 @@ function PopupScratchFoilOverlay({ theme, onComplete }) {
 export default function OffersScreen({ onBack }) {
   const insets = useSafeAreaInsets();
   const [coupons, setCoupons] = useState(INITIAL_COUPONS);
+
+  useEffect(() => {
+    apiGet('/coupons')
+      .then((body) => {
+        const list = body?.data || body?.coupons || body || [];
+        if (Array.isArray(list) && list.length > 0) {
+          const mapped = list.map((c, idx) => ({
+            id: String(c.id || c.code || `coupon-${idx}`),
+            brand: c.brand || c.title || 'Evegah Special Offer',
+            logoType: c.logo_type || 'first',
+            title: c.title || (c.discount ? `Flat ₹${c.discount} OFF` : 'Special Discount'),
+            expiry: c.expiry_text || (c.valid_till ? `Valid till ${c.valid_till}` : 'Valid for 14 days'),
+            validTill: c.valid_till ? `Valid till ${c.valid_till}` : 'Valid for limited time',
+            code: String(c.code || c.coupon_code || 'EVEGAH').toUpperCase(),
+            about: c.description || c.about || 'Enjoy special discount on your Evegah EV ride.',
+            scratched: Boolean(c.is_scratched ?? (idx % 2 === 0)),
+            scratchTheme: idx % 2 === 0 ? 'royalPurple' : 'deepIndigo',
+          }));
+          setCoupons(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const [selectedCouponId, setSelectedCouponId] = useState(null);
   const [justRevealedId, setJustRevealedId] = useState(null);
   const [applySheetOpen, setApplySheetOpen] = useState(false);

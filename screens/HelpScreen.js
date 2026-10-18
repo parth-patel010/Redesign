@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Linking,
@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { Easing, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
+import { getKnowledge, getSystemSettings } from '../services/api';
 const SUPPORT_ART = require('../assets/help/support-art.png');
 
 const PURPLE = '#4A168C';
@@ -69,11 +70,37 @@ export default function HelpScreen({ onBack }) {
   const [chatOn, setChatOn] = useState(false);
   const [draft, setDraft] = useState('');
   const [typing, setTyping] = useState(false);
+  const [faqs, setFaqs] = useState(FAQS);
+  const [supportPhone, setSupportPhone] = useState(PHONE);
+  const [supportEmail, setSupportEmail] = useState(EMAIL);
   const [messages, setMessages] = useState([
     { id: 'hi', from: 'team', text: 'Hi, this is Evegah support. Ask about a ride, the wallet, or parking.' },
   ]);
+
+  useEffect(() => {
+    getKnowledge()
+      .then((rows) => {
+        if (Array.isArray(rows) && rows.length > 0) {
+          const apiFaqs = rows.map((r) => ({
+            q: r.title,
+            a: r.description,
+          }));
+          setFaqs((prev) => [...apiFaqs, ...prev]);
+        }
+      })
+      .catch(() => {});
+
+    getSystemSettings()
+      .then((body) => {
+        const gen = body?.data?.general;
+        if (gen?.support_phone) setSupportPhone(gen.support_phone);
+        if (gen?.support_email) setSupportEmail(gen.support_email);
+      })
+      .catch(() => {});
+  }, []);
+
   const needle = query.trim().toLowerCase();
-  const visible = FAQS.filter((item) => item.q.toLowerCase().includes(needle) || item.a.toLowerCase().includes(needle));
+  const visible = faqs.filter((item) => item.q.toLowerCase().includes(needle) || item.a.toLowerCase().includes(needle));
 
   const send = (text) => {
     const body = text.trim();
@@ -132,19 +159,19 @@ export default function HelpScreen({ onBack }) {
         </Pressable>
 
         <View style={styles.contacts}>
-          <Pressable style={styles.contact} onPress={() => Linking.openURL(`tel:${PHONE}`)}>
+          <Pressable style={styles.contact} onPress={() => Linking.openURL(`tel:${supportPhone}`)}>
             <View style={styles.contactIcon}>
               <Ionicons name="call-outline" size={18} color={PURPLE} />
             </View>
             <Text style={styles.contactTitle}>Call</Text>
-            <Text style={styles.contactText}>+91 98765 43210</Text>
+            <Text style={styles.contactText}>{supportPhone}</Text>
           </Pressable>
-          <Pressable style={styles.contact} onPress={() => Linking.openURL(`mailto:${EMAIL}`)}>
+          <Pressable style={styles.contact} onPress={() => Linking.openURL(`mailto:${supportEmail}`)}>
             <View style={styles.contactIcon}>
               <Ionicons name="mail-outline" size={18} color={PURPLE} />
             </View>
             <Text style={styles.contactTitle}>Email</Text>
-            <Text style={styles.contactText}>support@evegah.com</Text>
+            <Text style={styles.contactText}>{supportEmail}</Text>
           </Pressable>
         </View>
 

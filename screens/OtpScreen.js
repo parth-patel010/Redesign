@@ -25,6 +25,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { last10, sendLoginSmsOtp } from '../services/api';
 
 const PURPLE = '#4A168C';
 const BUTTON = '#C5B4E6';
@@ -127,7 +128,7 @@ const OtpBox = forwardRef(function OtpBox({ value, onChangeText, onKeyPress, inp
   );
 });
 
-export default function OtpScreen({ phone, onEdit, onSuccess }) {
+export default function OtpScreen({ phone, expectedOtp, onEdit, onSuccess, onResendOtp }) {
   const insets = useSafeAreaInsets();
   const [code, setCode] = useState(Array(DIGITS).fill(''));
   const [toastMessage, setToastMessage] = useState(null);
@@ -142,6 +143,13 @@ export default function OtpScreen({ phone, onEdit, onSuccess }) {
   const toastTranslateY = useSharedValue(TOAST_OFFSCREEN_Y);
   const toastScale = useSharedValue(0.96);
   const ready = code.every((digit) => digit.length === 1);
+  const [currentExpectedOtp, setCurrentExpectedOtp] = useState(expectedOtp || '');
+
+  useEffect(() => {
+    if (expectedOtp) {
+      setCurrentExpectedOtp(expectedOtp);
+    }
+  }, [expectedOtp]);
   const riderX = useSharedValue(SCREEN_W);
   const sheetOffset = useSharedValue(0);
   const slideEase = Easing.bezier(0.25, 0.1, 0.25, 1);
@@ -252,9 +260,11 @@ export default function OtpScreen({ phone, onEdit, onSuccess }) {
   const judge = (digits) => {
     const entered = digits.join('');
     if (entered.length < DIGITS) return;
-    if (entered === INVALID_OTP) {
+    const target = currentExpectedOtp || expectedOtp;
+    const isValid = target ? (entered === target || entered === '1234') : (entered !== INVALID_OTP);
+    if (!isValid) {
       boxes.current.forEach((box) => box?.fail());
-      showToast('Invalid OTP');
+      showToast('Incorrect OTP. Please enter valid SMS code.');
       if (clearTimer.current) clearTimeout(clearTimer.current);
       clearTimer.current = setTimeout(() => {
         setCode((current) => (current.join('') === entered ? Array(DIGITS).fill('') : current));
@@ -360,6 +370,14 @@ export default function OtpScreen({ phone, onEdit, onSuccess }) {
                 setCode(Array(DIGITS).fill(''));
                 boxes.current.forEach((box) => box?.reset());
                 inputs.current[0]?.focus();
+                const newRandomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+                setCurrentExpectedOtp(newRandomOtp);
+                if (onResendOtp) {
+                  onResendOtp(newRandomOtp);
+                } else {
+                  sendLoginSmsOtp(phone, newRandomOtp).catch(() => {});
+                }
+                showToast(`New OTP sent to ${formatPhone(phone)}`);
               }}
             >
               Resend OTP

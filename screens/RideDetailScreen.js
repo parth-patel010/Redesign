@@ -20,6 +20,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { cancelReservation } from '../services/api';
 
 const PURPLE = '#4A168C';
 const HERO_BG = require('../assets/rides/detail-hero.jpg');
@@ -144,6 +145,33 @@ export default function RideDetailScreen({ ride, onBack }) {
     }
   };
 
+  const isUpcoming =
+    String(ride.status || '').toLowerCase() === 'upcoming' ||
+    String(ride.status || '').toLowerCase() === 'reserved';
+
+  const handleCancelReservation = () => {
+    Alert.alert(
+      'Cancel Reservation',
+      'Are you sure you want to cancel this booking? Any pre-paid amount will be refunded to your Evegah wallet.',
+      [
+        { text: 'Keep Booking', style: 'cancel' },
+        {
+          text: 'Yes, Cancel',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const res = await cancelReservation(ride.id);
+              Alert.alert('Booking Cancelled', res?.message || 'Your reservation has been cancelled.');
+              onBack?.();
+            } catch (e) {
+              Alert.alert('Notice', e?.message || 'Unable to cancel this reservation right now.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.root}>
       <StatusBar style={lifted ? 'dark' : 'light'} />
@@ -172,9 +200,20 @@ export default function RideDetailScreen({ ride, onBack }) {
             <Pressable hitSlop={8} style={styles.round} onPress={onBack}>
               <Ionicons name="chevron-back" size={20} color="#FFFFFF" />
             </Pressable>
-            <Pressable hitSlop={8} style={styles.round} onPress={downloadInvoice}>
-              <Ionicons name="ellipsis-horizontal" size={18} color="#FFFFFF" />
-            </Pressable>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {isUpcoming ? (
+                <Pressable
+                  hitSlop={8}
+                  style={[styles.round, { backgroundColor: 'rgba(239, 68, 68, 0.35)' }]}
+                  onPress={handleCancelReservation}
+                >
+                  <Ionicons name="trash-outline" size={17} color="#FCA5A5" />
+                </Pressable>
+              ) : null}
+              <Pressable hitSlop={8} style={styles.round} onPress={downloadInvoice}>
+                <Ionicons name="download-outline" size={18} color="#FFFFFF" />
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.heroRow}>

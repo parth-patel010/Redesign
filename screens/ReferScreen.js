@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  Alert,
   Dimensions,
   Pressable,
   Share,
@@ -23,7 +24,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { apiGet, last10 } from '../services/api';
+import { apiGet, apiPost, last10 } from '../services/api';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PURPLE = '#4A168C';
@@ -137,6 +138,7 @@ export default function ReferScreen({ onBack, phone, name }) {
   const [friendsJoined, setFriendsJoined] = useState('12');
   const [totalEarned, setTotalEarned] = useState('₹2,400');
   const [copied, setCopied] = useState(false);
+  const [redeeming, setRedeeming] = useState(false);
 
   const scrollY = useSharedValue(0);
   const wordAnim = useSharedValue(1);
@@ -248,6 +250,38 @@ export default function ReferScreen({ onBack, phone, name }) {
     Share.share({
       message: `Hey! Join me on Evegah with a ${currentTreat.phrase}! Use my referral code ${referralCode} and get a ₹200 gift coupon on your first EV ride!`,
     }).catch(() => {});
+  };
+
+  const handleRedeem = async () => {
+    const mobile = last10?.(phone);
+    if (!mobile) {
+      Alert.alert('Notice', 'Please login to redeem referral rewards.');
+      return;
+    }
+    setRedeeming(true);
+    try {
+      const res = await apiPost('/referral/redeem', { mobile });
+      if (res?.error) {
+        Alert.alert('Redeem', res.error);
+      } else {
+        Alert.alert('Success 🎉', res?.message || 'Referral bonus successfully credited to your wallet balance!');
+        apiGet(
+          `/referral?mobile=${encodeURIComponent(mobile)}&name=${encodeURIComponent(
+            name || 'Rider'
+          )}`
+        )
+          .then((body) => {
+            const data = body?.data;
+            if (data?.friendsJoined != null) setFriendsJoined(String(data.friendsJoined));
+            if (data?.totalEarned != null) setTotalEarned(`₹${data.totalEarned}`);
+          })
+          .catch(() => {});
+      }
+    } catch (err) {
+      Alert.alert('Redeem', err?.message || 'Unable to redeem referral bonus right now.');
+    } finally {
+      setRedeeming(false);
+    }
   };
 
   return (
@@ -380,6 +414,24 @@ export default function ReferScreen({ onBack, phone, name }) {
                   <Text style={styles.referStatLbl}>Per Referral</Text>
                 </View>
               </View>
+
+              {/* Redeem to Wallet Action */}
+              <Pressable
+                onPress={handleRedeem}
+                disabled={redeeming}
+                style={({ pressed }) => [
+                  styles.redeemBanner,
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <View style={styles.redeemBannerLeft}>
+                  <Ionicons name="wallet-outline" size={16} color={PURPLE} />
+                  <Text style={styles.redeemBannerText}>
+                    {redeeming ? 'Redeeming reward...' : 'Redeem rewards into Wallet balance'}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={14} color={PURPLE} />
+              </Pressable>
 
               {/* Referral Code & Share Body */}
               <View style={styles.referCardBody}>
@@ -838,6 +890,27 @@ const styles = StyleSheet.create({
     width: 1,
     height: 22,
     backgroundColor: '#E5DCF5',
+  },
+  redeemBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F3E8FF',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9D5FF',
+  },
+  redeemBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  redeemBannerText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: PURPLE,
   },
   referCardBody: {
     paddingHorizontal: 16,

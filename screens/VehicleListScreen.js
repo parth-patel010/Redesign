@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardEnter } from '../utils/cardEnter';
+import { apiGet } from '../services/api';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PURPLE = '#300D4F';
@@ -94,14 +95,114 @@ const LIST_VEHICLES = [
 ];
 
 export default function VehicleListScreen({
+  selectedZone,
+  trip,
   onBack,
   onOpenLocation,
   onSelectVehicle,
 }) {
   const insets = useSafeAreaInsets();
   const [savedIds, setSavedIds] = useState({});
-  const [priceFilterActive, setPriceFilterActive] = useState(true);
+  const [priceFilterActive, setPriceFilterActive] = useState(false);
   const [savedFilter, setSavedFilter] = useState(false);
+  const [vehicles, setVehicles] = useState(LIST_VEHICLES);
+  const [zoneEmptyNotice, setZoneEmptyNotice] = useState(false);
+
+  const currentZone =
+    trip?.pickupName ||
+    selectedZone?.shortName ||
+    selectedZone?.name?.split(',')[0] ||
+    'Gotri';
+
+  useEffect(() => {
+    // 1. Fetch live vehicles as per the selected zone!
+    apiGet(`/vehicles?zone=${encodeURIComponent(currentZone)}&status=Available`)
+      .then((body) => {
+        const list = body?.data || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setZoneEmptyNotice(false);
+          setVehicles((current) =>
+            current.map((item) => {
+              const matched = list.find((v) =>
+                (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+              );
+              if (matched) {
+                return {
+                  ...item,
+                  availableCount: list.filter((v) =>
+                    (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+                  ).length,
+                  rto: matched.registration_number || matched.code || item.rto,
+                  batteryPct: matched.battery_pct != null ? `${matched.battery_pct}%` : '100%',
+                  hub: `HUB · ${matched.zone || currentZone + ' Zone, Vadodara'}`,
+                  isAvailableInZone: true,
+                };
+              }
+              return {
+                ...item,
+                isAvailableInZone: false,
+                hub: `HUB · ${currentZone} Hub`,
+              };
+            })
+          );
+        } else {
+          // If no vehicles available in this specific zone, fetch all available fleet
+          setZoneEmptyNotice(true);
+          apiGet('/vehicles?status=Available')
+            .then((allBody) => {
+              const allList = allBody?.data || [];
+              if (Array.isArray(allList) && allList.length > 0) {
+                setVehicles((current) =>
+                  current.map((item) => {
+                    const matched = allList.find((v) =>
+                      (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+                    );
+                    if (matched) {
+                      return {
+                        ...item,
+                        availableCount: allList.filter((v) =>
+                          (v.evegah_model_name || v.vehicle_model || '').toLowerCase().includes(item.id.toLowerCase())
+                        ).length,
+                        rto: matched.registration_number || matched.code || item.rto,
+                        batteryPct: matched.battery_pct != null ? `${matched.battery_pct}%` : '100%',
+                        hub: `HUB · ${matched.zone || 'Vadodara Station'}`,
+                        isAvailableInZone: true,
+                      };
+                    }
+                    return item;
+                  })
+                );
+              }
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+
+    // 2. Fetch official model rates and specs
+    apiGet('/vehicles/models')
+      .then((body) => {
+        const rows = body?.data || [];
+        if (Array.isArray(rows) && rows.length > 0) {
+          setVehicles((current) =>
+            current.map((item) => {
+              const live = rows.find(
+                (r) => String(r.name || '').toLowerCase() === item.name.toLowerCase()
+              );
+              if (!live) return item;
+              return {
+                ...item,
+                price: live.daily_price ? `₹${live.daily_price}/day` : item.price,
+                range: live.range ? `${live.range} km` : item.range,
+                speed: live.top_speed ? `${live.top_speed} km/h` : item.speed,
+                edition: live.tagline || item.edition,
+              };
+            })
+          );
+        }
+      })
+      .catch(() => {});
+  }, [currentZone]);
 
   const toggleSave = (id) => {
     setSavedIds((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -117,14 +218,14 @@ export default function VehicleListScreen({
             <Ionicons name="arrow-back" size={22} color={PURPLE} />
           </Pressable>
           <View style={styles.brandWrap}>
-           
             <Text style={styles.brandTitle}>EVegah</Text>
           </View>
         </View>
 
         <View style={styles.topRight}>
           <Pressable style={styles.cityPill} onPress={onOpenLocation}>
-            <Text style={styles.cityPillText}>Vadodara</Text>
+            <Ionicons name="location" size={12} color={PURPLE} />
+            <Text style={styles.cityPillText}>{currentZone}</Text>
             <Ionicons name="caret-down" size={12} color={PURPLE} />
           </Pressable>
           <Pressable style={styles.circleIcon}>
@@ -224,11 +325,23 @@ export default function VehicleListScreen({
           ) : null}
         </View>
 
+        {zoneEmptyNotice ? (
+          <View style={styles.zoneAlertBox}>
+            <Ionicons name="information-circle" size={18} color="#D97706" />
+            <Text style={styles.zoneAlertText}>
+              All EVs at {currentZone} Hub are currently on rent. Showing available vehicles across nearest Vadodara hubs.
+            </Text>
+          </View>
+        ) : null}
+
         <Text style={styles.resultsHeading}>
-          <Text style={styles.resultsCount}>217</Text> EV Scooters under Rs 299/day in Vadodara
+          <Text style={styles.resultsCount}>
+            {vehicles.filter((v) => v.isAvailableInZone !== false).length}
+          </Text>{' '}
+          EV Scooters available at {currentZone} Hub
         </Text>
 
-        {LIST_VEHICLES.map((item, index) => {
+        {vehicles.map((item, index) => {
           const isSaved = !!savedIds[item.id];
           return (
             <Animated.View key={item.id} entering={cardEnter(index)} style={styles.cardWrap}>
@@ -244,6 +357,18 @@ export default function VehicleListScreen({
                   />
                   <View style={styles.stageFloor} />
                   <Image source={item.image} style={styles.cardVehicleImg} contentFit="contain" />
+
+                  {item.isAvailableInZone ? (
+                    <View style={styles.liveAvailableBadge}>
+                      <View style={styles.liveAvailableDot} />
+                      <Text style={styles.liveAvailableText}>Available at Hub</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.nearbyHubBadge}>
+                      <Text style={styles.nearbyHubText}>Nearby Hub</Text>
+                    </View>
+                  )}
+
                   <Pressable
                     hitSlop={10}
                     style={styles.cardHeart}
@@ -502,6 +627,69 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: PURPLE,
+  },
+  zoneAlertBox: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 4,
+    padding: 12,
+    backgroundColor: '#FFFBEB',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  zoneAlertText: {
+    flex: 1,
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: '#92400E',
+    lineHeight: 18,
+  },
+  liveAvailableBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#E8F8F0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    zIndex: 2,
+  },
+  liveAvailableDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#16A34A',
+  },
+  liveAvailableText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#15803D',
+  },
+  nearbyHubBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    zIndex: 2,
+  },
+  nearbyHubText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#6B7280',
   },
   resultsHeading: {
     marginTop: 18,
